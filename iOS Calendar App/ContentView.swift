@@ -1,61 +1,99 @@
-//
-//  ContentView.swift
-//  iOS Calendar App
-//
-//  Created by Fadi Al Eliwi on 09.12.24.
-//
-
 import SwiftUI
-import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    
+    @State private var now = Date()
+    private let christmas = Calendar.current.date(from: DateComponents(year: 2024, month: 12, day: 25))!
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
+    var remainingTime: (days: Int, hours: Int, minutes: Int, seconds: Int) {
+        let diff = Calendar.current.dateComponents([.day, .hour, .minute, .second], from: now, to: christmas)
+        return (days: diff.day ?? 0, hours: diff.hour ?? 0, minutes: diff.minute ?? 0, seconds: diff.second ?? 0)
+    }
+    
+    var currentDateString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMMM"
+        return formatter.string(from: now)
+    }
+    
+    let columns = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
+    
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+        ZStack {
+            Color.blue.ignoresSafeArea()
+            VStack(spacing: 16) {
+                HStack {
+                    Text("Holiday Calendar")
+                        .font(.title)
+                        .foregroundColor(.white)
+                    Spacer()
+                    VStack {
+                        Text(currentDateString)
+                        .font(.headline)
+                        .foregroundColor(.black)
+                        .padding()
+                        .background(Color.yellow)
+                        .cornerRadius(8)
                     }
                 }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                .padding()
+                VStack {
+                    Text("Festive Countdown Unleashed:")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    HStack(spacing: 8) {
+                        Text("\(remainingTime.days)")
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
+                        Text(":")
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
+                        Text(String(format: "%02d", remainingTime.hours))
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
+                        Text(":")
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
+                        Text(String(format: "%02d", remainingTime.minutes))
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
+                        Text(":")
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
+                        Text(String(format: "%02d", remainingTime.seconds))
+                            .font(.largeTitle)
+                            .foregroundColor(.white)
                     }
+                    Text("to Christmas!")
+                        .font(.callout)
+                        .foregroundColor(.white)
                 }
+                .padding()
+                ScrollView {
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(1..<16) { day in
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.white)
+                                    .frame(height: 100)
+                                Text("\(day)")
+                                    .font(.largeTitle)
+                                    .foregroundColor(.black)
+                            }
+                        }
+                    }
+                    .padding()
+                }
+                Spacer()
             }
-        } detail: {
-            Text("Select an item")
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
-            }
+        .onReceive(timer) { _ in
+            now = Date()
         }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }
