@@ -1,7 +1,7 @@
 import SwiftUI
 
 // View representing an individual door in the calendar
-struct DoorView: View {
+struct DoorViewCell: View {
     
     // MARK: - Properties
     
@@ -40,17 +40,20 @@ struct DoorView: View {
                 doorNumber
             }
         }
+        .aspectRatio(1, contentMode: .fit)
         .sheet(isPresented: $isShowingContent) {
             DoorContentView(content: door.content)
         }
     }
     
+    // MARK: - UI Components
+    
     private var doorBackground: some View {
-        RoundedRectangle(cornerRadius: 12)
+        RoundedRectangle(cornerRadius: Constants.UI.defaultCornerRadius)
             .fill(backgroundColor)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                RoundedRectangle(cornerRadius: Constants.UI.defaultCornerRadius)
+                    .stroke(Constants.Colors.borderColor, lineWidth: 1)
             )
             .aspectRatio(1, contentMode: .fit)
     }
@@ -61,18 +64,58 @@ struct DoorView: View {
                 .font(.title2)
                 .bold()
                 .foregroundStyle(textColor)
-            // Show opened indicator for unlocked doors
             if door.isUnlocked {
                 Image(systemName: door.hasBeenOpened ? "checkmark.circle.fill" : "checkmark.circle")
                     .foregroundStyle(.green)
-                    .font(.system(size: 14))
+                    .font(.system(size: Constants.UI.bodyFontSize))
             }
         }
     }
+    
+    // MARK: - Helper Methods
 
     private func handleDoorTap() {
         guard door.isUnlocked else { return }
         isShowingContent.toggle()
         door.hasBeenOpened = true
+    }
+}
+
+// MARK: - Door View Content
+
+// View for displaying the content behind an opened door
+struct DoorContentView: View {
+    let content: DoorContent
+    @Environment(\.dismiss) private var dismiss // For dismissing the sheet
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack {
+                    // Display different content types
+                    switch content {
+                    case .text(let text):
+                        Text(text)
+                            .padding()
+                    case .image(let imageName):
+                        Image(imageName)
+                            .resizable()
+                            .scaledToFit()
+                    case .video(_):
+                        Text("Video Player Placeholder")
+                    case .map(_, _):
+                        Text("Map View Placeholder")
+                    }
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Close") {
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
 }

@@ -3,23 +3,27 @@ import Foundation
 // Represents a complete holiday calendar with multiple doors
 struct HolidayCalendar: Identifiable, Codable {
     var id = UUID()
-    let title: String
+    var title: String
     let startDate: Date
     let endDate: Date
     var doors: [CalendarDoor]
+    var gridColumns: Int
+    var backgroundImageData: Data?
     
-    init(title: String, startDate: Date, endDate: Date, doors: [CalendarDoor]) {
+    init(title: String, startDate: Date, endDate: Date, doors: [CalendarDoor], gridColumns: Int = 4, backgroundImageData: Data? = nil) {
         self.id = UUID()
         self.title = title
         self.startDate = startDate
         self.endDate = endDate
         self.doors = doors
+        self.gridColumns = gridColumns
+        self.backgroundImageData = backgroundImageData
     }
     
     // Creates a sample holiday calendar for preview
     // Each door is configured with a unlock date and sample text content
     static func createDefault() -> HolidayCalendar {
-        let dates = (1...Constants.Calendar.doorCount).map { day -> Date in
+        let dates = (1...Constants.Calendar.defaultDoorCount).map { day -> Date in
             let components = DateComponents(
                 year: Constants.Calendar.defaultYear,
                 month: Constants.Calendar.defaultMonth,
@@ -42,7 +46,8 @@ struct HolidayCalendar: Identifiable, Codable {
             title: "Calendar \(Constants.Calendar.defaultYear)",
             startDate: dates.first ?? Date(),
             endDate: dates.last ?? Date(),
-            doors: doors
+            doors: doors,
+            gridColumns: Constants.Calendar.defaultGridColumns
         )
     }
 }
@@ -51,7 +56,7 @@ struct HolidayCalendar: Identifiable, Codable {
 struct CalendarDoor: Identifiable, Codable {
     var id = UUID()
     let number: Int
-    let unlockDate: Date // Date when the door becomes unlockable
+    var unlockDate: Date // Date when the door becomes unlockable
     var isUnlocked: Bool
     var content: DoorContent
     var hasBeenOpened: Bool
@@ -67,7 +72,7 @@ struct CalendarDoor: Identifiable, Codable {
 }
 
 // Defines different types of content that can be behind a door
-enum DoorContent: Codable {
+enum DoorContent: Codable, Hashable {
     case text(String)
     case image(String)
     case video(String)
@@ -106,12 +111,27 @@ enum Tab {
     }
 }
 
+// Defines how doors in the calendar should unlock
+enum UnlockMode {
+    case daily     // Doors unlock one per day
+    case specific  // Each door has a specific unlock date
+    
+    var description: String {
+        switch self {
+        case .daily: return "Daily"
+        case .specific: return "Specific Dates"
+        }
+    }
+}
+
+// Holds information for countdown display
 struct CountdownInfo {
     var days: Int = 0
     var hours: Int = 0
     var minutes: Int = 0
 }
 
+// Defines possible errors that can occur during calendar operations
 enum CalendarError: LocalizedError {
     case invalidDate
     case invalidContent

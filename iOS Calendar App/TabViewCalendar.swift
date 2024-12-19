@@ -5,44 +5,69 @@ struct TabViewCalendar: View {
     // MARK: - Properties
     
     // The calendar data model containing all doors and their content
-    @State private var calendar: HolidayCalendar
-    
+    let calendar: HolidayCalendar
+    // Current countdown information (days, hours, minutes)
     @State private var countdown = CountdownInfo()
     // Timer that updates the countdown every second
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    
-    private let doorGridCount: Int = 4
-    
-    // MARK: - Initialization
-    
-    init(calendar: HolidayCalendar) {
-        _calendar = State(initialValue: calendar)
-    }
     
     // MARK: - View Body
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                backgroundLayer
-                VStack(spacing: 16) {
-                    countdownView
-                    doorGrid
+            GeometryReader { geometry in // GeometryReader provides access to the parent view's dimensions
+                ZStack {
+                    backgroundLayer
+                        .edgesIgnoringSafeArea(.all)
+                    
+                    // Main content layout including title, countdown and calendar grid
+                    VStack(spacing: 16) {
+                        Text(calendar.title)
+                            .font(.title)
+                            .bold()
+                            .foregroundStyle(Constants.Colors.whiteText)
+                            .padding(.top)
+                        
+                        countdownView
+                        ScrollView() {
+                            calendarGrid(width: geometry.size.width)
+                        }
+                    }
+                    .padding(.vertical)
                 }
             }
         }
+        // Initialize countdown immediately when view appears
         .onAppear(perform: updateCountdown)
+        // Update countdown every second using the timer publisher
         .onReceive(timer) { _ in
             updateCountdown()
         }
     }
     
+    // MARK: - UI Components
+    
+    // Background layer that displays either a custom image or default color
     private var backgroundLayer: some View {
-        Color(UIColor.systemIndigo)
-            .opacity(0.9)
-            .ignoresSafeArea()
+        ZStack {
+            if let backgroundData = calendar.backgroundImageData,
+               let uiImage = UIImage(data: backgroundData) {
+                GeometryReader { geo in
+                    // Configures the background image with proper scaling and overlay
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill) // (might crop the image if aspect ratios don't match)
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .overlay(Constants.Colors.darkOverlay) // Darkening overlay for better readability
+                        .position(x: geo.size.width / 2, y: geo.size.height / 2) // Center the image in the available space
+                }
+            } else {
+                Constants.Colors.primaryBackground
+            }
+        }
     }
     
+    // Displays the countdown to the next unlockable door
     private var countdownView: some View {
         Group {
             if let nextDoor = findNextDoor() {
@@ -54,18 +79,30 @@ struct TabViewCalendar: View {
         }
     }
     
-    private var doorGrid: some View {
-        ScrollView {
-            LazyVGrid(
-                columns: Array(repeating: GridItem(.flexible()), count: doorGridCount),
-                spacing: 8
-            ) {
-                ForEach(calendar.doors) { door in
-                    DoorView(door: door)
-                }
+    // Creates the grid layout for calendar doors
+    // This function also calculates the optimal size for door cells
+    // width parameter: Available width for the grid
+    private func calendarGrid(width: CGFloat) -> some View {
+        let spacing = Constants.UI.defaultSpacing // Space between each door cell (vertical and horizontal)
+        let horizontalPadding = Constants.UI.defaultHorizontalPadding // Padding on left and right edges of the entire grid
+        let availableWidth = width - (horizontalPadding * 2) // Calculate actual width available for the grid after padding
+        // Calculate total space used by gaps between cells
+        // Example: For 4 columns, we need 3 gaps (columns - 1)
+        let totalSpacing = spacing * CGFloat(calendar.gridColumns - 1)
+        let cellSize = (availableWidth - totalSpacing) / CGFloat(calendar.gridColumns) // Calculate size of each cell to fit perfectly in the grid
+        
+        return LazyVGrid(
+            // Create an array of grid items, one for each column
+            // .fixed ensures all cells have the exact same width (cellSize)
+            columns: Array(repeating: GridItem(.fixed(cellSize), spacing: spacing),
+                          count: calendar.gridColumns),
+            spacing: spacing
+        ) {
+            ForEach(calendar.doors) { door in
+                DoorViewCell(door: door)
             }
-            .padding()
         }
+        .padding(.horizontal, horizontalPadding)
     }
     
     // MARK: - Helper Methods
@@ -77,7 +114,7 @@ struct TabViewCalendar: View {
             .min { $0.unlockDate < $1.unlockDate }
     }
     
-    // Updates the countdown timer values
+    // Updates the countdown timer values based on the next unlockable door
     func updateCountdown() {
         guard let nextDoor = findNextDoor() else {
             countdown = CountdownInfo()
