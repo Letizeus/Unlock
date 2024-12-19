@@ -2,21 +2,22 @@ import SwiftUI
 
 // View representing an individual door in the calendar
 struct DoorView: View {
-    let door: CalendarDoor
+    
+    // MARK: - Properties
+    
+    @State var door: CalendarDoor
     @State private var isShowingContent = false // Controls content sheet presentation
-    @State private var hasBeenOpened = false // New state to track if door has been opened    
-    // Get current date components for highlighting today's door
     private var isToday: Bool {
         Calendar.current.isDate(door.unlockDate, inSameDayAs: Date())
     }
     
     private var backgroundColor: Color {
         if isToday {
-            return .yellow.opacity(0.3) // Highlight today's door
+            return Constants.Colors.doorToday // Highlight today's door
         } else if door.isUnlocked {
-            return .green.opacity(0.2) // Show unlocked doors
+            return Constants.Colors.doorUnlocked // Show unlocked doors
         } else {
-            return .white.opacity(0.15) // Default state
+            return Constants.Colors.doorLocked // Default state
         }
     }
     
@@ -30,41 +31,48 @@ struct DoorView: View {
         }
     }
     
+    // MARK: - View Body
+    
     var body: some View {
-        Button {
-            if door.isUnlocked {
-                isShowingContent.toggle()
-                hasBeenOpened = true // Mark as opened when content is shown
-            }
-        } label: {
+        Button(action: handleDoorTap) {
             ZStack {
-                // Door background and border
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(backgroundColor)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                    )
-                    .aspectRatio(1, contentMode: .fit)
-                
-                VStack(spacing: 4) {
-                    // Door number
-                    Text("\(door.number)")
-                        .font(.title2)
-                        .bold()
-                        .foregroundStyle(textColor)
-                    
-                    // Show opened indicator for unlocked doors
-                    if door.isUnlocked {
-                        Image(systemName: hasBeenOpened ? "checkmark.circle.fill" : "checkmark.circle")
-                            .foregroundStyle(.green)
-                            .font(.system(size: 14))
-                    }
-                }
+                doorBackground
+                doorNumber
             }
         }
         .sheet(isPresented: $isShowingContent) {
             DoorContentView(content: door.content)
         }
+    }
+    
+    private var doorBackground: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .fill(backgroundColor)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+            )
+            .aspectRatio(1, contentMode: .fit)
+    }
+    
+    private var doorNumber: some View {
+        VStack(spacing: 4) {
+            Text("\(door.number)")
+                .font(.title2)
+                .bold()
+                .foregroundStyle(textColor)
+            // Show opened indicator for unlocked doors
+            if door.isUnlocked {
+                Image(systemName: door.hasBeenOpened ? "checkmark.circle.fill" : "checkmark.circle")
+                    .foregroundStyle(.green)
+                    .font(.system(size: 14))
+            }
+        }
+    }
+
+    private func handleDoorTap() {
+        guard door.isUnlocked else { return }
+        isShowingContent.toggle()
+        door.hasBeenOpened = true
     }
 }
