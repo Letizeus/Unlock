@@ -4,6 +4,9 @@ import PhotosUI
 // Main view for creating and editing holiday calendars.
 // Allows users to configure calendar settings, add content, and preview the result.
 struct TabViewEditor: View {
+    
+    @Environment(\.editorTheme) private var theme // Access the editor theme from the environment
+    
     // MARK: - Properties
     
     // Basic Calendar Settings
@@ -11,7 +14,7 @@ struct TabViewEditor: View {
     @State private var startDate = Date()
     @State private var endDate = Date().addingTimeInterval(24 * 60 * 60 * 31) // 31 days ahead
     @State private var doorCount = Constants.Calendar.defaultDoorCount
-    @State private var gridColumns = 4
+    @State private var gridColumns = Constants.Calendar.defaultGridColumns
     @State private var unlockMode: UnlockMode = .daily
     
     // Background Image Configuration
@@ -29,7 +32,7 @@ struct TabViewEditor: View {
         Calendar.current.dateComponents([.day], from: startDate, to: endDate).day ?? 0 + 1
     }
     
-    let onSaveCalendar: (HolidayCalendar) -> Void
+    let onSaveCalendar: (HolidayCalendar) -> Void // Callback function to handle saving the calendar
     
     // MARK: - View Body
     
@@ -39,12 +42,12 @@ struct TabViewEditor: View {
                 backgroundLayer
                 
                 ScrollView {
-                    VStack(spacing: 20) {
+                    VStack(spacing: theme.spacing) {
                         basicInfoSection
                         backgroundImageSection
                         previewSection
                     }
-                    .padding()
+                    .padding(theme.padding)
                 }
             }
             .navigationTitle("Create Calendar")
@@ -64,18 +67,21 @@ struct TabViewEditor: View {
                         previewButton
                 }
             }
-            .onAppear(perform: generateDoors)
+            .onAppear(perform: generateDoors) // Generate initial doors when view appears
+            // Update doors when dates change
             .onChange(of: startDate) { _, _ in
                 updateDoorCountIfNeeded()
             }
             .onChange(of: endDate) { _, _ in
                 updateDoorCountIfNeeded()
             }
+            // Regenerate doors when count changes in specific mode
             .onChange(of: doorCount) { _, _ in
                 if unlockMode == .specific {
                     generateDoors()
                 }
             }
+            // Regenerate doors when unlock mode changes
             .onChange(of: unlockMode) { _, _ in
                 generateDoors()
             }
@@ -86,25 +92,30 @@ struct TabViewEditor: View {
     
     // Background layer for the entire view
     private var backgroundLayer: some View {
-        Color(UIColor.systemBackground)
+        theme.background
             .ignoresSafeArea()
     }
     
+    // Save button that becomes enabled when calendar has title and doors
     private var saveButton: some View {
         Button(action: saveCalendar) {
             Text("Save & Use")
+                .foregroundColor(calendarTitle.isEmpty || doors.isEmpty ? 
+                           theme.text.opacity(0.4) :  // Disabled state
+                           theme.accent)              // Enabled state
         }
         .disabled(calendarTitle.isEmpty || doors.isEmpty)
     }
     
     // Section for basic calendar information input
     private var basicInfoSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: theme.spacing) {
             Text("Basic Information")
-                .font(.headline)
-            
+                .font(.headline) // Note: When added to Protocol, Editor crashes
+                .foregroundColor(theme.text)
             TextField("Calendar Title", text: $calendarTitle)
                 .textFieldStyle(.roundedBorder)
+                .font(theme.bodyFont)
             
             // Unlock mode selection
             Picker("Unlock Mode", selection: $unlockMode) {
@@ -116,7 +127,9 @@ struct TabViewEditor: View {
             // Date selection for daily unlock mode
             if unlockMode == .daily {
                 DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
+                    .font(theme.bodyFont)
                 DatePicker("End Date", selection: $endDate, displayedComponents: .date)
+                    .font(theme.bodyFont)
             }
             
             // Always show the stepper, but disable it in daily mode
@@ -124,44 +137,46 @@ struct TabViewEditor: View {
                    value: $doorCount,
                    in: 1...Constants.Calendar.maxDoorCount)
                 .disabled(unlockMode == .daily)
+                .font(theme.bodyFont)
             
             HStack {
                 Text("Grid Columns:")
+                    .font(theme.bodyFont)
                 Stepper("\(gridColumns)", value: $gridColumns, in: 2...Constants.Calendar.maxGridColumns)
+                    .font(theme.bodyFont)
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(Constants.Colors.secondaryBackground)
-        .cornerRadius(Constants.UI.defaultCornerRadius)
+        .padding(theme.padding)
+        .background(theme.secondary)
+        .cornerRadius(theme.cornerRadius)
     }
     
     // Section for background image selection
     private var backgroundImageSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: theme.spacing) {
             Text("Background Image")
                 .font(.headline)
+                .foregroundColor(theme.text)
             
             PhotosPicker(selection: $selectedImageItem, matching: .images) {
                 if let selectedBackgroundImage {
                     Image(uiImage: selectedBackgroundImage)
                         .resizable()
                         .scaledToFit()
-                        .frame(maxHeight: Constants.UI.imagePreviewHeight)
-                        .cornerRadius(Constants.UI.defaultCornerRadius)
+                        .frame(maxHeight: theme.imagePickerStyle.previewHeight)
+                        .cornerRadius(theme.cornerRadius)
                 } else {
                     Label("Select Image", systemImage: "photo")
                         .frame(maxWidth: .infinity)
-                        .frame(height: Constants.UI.imagePreviewHeight / 2)
-                        .background(Constants.Colors.tertiaryBackground)
-                        .cornerRadius(Constants.UI.defaultCornerRadius)
+                        .frame(height: theme.imagePickerStyle.previewHeight / 2)
+                        .background(theme.imagePickerStyle.placeholderColor)
+                        .cornerRadius(theme.cornerRadius)
                 }
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(Constants.Colors.secondaryBackground)
-        .cornerRadius(Constants.UI.defaultCornerRadius)
+        .padding(theme.padding)
+        .background(theme.secondary)
+        .cornerRadius(theme.cornerRadius)
         .onChange(of: selectedImageItem) { _, _ in
             Task {
                 // Try to load the selected image as transferable data
@@ -176,25 +191,30 @@ struct TabViewEditor: View {
     private var previewButton: some View {
         Button(action: { isPreviewActive = true }) {
             Text("Full Preview")
+                .foregroundColor(theme.accent)
         }
         .disabled(doors.isEmpty)
     }
     
     // Section showing door preview grid
     private var previewSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: theme.spacing) {
             Text("Preview")
-                .font(.headline)
+                .font(.headline) // Note: When added to Protocol, Editor crashes
+                .foregroundColor(theme.text)
             
             if doors.isEmpty {
-                Text("Add doors to see preview")
-                    .frame(maxWidth: .infinity)
-                    .foregroundStyle(Constants.Colors.secondaryText)
+                HStack {
+                    Text("Add doors to see preview")
+                        .foregroundColor(theme.text.opacity(0.6))
+                        .font(theme.bodyFont)
+                    Spacer()
+                }
             } else {
                 ScrollView {
-                    let columns = Array(repeating: GridItem(.flexible(), spacing: Constants.UI.defaultSpacing),
+                    let columns = Array(repeating: GridItem(.flexible(), spacing: theme.spacing),
                                       count: gridColumns)
-                    LazyVGrid(columns: columns, spacing: Constants.UI.defaultSpacing) {
+                    LazyVGrid(columns: columns, spacing: theme.spacing) {
                         ForEach(doors) { door in
                             DoorPreviewCell(door: door)
                                 .onTapGesture {
@@ -204,13 +224,12 @@ struct TabViewEditor: View {
                         }
                     }
                 }
-                .frame(maxHeight: Constants.UI.previewMaxHeight)
+                .frame(maxHeight: theme.previewStyle.maxHeight)
             }
         }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(Constants.Colors.secondaryBackground)
-        .cornerRadius(Constants.UI.defaultCornerRadius)
+        .padding(theme.padding)
+        .background(theme.secondary)
+        .cornerRadius(theme.cornerRadius)
     }
     
     // Full calendar preview view
@@ -220,11 +239,13 @@ struct TabViewEditor: View {
     
     // MARK: - Helper Methods
     
+    // Saves the current calendar configuration
     private func saveCalendar() {
         let calendar = createPreviewCalendar()
         onSaveCalendar(calendar)
     }
     
+    // Updates door count based on date range in daily mode
     private func updateDoorCountIfNeeded() {
         if unlockMode == .daily {
             doorCount = daysBetweenDates

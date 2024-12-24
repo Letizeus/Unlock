@@ -80,10 +80,10 @@ enum DoorContent: Codable, Hashable {
     
     var contentType: String {
         switch self {
-        case .text: return "Text"
-        case .image: return "Image"
-        case .video: return "Video"
-        case .map: return "Location"
+            case .text: return "Text"
+            case .image: return "Image"
+            case .video: return "Video"
+            case .map: return "Location"
         }
     }
 }
@@ -96,17 +96,17 @@ enum Tab {
     
     var title: String {
         switch self {
-        case .calendar: return "Home"
-        case .map: return "Map"
-        case .editor: return "Editor"
+            case .calendar: return "Home"
+            case .map: return "Map"
+            case .editor: return "Editor"
         }
     }
     
     var icon: String {
         switch self {
-        case .calendar: return "house.fill"
-        case .map: return "map"
-        case .editor: return "pencil"
+            case .calendar: return "house.fill"
+            case .map: return "map"
+            case .editor: return "pencil"
         }
     }
 }
@@ -118,8 +118,8 @@ enum UnlockMode {
     
     var description: String {
         switch self {
-        case .daily: return "Daily"
-        case .specific: return "Specific Dates"
+            case .daily: return "Daily"
+            case .specific: return "Specific Dates"
         }
     }
 }
@@ -140,10 +140,10 @@ enum CalendarError: LocalizedError {
     
     var errorDescription: String? {
         switch self {
-        case .invalidDate: return "Invalid date provided"
-        case .invalidContent: return "Invalid content format"
-        case .exportFailed: return "Failed to export calendar"
-        case .importFailed: return "Failed to import calendar"
+            case .invalidDate: return "Invalid date provided"
+            case .invalidContent: return "Invalid content format"
+            case .exportFailed: return "Failed to export calendar"
+            case .importFailed: return "Failed to import calendar"
         }
     }
 }

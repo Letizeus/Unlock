@@ -3,6 +3,9 @@ import SwiftData
 
 @main
 struct CalendarApp: App {
+    
+    @StateObject private var themeManager = ThemeManager.shared // Manages theme-related state across the app
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
@@ -19,6 +22,9 @@ struct CalendarApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
+                // Inject theme values into the environment for child views to access
+                .environment(\.calendarTheme, themeManager.calendarTheme)
+                .environment(\.editorTheme, themeManager.editorTheme)
         }
         .modelContainer(sharedModelContainer)
     }

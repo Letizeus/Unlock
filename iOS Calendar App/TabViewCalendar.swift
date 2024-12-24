@@ -2,6 +2,8 @@ import SwiftUI
 
 struct TabViewCalendar: View {
     
+    @Environment(\.calendarTheme) private var theme // Access the calendar theme from the environment
+    
     // MARK: - Properties
     
     // The calendar data model containing all doors and their content
@@ -21,12 +23,12 @@ struct TabViewCalendar: View {
                         .edgesIgnoringSafeArea(.all)
                     
                     // Main content layout including title, countdown and calendar grid
-                    VStack(spacing: 16) {
+                    VStack(spacing: theme.spacing) {
                         Text(calendar.title)
-                            .font(.title)
+                            .font(theme.titleFont)
                             .bold()
-                            .foregroundStyle(Constants.Colors.whiteText)
-                            .padding(.top)
+                            .foregroundStyle(theme.text)
+                            .padding(.top, theme.padding.top)
                         
                         countdownView
                         ScrollView() {
@@ -58,11 +60,11 @@ struct TabViewCalendar: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill) // (might crop the image if aspect ratios don't match)
                         .frame(width: geo.size.width, height: geo.size.height)
-                        .overlay(Constants.Colors.darkOverlay) // Darkening overlay for better readability
+                        .overlay(theme.doorStyle.lockedBackground) // Darkening overlay for better readability
                         .position(x: geo.size.width / 2, y: geo.size.height / 2) // Center the image in the available space
                 }
             } else {
-                Constants.Colors.primaryBackground
+                theme.background
             }
         }
     }
@@ -83,9 +85,9 @@ struct TabViewCalendar: View {
     // This function also calculates the optimal size for door cells
     // width parameter: Available width for the grid
     private func calendarGrid(width: CGFloat) -> some View {
-        let spacing = Constants.UI.defaultSpacing // Space between each door cell (vertical and horizontal)
-        let horizontalPadding = Constants.UI.defaultHorizontalPadding // Padding on left and right edges of the entire grid
-        let availableWidth = width - (horizontalPadding * 2) // Calculate actual width available for the grid after padding
+        let spacing = theme.spacing // Space between each door cell (vertical and horizontal)
+        let padding = (theme.padding.leading + theme.padding.trailing) // Padding on left and right edges of the entire grid
+        let availableWidth = width - padding // Calculate actual width available for the grid after padding
         // Calculate total space used by gaps between cells
         // Example: For 4 columns, we need 3 gaps (columns - 1)
         let totalSpacing = spacing * CGFloat(calendar.gridColumns - 1)
@@ -102,7 +104,6 @@ struct TabViewCalendar: View {
                 DoorViewCell(door: door)
             }
         }
-        .padding(.horizontal, horizontalPadding)
     }
     
     // MARK: - Helper Methods
