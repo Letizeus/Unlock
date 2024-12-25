@@ -67,7 +67,7 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
             doorStyle: DoorStyle(
                 lockedBackground: Color.white.opacity(0.7),
                 unlockedBackground: Color(red: 94/255, green: 92/255, blue: 230/255).opacity(0.2),
-                todayBackground: Color(red: 94/255, green: 92/255, blue: 230/255).opacity(0.25),
+                todayBackground: Color(red: 94/255, green: 92/255, blue: 230/255).opacity(0.4),
                 borderColor: Color.black.opacity(0.2),
                 borderWidth: 1.5
             ),
@@ -104,8 +104,8 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
             // Door Styling
             doorStyle: DoorStyle(
                 lockedBackground: Color(red: 44/255, green: 44/255, blue: 46/255).opacity(0.7),  // Dark gray, slightly lighter than background
-                unlockedBackground: Color(red: 94/255, green: 92/255, blue: 230/255).opacity(0.2), // Primary purple
-                todayBackground: Color(red: 94/255, green: 92/255, blue: 230/255).opacity(0.3),  // Primary purple
+                unlockedBackground: Color(red: 94/255, green: 92/255, blue: 230/255).opacity(0.2),
+                todayBackground: Color(red: 94/255, green: 92/255, blue: 230/255).opacity(0.4),
                 borderColor: Color.white.opacity(0.1),
                 borderWidth: 1.5
             ),

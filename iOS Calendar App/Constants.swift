@@ -15,11 +15,4 @@ enum Constants {
         static let defaultGridColumns = 4
         static let maxGridColumns = 6
     }
-    
-    // Constants related to animations
-    enum Animation {
-        static let spring = SwiftUI.Animation.spring(response: 0.3, dampingFraction: 0.7)
-        static let bouncy = SwiftUI.Animation.spring(response: 0.5, dampingFraction: 0.6)
-        static let smooth = SwiftUI.Animation.easeInOut(duration: 0.3)
-    }
 }
