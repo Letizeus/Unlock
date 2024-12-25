@@ -4,12 +4,15 @@ import SwiftUI
 enum Constants {
     // Constants related to calendar configuration and behavior
     enum Calendar {
-        static let defaultYear = 2024
-        static let defaultMonth = 12
-        static let defaultDoorCount = 31
-        static let defaultGridColumns = 4
-        
+        static let defaultYear = Foundation.Calendar.current.component(.year, from: Date())
+        static let defaultMonth = Foundation.Calendar.current.component(.month, from: Date())
+        static let defaultDoorCount: Int = {
+            let range = Foundation.Calendar.current.range(of: .day, in: .month, for: Date())
+            return range?.count ?? 31
+        }()
         static let maxDoorCount = 1000
+        
+        static let defaultGridColumns = 4
         static let maxGridColumns = 6
     }
     

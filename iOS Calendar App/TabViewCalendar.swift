@@ -60,7 +60,11 @@ struct TabViewCalendar: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill) // (might crop the image if aspect ratios don't match)
                         .frame(width: geo.size.width, height: geo.size.height)
-                        .overlay(theme.doorStyle.lockedBackground) // Darkening overlay for better readability
+                        .overlay {
+                            @Environment(\.colorScheme) var scheme
+                            Color(scheme == .dark ? .black : .white)
+                                .opacity(0.4)
+                        }
                         .position(x: geo.size.width / 2, y: geo.size.height / 2) // Center the image in the available space
                 }
             } else {

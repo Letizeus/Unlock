@@ -4,7 +4,7 @@ import SwiftData
 @main
 struct CalendarApp: App {
     
-    @StateObject private var themeManager = ThemeManager.shared // Manages theme-related state across the app
+    @StateObject private var themeManager = ThemeManager() // Manages theme-related state across the app
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([

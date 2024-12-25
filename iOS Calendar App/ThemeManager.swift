@@ -8,15 +8,18 @@ class ThemeManager: ObservableObject {
     @Published private(set) var calendarTheme: CalendarTheme
     @Published private(set) var editorTheme: EditorTheme
     
-    static let shared = ThemeManager()
-    
     // Allows for custom themes to be set at initialization if needed
     init(
-        calendarTheme: CalendarTheme = .default,
+        calendarTheme : CalendarTheme = .default,
         editorTheme: EditorTheme = .default
     ) {
         self.calendarTheme = calendarTheme
         self.editorTheme = editorTheme
+    }
+    
+    // Update theme based on color scheme changes
+    func updateForColorScheme(_ colorScheme: ColorScheme) {
+        calendarTheme = colorScheme == .dark ? .darkMode : .lightMode
     }
     
     func updateCalendarTheme(_ theme: CalendarTheme) {

@@ -4,6 +4,9 @@ struct MainView: View {
     
     // MARK: - Properties
     
+    @StateObject private var themeManager = ThemeManager()
+    @Environment(\.colorScheme) var colorScheme // Reads whether the user's system is in light or dark mode
+    
     @State private var selectedTab = Tab.calendar
     @State private var currentCalendar: HolidayCalendar = HolidayCalendar.createDefault()
     
@@ -15,6 +18,16 @@ struct MainView: View {
             mapTab
             editorTab
         }
+        // Update theme when colorScheme changes
+        .onAppear {
+            themeManager.updateForColorScheme(colorScheme)
+        }
+        .onChange(of: colorScheme) { _, newValue in
+            themeManager.updateForColorScheme(newValue)
+        }
+        // Provide the theme through the environment
+        .environment(\.calendarTheme, themeManager.calendarTheme)
+        .environment(\.editorTheme, themeManager.editorTheme)
     }
     
     // MARK: - Tab Views
