@@ -23,7 +23,7 @@ struct TabViewCalendar: View {
                         .edgesIgnoringSafeArea(.all)
                     
                     // Main content layout including title, countdown and calendar grid
-                    VStack(spacing: theme.spacing * 1.5) {
+                    VStack(spacing: theme.spacing) {
                         Text(calendar.title)
                             .font(theme.titleFont)
                             .bold()
@@ -33,9 +33,9 @@ struct TabViewCalendar: View {
                         countdownView
                         ScrollView() {
                             calendarGrid(width: geometry.size.width)
+                                .padding(.top, 20)
                         }
                     }
-                    .padding(.vertical)
                 }
             }
         }
