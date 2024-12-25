@@ -235,6 +235,16 @@ struct DoorContentView: View {
     }
 }
 
+// creates an overlay color that adapts to the system theme
+struct AdaptiveOverlay: View {
+    @Environment(\.colorScheme) var scheme
+    
+    var body: some View {
+        Color(scheme == .dark ? .black : .white)
+            .opacity(0.4)
+    }
+}
+
 // MARK: - TabViewMap
 
 
