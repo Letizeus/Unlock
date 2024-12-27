@@ -43,9 +43,13 @@ struct TabViewCalendar: View {
                             }
                             // When the view appears, automatically scroll to the current door
                             .onAppear {
-                                if let doorToScrollTo = findCurrentDoor() {
-                                    withAnimation {
-                                        proxy.scrollTo(doorToScrollTo.id, anchor: .center)
+                                Task { @MainActor in
+                                    // Small delay to ensure view is ready
+                                    try? await Task.sleep(for: .milliseconds(300))
+                                    if let doorToScrollTo = findCurrentDoor() {
+                                        withAnimation {
+                                            proxy.scrollTo(doorToScrollTo.id, anchor: .center)
+                                        }
                                     }
                                 }
                             }
