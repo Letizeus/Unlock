@@ -118,6 +118,8 @@ struct DoorViewCell: View {
     
     // Properties
     
+    @Binding var isAnyDoorOpening: Bool
+    
     @State var door: CalendarDoor
     @State private var isShowingContent = false // Controls content sheet presentation
     @State private var doorRotation = 0.0
@@ -166,7 +168,7 @@ struct DoorViewCell: View {
         .animation(.spring(response: 0.2, dampingFraction: 0.6), value: isPressed)
         // Handle tap interaction
         .onTapGesture {
-            if door.isUnlocked {
+            if door.isUnlocked && !isAnyDoorOpening {
                 withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
                     isPressed = true
                 }
@@ -180,7 +182,7 @@ struct DoorViewCell: View {
             }
         }
         // Only allow interaction with unlocked doors
-        .allowsHitTesting(door.isUnlocked)
+        .allowsHitTesting(door.isUnlocked && !isAnyDoorOpening)
         // Present content sheet when door is opened
         .sheet(isPresented: $isShowingContent) {
             DoorContentView(content: door.content)
@@ -241,6 +243,8 @@ struct DoorViewCell: View {
     private func handleDoorTap() {
         guard door.isUnlocked else { return }
         
+        isAnyDoorOpening = true
+        
         // Animate door opening
         withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
             doorRotation = 180 // Rotate half turn
@@ -261,6 +265,7 @@ struct DoorViewCell: View {
                     doorRotation = 0
                     doorOpacity = 1.0
                 }
+                isAnyDoorOpening = false
             }
         }
     }

@@ -10,6 +10,8 @@ struct TabViewCalendar: View {
     let calendar: HolidayCalendar
     // Current countdown information (days, hours, minutes)
     @State private var countdown = CountdownInfo()
+    // Only one door at once
+    @State private var isAnyDoorOpening = false
     // Timer that updates the countdown every second
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -101,7 +103,7 @@ struct TabViewCalendar: View {
             spacing: spacing
         ) {
             ForEach(calendar.doors) { door in
-                DoorViewCell(door: door)
+                DoorViewCell(isAnyDoorOpening: $isAnyDoorOpening, door: door)
             }
         }
     }
