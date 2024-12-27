@@ -265,7 +265,7 @@ struct TabViewEditor: View {
             return CalendarDoor(
                 number: number,
                 unlockDate: unlockDate,
-                isUnlocked: unlockDate <= Date(),
+                isUnlocked: false,
                 content: .text("Add content for door \(number)"),
                 hasBeenOpened: false
             )

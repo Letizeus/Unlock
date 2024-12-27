@@ -21,6 +21,8 @@ struct MainView: View {
         // Update theme when colorScheme changes
         .onAppear {
             themeManager.updateForColorScheme(colorScheme)
+            UITabBarAppearance().configureWithOpaqueBackground()
+            UITabBar.appearance().scrollEdgeAppearance = UITabBarAppearance()
         }
         .onChange(of: colorScheme) { _, newValue in
             themeManager.updateForColorScheme(newValue)

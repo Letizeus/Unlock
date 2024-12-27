@@ -185,6 +185,10 @@ struct DoorViewCell: View {
         .sheet(isPresented: $isShowingContent) {
             DoorContentView(content: door.content)
         }
+        // Checks unlock state when view appears
+        .onAppear {
+            updateUnlockState()
+        }
     }
     
     // UI Components
@@ -228,6 +232,11 @@ struct DoorViewCell: View {
     
     // Helper Methods
     
+    // Checks if the door should be unlocked
+    private func updateUnlockState() {
+        door.isUnlocked = Calendar.current.startOfDay(for: Date()) >= Calendar.current.startOfDay(for: door.unlockDate)
+    }
+    
     // Door tap handler
     private func handleDoorTap() {
         guard door.isUnlocked else { return }
@@ -244,6 +253,7 @@ struct DoorViewCell: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             isShowingContent = true
             door.hasBeenOpened = true
+            door.isUnlocked = true
             
             // Reset door after a brief delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {

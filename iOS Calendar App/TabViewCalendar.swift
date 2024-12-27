@@ -33,7 +33,8 @@ struct TabViewCalendar: View {
                         countdownView
                         ScrollView() {
                             calendarGrid(width: geometry.size.width)
-                                .padding(.top, 20)
+                                .padding(.top, theme.padding.top)
+                                .padding(.bottom, theme.padding.bottom)
                         }
                     }
                 }
@@ -73,14 +74,11 @@ struct TabViewCalendar: View {
     
     // Displays the countdown to the next unlockable door
     private var countdownView: some View {
-        Group {
-            if let nextDoor = findNextDoor() {
-                CountdownDisplay(
-                    nextDoorNumber: nextDoor.number,
-                    countdown: countdown
-                )
-            }
-        }
+        let nextDoor = findNextDoor()
+        return CountdownDisplay(
+            nextDoorNumber: nextDoor?.number ?? 0,
+            countdown: countdown
+        )
     }
     
     // Creates the grid layout for calendar doors
@@ -112,8 +110,12 @@ struct TabViewCalendar: View {
     
     // Finds the next unopened door that can be unlocked
     private func findNextDoor() -> CalendarDoor? {
+        let now = Calendar.current.startOfDay(for: Date())
         return calendar.doors
-            .filter { !$0.isUnlocked && $0.unlockDate > Date() }
+            .filter { door in
+                let doorDate = Calendar.current.startOfDay(for: door.unlockDate)
+                return doorDate > now && !door.isUnlocked
+            }
             .min { $0.unlockDate < $1.unlockDate }
     }
     
