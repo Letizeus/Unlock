@@ -3,6 +3,7 @@ import SwiftUI
 struct TabViewCalendar: View {
     
     @Environment(\.calendarTheme) private var theme // Access the calendar theme from the environment
+    @Environment(\.colorScheme) var colorScheme
     
     // MARK: - Properties
     
@@ -33,10 +34,21 @@ struct TabViewCalendar: View {
                             .padding(.top, theme.padding.top)
                         
                         countdownView
-                        ScrollView() {
-                            calendarGrid(width: geometry.size.width)
-                                .padding(.top, theme.padding.top)
-                                .padding(.bottom, theme.padding.bottom)
+                        // ScrollViewReader enables programmatic scrolling to specific doors
+                        ScrollViewReader { proxy in
+                            ScrollView() {
+                                calendarGrid(width: geometry.size.width)
+                                    .padding(.top, theme.padding.top)
+                                    .padding(.bottom, theme.padding.bottom)
+                            }
+                            // When the view appears, automatically scroll to the current door
+                            .onAppear {
+                                if let doorToScrollTo = findCurrentDoor() {
+                                    withAnimation {
+                                        proxy.scrollTo(doorToScrollTo.id, anchor: .center)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -64,7 +76,7 @@ struct TabViewCalendar: View {
                         .aspectRatio(contentMode: .fill) // (might crop the image if aspect ratios don't match)
                         .frame(width: geo.size.width, height: geo.size.height)
                         .overlay {
-                            AdaptiveOverlay() // adaptive overlay that changes with system theme
+                            Color(colorScheme == .dark ? .black : .white).opacity(0.4) // adaptive overlay that changes with system theme
                         }
                         .position(x: geo.size.width / 2, y: geo.size.height / 2) // Center the image in the available space
                 }
@@ -84,31 +96,31 @@ struct TabViewCalendar: View {
     }
     
     // Creates the grid layout for calendar doors
-    // This function also calculates the optimal size for door cells
-    // width parameter: Available width for the grid
     private func calendarGrid(width: CGFloat) -> some View {
-        let spacing = theme.spacing // Space between each door cell (vertical and horizontal)
-        let padding = (theme.padding.leading + theme.padding.trailing) // Padding on left and right edges of the entire grid
-        let availableWidth = width - padding // Calculate actual width available for the grid after padding
-        // Calculate total space used by gaps between cells
-        // Example: For 4 columns, we need 3 gaps (columns - 1)
-        let totalSpacing = spacing * CGFloat(calendar.gridColumns - 1)
-        let cellSize = (availableWidth - totalSpacing) / CGFloat(calendar.gridColumns) // Calculate size of each cell to fit perfectly in the grid
-        
-        return LazyVGrid(
+        LazyVGrid(
             // Create an array of grid items, one for each column
-            // .fixed ensures all cells have the exact same width (cellSize)
-            columns: Array(repeating: GridItem(.fixed(cellSize), spacing: spacing),
+            columns: Array(repeating: GridItem(.flexible(), spacing: theme.spacing),
                           count: calendar.gridColumns),
-            spacing: spacing
+            spacing: theme.spacing
         ) {
             ForEach(calendar.doors) { door in
                 DoorViewCell(isAnyDoorOpening: $isAnyDoorOpening, door: door)
+                    .aspectRatio(1, contentMode: .fit) // Maintain square shape
             }
         }
+        .padding(.horizontal, theme.padding.trailing)
     }
     
     // MARK: - Helper Methods
+    
+    // Finds the door that corresponds to the current date
+    private func findCurrentDoor() -> CalendarDoor? {
+        let today = Calendar.current.startOfDay(for: Date())
+        
+        return calendar.doors.first { door in
+            Calendar.current.isDate(today, inSameDayAs: door.unlockDate)
+        }
+    }
     
     // Finds the next unopened door that can be unlocked
     private func findNextDoor() -> CalendarDoor? {

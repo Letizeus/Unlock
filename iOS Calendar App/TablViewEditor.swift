@@ -16,6 +16,7 @@ struct TabViewEditor: View {
     @State private var doorCount = Constants.Calendar.defaultDoorCount
     @State private var gridColumns = Constants.Calendar.defaultGridColumns
     @State private var unlockMode: UnlockMode = .daily
+    @State private var layoutMode: GridLayoutMode = .uniform
     
     // Background Image Configuration
     @State private var selectedBackgroundImage: UIImage?
@@ -29,7 +30,7 @@ struct TabViewEditor: View {
     
     // Computed property to get the number of days between start and end dates
     private var daysBetweenDates: Int {
-        Calendar.current.dateComponents([.day], from: startDate, to: endDate).day ?? 0 + 1
+        (Calendar.current.dateComponents([.day], from: startDate + 10, to: endDate).day ?? 0) + 2
     }
     
     let onSaveCalendar: (HolidayCalendar) -> Void // Callback function to handle saving the calendar
@@ -70,10 +71,10 @@ struct TabViewEditor: View {
             .onAppear(perform: generateDoors) // Generate initial doors when view appears
             // Update doors when dates change
             .onChange(of: startDate) { _, _ in
-                updateDoorCountIfNeeded()
+                generateDoors()
             }
             .onChange(of: endDate) { _, _ in
-                updateDoorCountIfNeeded()
+                generateDoors()
             }
             // Regenerate doors when count changes in specific mode
             .onChange(of: doorCount) { _, _ in
@@ -123,6 +124,16 @@ struct TabViewEditor: View {
                 Text(UnlockMode.specific.description).tag(UnlockMode.specific)
             }
             .pickerStyle(.segmented)
+            
+            VStack(alignment: .leading) {
+                Text("Layout Style (not working)")
+                    .font(theme.bodyFont)
+                Picker("Layout Mode", selection: $layoutMode) {
+                    Text(GridLayoutMode.uniform.description).tag(GridLayoutMode.uniform)
+                    Text(GridLayoutMode.random.description).tag(GridLayoutMode.random)
+                }
+                .pickerStyle(.segmented)
+            }
             
             // Date selection for daily unlock mode
             if unlockMode == .daily {
@@ -245,23 +256,20 @@ struct TabViewEditor: View {
         onSaveCalendar(calendar)
     }
     
-    // Updates door count based on date range in daily mode
-    private func updateDoorCountIfNeeded() {
-        if unlockMode == .daily {
-            doorCount = daysBetweenDates
-            generateDoors()
-        }
-    }
-    
     // Generates door entries based on current settings
     private func generateDoors() {
         let calendar = Calendar.current
+        
+        // Updates door count based on date range in daily mode
+        if unlockMode == .daily {
+            doorCount = daysBetweenDates
+        }
         
         doors = (1...doorCount).map { number in
             let unlockDate = unlockMode == .daily
                 ? calendar.date(byAdding: .day, value: number - 1, to: startDate) ?? startDate
                 : startDate // For specific mode, default to start date
-            
+                
             return CalendarDoor(
                 number: number,
                 unlockDate: unlockDate,
@@ -271,7 +279,7 @@ struct TabViewEditor: View {
             )
         }
     }
-    
+
     // Creates a preview calendar instance with current settings
     private func createPreviewCalendar() -> HolidayCalendar {
         let backgroundData = selectedBackgroundImage?.jpegData(compressionQuality: 1.0)

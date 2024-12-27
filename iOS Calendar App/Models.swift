@@ -88,6 +88,18 @@ enum DoorContent: Codable, Hashable {
     }
 }
 
+enum GridLayoutMode: String, CaseIterable, Codable {
+    case uniform = "Uniform"
+    case random = "Different Sizes"
+    
+    var description: String {
+        switch self {
+            case .uniform: return "Uniform"
+            case .random: return "Different Sizes"
+        }
+    }
+}
+
 // Defines the available tabs in the main navigation
 enum Tab {
     case calendar

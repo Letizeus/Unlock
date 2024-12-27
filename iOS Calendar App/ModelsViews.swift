@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - TabViewEditor
 
 // A view cell that displays a preview of a calendar door in the editor
-// Used in the calendar creation interface to show door content types
+// Used in the calendar editor interface to show door content types
 struct DoorPreviewCell: View {
     
     @Environment(\.editorTheme) private var theme
@@ -268,18 +268,6 @@ struct DoorViewCell: View {
                 isAnyDoorOpening = false
             }
         }
-    }
-}
-
-// ------------------------------------------------------------------------------------------------------
-
-// creates an overlay color that adapts to the system theme
-struct AdaptiveOverlay: View {
-    @Environment(\.colorScheme) var scheme
-    
-    var body: some View {
-        Color(scheme == .dark ? .black : .white)
-            .opacity(0.4)
     }
 }
 
