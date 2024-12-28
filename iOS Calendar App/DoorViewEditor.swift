@@ -14,6 +14,7 @@ struct DoorViewEditor: View {
     
     @State private var contentType: DoorContent // The current type of content being edited
     @State private var textContent = "" // Text content when content type is .text
+    @State private var selectedType: DoorContent.SelectionType // Track the current UI selection for content
     // Selected image for image content type
     @State private var selectedImage: UIImage?
     @State private var selectedImageItem: PhotosPickerItem?
@@ -32,13 +33,22 @@ struct DoorViewEditor: View {
         _contentType = State(initialValue: door.content)
         _unlockDate = State(initialValue: door.unlockDate)
         _useCustomUnlockDate = State(initialValue: unlockMode == .specific)
+        _selectedType = State(initialValue: DoorContent.SelectionType.from(door.content))
         
-        // Set initial text content if door contains text
+        // Initialize content based on type
         switch door.content {
         case .text(let text):
             _textContent = State(initialValue: text)
-        default:
-            break
+        case .image(let path):
+            _textContent = State(initialValue: path)
+            // Load image if exists
+            if let image = UIImage(named: path) {
+                _selectedImage = State(initialValue: image)
+            }
+        case .video(let url):
+            _textContent = State(initialValue: url)
+        case .map(_, _):
+            _textContent = State(initialValue: "")
         }
     }
     
@@ -56,7 +66,6 @@ struct DoorViewEditor: View {
             }
             .padding(theme.padding)
         }
-        .scrollContentBackground(.hidden)
         .background(theme.background)
         .navigationTitle("Edit Door \(door.number)")
         .navigationBarTitleDisplayMode(.inline)
@@ -97,11 +106,10 @@ struct DoorViewEditor: View {
                     Text("Type")
                         .foregroundColor(theme.text)
                     Spacer() // This pushes the picker to the right
-                    Picker("", selection: $contentType) {
-                        Text("Text").tag(DoorContent.text(""))
-                        Text("Image").tag(DoorContent.image(""))
-                        Text("Video").tag(DoorContent.video(""))
-                        Text("Location").tag(DoorContent.map(latitude: 0, longitude: 0))
+                    Picker("", selection: $selectedType) {
+                        ForEach(DoorContent.SelectionType.allCases, id: \.self) { type in
+                            Text(type.rawValue).tag(type)
+                        }
                     }
                     .font(theme.bodyFont)
                 }
@@ -121,7 +129,7 @@ struct DoorViewEditor: View {
         VStack(alignment: .leading, spacing: theme.spacing) {
             Section("Content") {
                 HStack {
-                    switch contentType {
+                    switch selectedType {
                     case .text:
                         textEditor
                     case .image:

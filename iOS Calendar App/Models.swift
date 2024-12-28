@@ -83,7 +83,27 @@ enum DoorContent: Codable, Hashable {
             case .text: return "Text"
             case .image: return "Image"
             case .video: return "Video"
-            case .map: return "Location"
+            case .map: return "Map"
+        }
+    }
+    
+    // This enum helps manage the UI selection for content types
+    // It's simpler because it doesn't have associated values
+    // Making it easier for SwiftUI's Picker to handle
+    enum SelectionType: String, CaseIterable {
+        case text = "Text"
+        case image = "Image"
+        case video = "Video"
+        case map = "Map"
+        
+        // Takes a DoorContent and returns the corresponding UI selection
+        static func from(_ content: DoorContent) -> SelectionType {
+            switch content {
+                case .text: return .text
+                case .image: return .image
+                case .video: return .video
+                case .map: return .map
+            }
         }
     }
 }

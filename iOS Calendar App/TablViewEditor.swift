@@ -55,9 +55,21 @@ struct TabViewEditor: View {
             .sheet(isPresented: $isPreviewActive) {
                 calendarPreview
             }
-            .sheet(isPresented: $isEditingDoor) {
-                if let door = selectedDoor {
-                    doorEditor(door: door)
+            .sheet(item: $selectedDoor) { door in
+                NavigationStack {
+                    DoorViewEditor(
+                        door: door,
+                        unlockMode: unlockMode
+                    ) { updatedDoor in
+                        // When the door is saved:
+                        // Find the index of the door in our array using its ID
+                        if let index = doors.firstIndex(where: { $0.id == updatedDoor.id }) {
+                            // Update the door at that index with the edited version
+                            doors[index] = updatedDoor
+                        }
+                        // Set selectedDoor to nil to dismiss the sheet
+                        selectedDoor = nil
+                    }
                 }
             }
             .toolbar {
@@ -223,14 +235,13 @@ struct TabViewEditor: View {
                 }
             } else {
                 ScrollView {
-                    let columns = Array(repeating: GridItem(.flexible(), spacing: theme.spacing),
-                                      count: gridColumns)
+                    let columns = Array(repeating: GridItem(.flexible(), spacing: theme.spacing), count: gridColumns)
                     LazyVGrid(columns: columns, spacing: theme.spacing) {
                         ForEach(doors) { door in
                             DoorPreviewCell(door: door)
+                                .contentShape(Rectangle())
                                 .onTapGesture {
                                     selectedDoor = door
-                                    isEditingDoor = true
                                 }
                         }
                     }
@@ -292,18 +303,6 @@ struct TabViewEditor: View {
             gridColumns: gridColumns,
             backgroundImageData: backgroundData
         )
-    }
-    
-    // Creates a door editor view for the specified door
-    private func doorEditor(door: CalendarDoor) -> some View {
-        NavigationStack {
-            DoorViewEditor(door: door, unlockMode: unlockMode) { updatedDoor in
-                if let index = doors.firstIndex(where: { $0.id == updatedDoor.id }) {
-                    doors[index] = updatedDoor
-                }
-                isEditingDoor = false
-            }
-        }
     }
 }
 
