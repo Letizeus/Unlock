@@ -26,7 +26,7 @@ struct TabViewCalendar: View {
                         .edgesIgnoringSafeArea(.all)
                     
                     // Main content layout including title, countdown and calendar grid
-                    VStack(spacing: theme.spacing) {
+                    VStack(spacing: 0) {
                         Text(calendar.title)
                             .font(theme.titleFont)
                             .bold()
@@ -34,6 +34,10 @@ struct TabViewCalendar: View {
                             .padding(.top, theme.padding.top)
                         
                         countdownView
+                            .padding(.bottom, theme.padding.bottom)
+                        Divider()
+                            .background(theme.text)
+                            .padding(.horizontal, theme.spacing)
                         // ScrollViewReader enables programmatic scrolling to specific doors
                         ScrollViewReader { proxy in
                             ScrollView() {
