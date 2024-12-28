@@ -32,6 +32,7 @@ struct TabViewCalendar: View {
                             .bold()
                             .foregroundStyle(theme.text)
                             .padding(.top, theme.padding.top)
+                            .padding(.bottom, theme.padding.bottom)
                         
                         countdownView
                             .padding(.bottom, theme.padding.bottom)
