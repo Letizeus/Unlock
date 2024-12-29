@@ -1,0 +1,100 @@
+import SwiftUI
+
+// Manages the state and animations for door interactions
+class DoorOpeningManager: ObservableObject {
+    
+    @Published var door: CalendarDoor
+    @Published var isShowingContent = false // Controls content sheet presentation
+    @Published var doorRotation = 0.0
+    @Published var doorOpacity = 1.0
+    @Published var isPressed = false
+    @Published var hasCompletedOpening = false
+    
+    @Binding var isAnyDoorOpening: Bool
+    
+    init(door: CalendarDoor, isAnyDoorOpening: Binding<Bool>) {
+        self.door = door
+        self._isAnyDoorOpening = isAnyDoorOpening
+    }
+    
+    func handleDoorTap(completion: @escaping () -> Void) {
+        guard door.isUnlocked && !isAnyDoorOpening else { return }
+        
+        isAnyDoorOpening = true
+        
+        // Animate door opening
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+            doorRotation = 180 // Rotate half turn
+            doorOpacity = 0.0 // Fade out door to see content
+        }
+        
+        // Show content sheet after the door animation
+        // Schedule code execution after a delay of 0.5 seconds
+        // - Uses the main dispatch queue to ensure UI updates happen on the main thread
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            self.isShowingContent = true
+            self.door.hasBeenOpened = true
+            self.door.isUnlocked = true
+            
+            // Reset door after a brief delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+                    self.doorRotation = 0
+                    self.doorOpacity = 1.0
+                }
+                self.isAnyDoorOpening = false
+            }
+        }
+    }
+    
+    // Checks if the door should be unlocked
+    func updateUnlockState() {
+        door.isUnlocked = Calendar.current.startOfDay(for: Date()) >= Calendar.current.startOfDay(for: door.unlockDate)
+    }
+}
+
+// Shared view modifier for door interaction
+struct DoorInteractionModifier: ViewModifier {
+    @ObservedObject var manager: DoorOpeningManager
+    let onCompletion: () -> Void
+    
+    func body(content: Content) -> some View {
+        content
+        .scaleEffect(manager.isPressed ? 0.95 : 1.0)
+        .animation(.spring(response: 0.2, dampingFraction: 0.6), value: manager.isPressed)
+        // Handle tap interaction
+        .onTapGesture {
+            if manager.door.isUnlocked && !manager.isAnyDoorOpening {
+                withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
+                    manager.isPressed = true
+                }
+                // Reset the pressed state after a short delay and trigger door opening
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
+                        manager.isPressed = false
+                    }
+                    manager.handleDoorTap(completion: onCompletion)
+                }
+            }
+        }
+        // Only allow interaction with unlocked doors
+        .allowsHitTesting(manager.door.isUnlocked && !manager.isAnyDoorOpening)
+        // Present content sheet when door is opened
+        .sheet(isPresented: $manager.isShowingContent) {
+            DoorContentView(content: manager.door.content)
+                .interactiveDismissDisabled()
+        }
+        // Checks unlock state when view appears
+        .onAppear {
+            manager.updateUnlockState()
+        }
+    }
+}
+
+// Extension on View to provide a convenient way to add door interaction behavior
+// This allows us to use the .doorInteraction() modifier on any view
+extension View {
+    func doorInteraction(manager: DoorOpeningManager, onCompletion: @escaping () -> Void) -> some View {
+        modifier(DoorInteractionModifier(manager: manager, onCompletion: onCompletion))
+    }
+}

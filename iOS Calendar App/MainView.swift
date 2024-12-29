@@ -43,7 +43,7 @@ struct MainView: View {
     }
     
     private var mapTab: some View {
-        TabViewMap()
+        TabViewMap(calendar: currentCalendar)
             .tabItem {
                 Label(Tab.map.title, systemImage: Tab.map.icon)
             }

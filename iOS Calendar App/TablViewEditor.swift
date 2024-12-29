@@ -57,7 +57,7 @@ struct TabViewEditor: View {
             }
             .sheet(item: $selectedDoor) { door in
                 NavigationStack {
-                    DoorViewEditor(
+                    DoorEditorView(
                         door: door,
                         unlockMode: unlockMode
                     ) { updatedDoor in
@@ -71,6 +71,7 @@ struct TabViewEditor: View {
                         selectedDoor = nil
                     }
                 }
+                .interactiveDismissDisabled()
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -124,7 +125,7 @@ struct TabViewEditor: View {
     private var basicInfoSection: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
             Text("Basic Information")
-                .font(.headline) // Note: When added to Protocol, Editor crashes
+                .font(theme.headlineFont)
                 .foregroundColor(theme.text)
             TextField("Calendar Title", text: $calendarTitle)
                 .textFieldStyle(.roundedBorder)
@@ -178,7 +179,7 @@ struct TabViewEditor: View {
     private var backgroundImageSection: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
             Text("Background Image")
-                .font(.headline)
+                .font(theme.headlineFont)
                 .foregroundColor(theme.text)
             
             PhotosPicker(selection: $selectedImageItem, matching: .images) {
@@ -223,7 +224,7 @@ struct TabViewEditor: View {
     private var previewSection: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
             Text("Preview")
-                .font(.headline) // Note: When added to Protocol, Editor crashes
+                .font(theme.headlineFont)
                 .foregroundColor(theme.text)
             
             if doors.isEmpty {
@@ -259,7 +260,7 @@ struct TabViewEditor: View {
         TabViewCalendar(calendar: createPreviewCalendar())
     }
     
-    // MARK: - Helper Methods
+    // MARK: - Helper Functions
     
     // Saves the current calendar configuration
     private func saveCalendar() {

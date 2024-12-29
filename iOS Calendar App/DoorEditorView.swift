@@ -1,7 +1,7 @@
 import SwiftUI
 import PhotosUI
 
-struct DoorViewEditor: View {
+struct DoorEditorView: View {
     
     @Environment(\.editorTheme) private var theme
     @Environment(\.dismiss) private var dismiss
@@ -13,8 +13,8 @@ struct DoorViewEditor: View {
     let unlockMode: UnlockMode
     
     @State private var contentType: DoorContent // The current type of content being edited
+    
     @State private var textContent = "" // Text content when content type is .text
-    @State private var selectedType: DoorContent.SelectionType // Track the current UI selection for content
     // Selected image for image content type
     @State private var selectedImage: UIImage?
     @State private var selectedImageItem: PhotosPickerItem?
@@ -31,17 +31,15 @@ struct DoorViewEditor: View {
         self.onSaveDoor = onSaveDoor
         
         _contentType = State(initialValue: door.content)
+        
         _unlockDate = State(initialValue: door.unlockDate)
         _useCustomUnlockDate = State(initialValue: unlockMode == .specific)
-        _selectedType = State(initialValue: DoorContent.SelectionType.from(door.content))
         
         // Initialize content based on type
         switch door.content {
         case .text(let text):
             _textContent = State(initialValue: text)
         case .image(let path):
-            _textContent = State(initialValue: path)
-            // Load image if exists
             if let image = UIImage(named: path) {
                 _selectedImage = State(initialValue: image)
             }
@@ -55,22 +53,24 @@ struct DoorViewEditor: View {
     // MARK: - View Body
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: theme.spacing) {
-                // Only show unlock date section if in specific unlock mode
-                if unlockMode == .specific {
-                    unlockDateSection
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: theme.spacing) {
+                    // Only show unlock date section if in specific unlock mode
+                    if unlockMode == .specific {
+                        unlockDateSection
+                    }
+                    contentTypeSection
+                    contentSection
                 }
-                contentTypeSection
-                contentSection
+                .padding(theme.padding)
             }
-            .padding(theme.padding)
-        }
-        .background(theme.background)
-        .navigationTitle("Edit Door \(door.number)")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            toolbarContent
+            .background(theme.background)
+            .navigationTitle("Edit Door \(door.number)")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                toolbarContent
+            }
         }
     }
     
@@ -106,10 +106,11 @@ struct DoorViewEditor: View {
                     Text("Type")
                         .foregroundColor(theme.text)
                     Spacer() // This pushes the picker to the right
-                    Picker("", selection: $selectedType) {
-                        ForEach(DoorContent.SelectionType.allCases, id: \.self) { type in
-                            Text(type.rawValue).tag(type)
-                        }
+                    Picker("", selection: $contentType) {
+                        Text("Text").tag(DoorContent.text(textContent))
+                        Text("Image").tag(DoorContent.image(""))
+                        Text("Video").tag(DoorContent.video(""))
+                        Text("Map").tag(DoorContent.map(latitude: 0, longitude: 0))
                     }
                     .font(theme.bodyFont)
                 }
@@ -129,7 +130,7 @@ struct DoorViewEditor: View {
         VStack(alignment: .leading, spacing: theme.spacing) {
             Section("Content") {
                 HStack {
-                    switch selectedType {
+                    switch contentType {
                     case .text:
                         textEditor
                     case .image:
@@ -223,7 +224,7 @@ struct DoorViewEditor: View {
 
 #Preview {
     NavigationStack {
-        DoorViewEditor(
+        DoorEditorView(
             door: CalendarDoor(
                 number: 1,
                 unlockDate: Date(),

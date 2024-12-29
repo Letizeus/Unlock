@@ -173,9 +173,6 @@ struct DoorContentView: View {
         .background(theme.secondary)
         .cornerRadius(theme.cornerRadius)
     }
-    
-    
-    // MARK: - Helper Methods
         
     // Sheet view for selecting reactions
     private var reactionSheet: some View {
@@ -223,7 +220,7 @@ struct DoorContentView: View {
 #Preview {
     NavigationStack {
         DoorContentView(
-            content: .text("✨ Welcome to today's surprise! ✨\n\nHope this brings a smile to your face and makes your day a little more special. Enjoy this moment of joy and discovery! 🌟")
+            content: .text("✨ Lorem ipsum dolor sit amet! ✨\n\nConsectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 🌟")
         )
         .environment(\.calendarTheme, CalendarTheme.default)
     }

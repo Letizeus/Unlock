@@ -7,14 +7,17 @@ class ThemeManager: ObservableObject {
     // private(set) allows reading from outside but only writing from within this class
     @Published private(set) var calendarTheme: CalendarTheme
     @Published private(set) var editorTheme: EditorTheme
+    @Published private(set) var mapTheme: MapTheme
     
     // Allows for custom themes to be set at initialization if needed
     init(
         calendarTheme : CalendarTheme = .default,
-        editorTheme: EditorTheme = .default
+        editorTheme: EditorTheme = .default,
+        mapTheme: MapTheme = .default
     ) {
         self.calendarTheme = calendarTheme
         self.editorTheme = editorTheme
+        self.mapTheme = mapTheme
     }
     
     // Update theme based on color scheme changes
@@ -29,6 +32,10 @@ class ThemeManager: ObservableObject {
     func updateEditorTheme(_ theme: EditorTheme) {
         editorTheme = theme
     }
+    
+    func updateMapTheme(_ theme: MapTheme) {
+        mapTheme = theme
+    }
 }
 
 // MARK: - Environment Values Extension
@@ -42,6 +49,10 @@ private struct EditorThemeKey: EnvironmentKey {
     static let defaultValue = EditorTheme.default
 }
 
+private struct MapThemeKey: EnvironmentKey {
+    static let defaultValue = MapTheme.default
+}
+
 // This allows views to access themes through the environment
 extension EnvironmentValues {
     // Usage: @Environment(\.calendarTheme) private var theme
@@ -53,5 +64,11 @@ extension EnvironmentValues {
     var editorTheme: EditorTheme {
         get { self[EditorThemeKey.self] }
         set { self[EditorThemeKey.self] = newValue }
+    }
+    
+    // Usage: @Environment(\.mapTheme) private var theme
+    var mapTheme: MapTheme {
+        get { self[MapThemeKey.self] }
+        set { self[MapThemeKey.self] = newValue }
     }
 }

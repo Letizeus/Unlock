@@ -2,19 +2,19 @@ import SwiftUI
 
 struct TabViewCalendar: View {
     
+    class CalendarViewModel: ObservableObject {
+        @Published var isAnyDoorOpening = false
+    }
+    
     @Environment(\.calendarTheme) private var theme // Access the calendar theme from the environment
     @Environment(\.colorScheme) var colorScheme
     
     // MARK: - Properties
     
-    // The calendar data model containing all doors and their content
-    let calendar: HolidayCalendar
-    // Current countdown information (days, hours, minutes)
-    @State private var countdown = CountdownInfo()
-    // Only one door at once
-    @State private var isAnyDoorOpening = false
-    // Timer that updates the countdown every second
-    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    let calendar: HolidayCalendar // The calendar data model containing all doors and their content
+    @StateObject private var viewModel = CalendarViewModel() // Only one door at once
+    @State private var countdown = CountdownInfo() // Current countdown information (days, hours, minutes)
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()// Timer that updates the countdown every second
     
     // MARK: - View Body
     
@@ -95,13 +95,37 @@ struct TabViewCalendar: View {
         }
     }
     
-    // Displays the countdown to the next unlockable door
+    // A view that displays the complete countdown timer for the next door
+    // Combines multiple CountdownCells with separators and descriptive text
     private var countdownView: some View {
-        let nextDoor = findNextDoor()
-        return CountdownDisplay(
-            nextDoorNumber: nextDoor?.number ?? 0,
-            countdown: countdown
-        )
+        return VStack(spacing: theme.spacing) {
+            HStack(spacing: 4) {
+                CountdownCell(value: countdown.days, label: "days")
+                colonSeparator()
+                CountdownCell(value: countdown.hours, label: "hours")
+                colonSeparator()
+                CountdownCell(value: countdown.minutes, label: "minutes")
+            }
+            
+            Text("until Door \(findNextDoor()?.number ?? 0)!")
+                .foregroundStyle(theme.text)
+                .font(theme.bodyFont)
+        }
+        .padding()
+        .background {
+            // Semi-transparent background container
+            RoundedRectangle(cornerRadius: theme.cornerRadius)
+                .fill(theme.countdownStyle.backgroundColor)
+                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
+        }
+        
+        // Separator view used between countdown cells
+        func colonSeparator() -> some View {
+            Text(":")
+                .foregroundStyle(theme.countdownStyle.separatorColor)
+                .font(theme.titleFont)
+                .offset(y: -theme.spacing) // Adjust colon position to allign with the numbers
+        }
     }
     
     // Creates the grid layout for calendar doors
@@ -113,14 +137,14 @@ struct TabViewCalendar: View {
             spacing: theme.spacing
         ) {
             ForEach(calendar.doors) { door in
-                DoorViewCell(isAnyDoorOpening: $isAnyDoorOpening, door: door)
+                DoorViewCell(isAnyDoorOpening: $viewModel.isAnyDoorOpening, door: door)
                     .aspectRatio(1, contentMode: .fit) // Maintain square shape
             }
         }
         .padding(.horizontal, theme.padding.trailing)
     }
     
-    // MARK: - Helper Methods
+    // MARK: - Helper Functions
     
     // Finds the door that corresponds to the current date
     private func findCurrentDoor() -> CalendarDoor? {
@@ -143,7 +167,7 @@ struct TabViewCalendar: View {
     }
     
     // Updates the countdown timer values based on the next unlockable door
-    func updateCountdown() {
+    private func updateCountdown() {
         guard let nextDoor = findNextDoor() else {
             countdown = CountdownInfo()
             return

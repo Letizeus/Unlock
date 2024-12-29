@@ -1,5 +1,6 @@
 import Foundation
 
+// MARK: - HolidayCalendar
 // Represents a complete holiday calendar with multiple doors
 struct HolidayCalendar: Identifiable, Codable {
     var id = UUID()
@@ -52,6 +53,7 @@ struct HolidayCalendar: Identifiable, Codable {
     }
 }
 
+// MARK: - CalendarDoor
 // Represents an individual door in the holiday calendar
 struct CalendarDoor: Identifiable, Codable {
     var id = UUID()
@@ -71,6 +73,7 @@ struct CalendarDoor: Identifiable, Codable {
     }
 }
 
+// MARK: - DoorContent
 // Defines different types of content that can be behind a door
 enum DoorContent: Codable, Hashable {
     case text(String)
@@ -86,28 +89,9 @@ enum DoorContent: Codable, Hashable {
             case .map: return "Map"
         }
     }
-    
-    // This enum helps manage the UI selection for content types
-    // It's simpler because it doesn't have associated values
-    // Making it easier for SwiftUI's Picker to handle
-    enum SelectionType: String, CaseIterable {
-        case text = "Text"
-        case image = "Image"
-        case video = "Video"
-        case map = "Map"
-        
-        // Takes a DoorContent and returns the corresponding UI selection
-        static func from(_ content: DoorContent) -> SelectionType {
-            switch content {
-                case .text: return .text
-                case .image: return .image
-                case .video: return .video
-                case .map: return .map
-            }
-        }
-    }
 }
 
+// MARK: - GridLayoutMode
 enum GridLayoutMode: String, CaseIterable, Codable {
     case uniform = "Uniform"
     case random = "Different Sizes"
@@ -120,6 +104,7 @@ enum GridLayoutMode: String, CaseIterable, Codable {
     }
 }
 
+// MARK: - Tab
 // Defines the available tabs in the main navigation
 enum Tab {
     case calendar
@@ -143,6 +128,7 @@ enum Tab {
     }
 }
 
+// MARK: - UnlockMode
 // Defines how doors in the calendar should unlock
 enum UnlockMode {
     case daily     // Doors unlock one per day
@@ -156,6 +142,7 @@ enum UnlockMode {
     }
 }
 
+// MARK: - CountdownInfo
 // Holds information for countdown display
 struct CountdownInfo {
     var days: Int = 0
@@ -163,6 +150,7 @@ struct CountdownInfo {
     var minutes: Int = 0
 }
 
+// MARK: - CalendarError
 // Defines possible errors that can occur during calendar operations
 enum CalendarError: LocalizedError {
     case invalidDate
