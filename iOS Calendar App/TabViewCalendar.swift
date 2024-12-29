@@ -41,7 +41,7 @@ struct TabViewCalendar: View {
                             .padding(.horizontal, theme.spacing)
                         // ScrollViewReader enables programmatic scrolling to specific doors
                         ScrollViewReader { proxy in
-                            ScrollView() {
+                            ScrollView {
                                 calendarGrid(width: geometry.size.width)
                                     .padding(.top, theme.padding.top)
                                     .padding(.bottom, theme.padding.bottom)

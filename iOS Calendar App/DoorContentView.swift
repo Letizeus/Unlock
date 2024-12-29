@@ -8,12 +8,17 @@ struct DoorContentView: View {
     // MARK: - Properties
     
     let content: DoorContent
+    var door: CalendarDoor
+    let onReactionAdded: (String) -> Void // Callback function called when user adds a new reaction
+    
     @State private var isImageExpanded = false // State for image expansion animation
     @State private var showReactionSheet = false // Controls the presentation of the reaction sheet
-    @State private var selectedReaction: String?
     @State private var hasReacted = false
     
     private let reactions = ["❤️", "👍🏼", "🎁", "⭐️", "🤩"]
+    
+    // Generate a simple device ID (only a temp solution)
+    private let userId = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
     
     // MARK: - View Body
     
@@ -22,9 +27,8 @@ struct DoorContentView: View {
             ScrollView {
                 VStack(spacing: theme.spacing) {
                     // Display selected reaction at the top if one exists
-                    if let reaction = selectedReaction {
-                        Text(reaction)
-                            .font(.system(size: 44))
+                    if !door.reactions.isEmpty {
+                        reactionCountsView
                             .padding(.top, theme.spacing)
                     }
                     
@@ -33,7 +37,7 @@ struct DoorContentView: View {
                         .padding(.horizontal, theme.padding.leading)
                     
                     // Reaction button (only shown if user hasn't reacted)
-                    if !hasReacted {
+                    if !door.hasReacted(userId: userId) {
                         Button(action: { showReactionSheet = true }) {
                             Label("Add Reaction", systemImage: "heart")
                                 .font(theme.bodyFont)
@@ -46,7 +50,7 @@ struct DoorContentView: View {
                         .padding(.top, theme.spacing)
                     }
                     
-                    if hasReacted {
+                    if door.hasReacted(userId: userId) {
                         Text("Thanks for spreading love!")
                             .font(theme.bodyFont)
                             .foregroundColor(theme.text.opacity(0.6))
@@ -76,6 +80,23 @@ struct DoorContentView: View {
     }
     
     // MARK: - UI Components
+    
+    // Displays counts of all reactions for this door
+    private var reactionCountsView: some View {
+        let counts = door.reactionCounts()
+        return HStack(spacing: theme.spacing) {
+            ForEach(Array(counts.keys.sorted()), id: \.self) { emoji in
+                if let count = counts[emoji] {
+                    Text("\(emoji) \(count)")
+                        .font(theme.bodyFont)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(theme.secondary)
+                        .cornerRadius(theme.cornerRadius)
+                }
+            }
+        }
+    }
         
     // Switches between different content views based on the content type
     private var contentView: some View {
@@ -174,7 +195,7 @@ struct DoorContentView: View {
         .cornerRadius(theme.cornerRadius)
     }
         
-    // Sheet view for selecting reactions
+    // Sheet that appears when user wants to add a reaction
     private var reactionSheet: some View {
         VStack(spacing: theme.spacing) {
             Text("Choose a Reaction")
@@ -182,11 +203,11 @@ struct DoorContentView: View {
                 .foregroundColor(theme.text)
                 .padding(.top)
             
-            // Grid of reaction emojis
+            // Grid of available reactions
             HStack(spacing: theme.spacing) {
                 ForEach(reactions, id: \.self) { reaction in
                     Button(action: {
-                        selectedReaction = reaction
+                        onReactionAdded(reaction)
                         hasReacted = true
                         showReactionSheet = false
                     }) {
@@ -220,7 +241,15 @@ struct DoorContentView: View {
 #Preview {
     NavigationStack {
         DoorContentView(
-            content: .text("✨ Lorem ipsum dolor sit amet! ✨\n\nConsectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 🌟")
+            content: .text("✨ Lorem ipsum dolor sit amet! ✨\n\nConsectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 🌟"),
+            door: CalendarDoor(
+                number: 1,
+                unlockDate: Date(),
+                isUnlocked: true,
+                content: .text("✨ Lorem ipsum dolor sit amet! ✨\n\nConsectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 🌟"),
+                hasBeenOpened: true
+            ),
+            onReactionAdded: { _ in }
         )
         .environment(\.calendarTheme, CalendarTheme.default)
     }

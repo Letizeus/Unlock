@@ -62,6 +62,7 @@ struct CalendarDoor: Identifiable, Codable {
     var isUnlocked: Bool
     var content: DoorContent
     var hasBeenOpened: Bool
+    var reactions: [Reaction] // Array of reactions that users have added to this door
         
     init(number: Int, unlockDate: Date, isUnlocked: Bool, content: DoorContent, hasBeenOpened: Bool) {
         self.id = UUID()
@@ -70,6 +71,27 @@ struct CalendarDoor: Identifiable, Codable {
         self.isUnlocked = isUnlocked
         self.content = content
         self.hasBeenOpened = false
+        self.reactions = []
+    }
+    
+    // Adds a new reaction to the door
+    mutating func addReaction(_ emoji: String, userId: String) {
+        let reaction = Reaction(emoji: emoji, userId: userId)
+        reactions.append(reaction)
+    }
+    
+    // Checks if a specific user has already reacted to this door
+    func hasReacted(userId: String) -> Bool {
+        reactions.contains { $0.userId == userId }
+    }
+    
+    // Counts how many times each emoji has been used as a reaction
+    func reactionCounts() -> [String: Int] {
+        var counts: [String: Int] = [:]
+        for reaction in reactions {
+            counts[reaction.emoji, default: 0] += 1
+        }
+        return counts
     }
 }
 
@@ -88,6 +110,23 @@ enum DoorContent: Codable, Hashable {
             case .video: return "Video"
             case .map: return "Map"
         }
+    }
+}
+
+// MARK: - Reaction
+// Represents a single reaction to a calendar door
+// Stores information about who made the reaction and when
+struct Reaction: Identifiable, Codable {
+    let id: UUID
+    let emoji: String
+    let userId: String // Uses device ID for simplicity, but could be expanded to use actual user IDs
+    let timestamp: Date // When the reaction was created
+    
+    init(emoji: String, userId: String) {
+        self.id = UUID()
+        self.emoji = emoji
+        self.userId = userId
+        self.timestamp = Date()
     }
 }
 

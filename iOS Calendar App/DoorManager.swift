@@ -96,13 +96,25 @@ struct DoorInteractionModifier: ViewModifier {
         .allowsHitTesting(manager.door.isUnlocked && !manager.isAnyDoorOpening)
         // Present content sheet when door is opened
         .sheet(isPresented: $manager.isShowingContent) {
-            DoorContentView(content: manager.door.content)
+            DoorContentView(
+                content: manager.door.content,
+                door: manager.door,
+                onReactionAdded: handleReactionAdded
+            )
                 .interactiveDismissDisabled()
         }
         // Checks unlock state when view appears
         .onAppear {
             manager.updateUnlockState()
         }
+    }
+    
+    // Handles when a user adds a new reaction
+    // Updates the door's reactions and propagates the change through CalendarStateManager
+    private func handleReactionAdded(_ emoji: String) {
+        var updatedDoor = manager.door
+        updatedDoor.addReaction(emoji, userId: UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString)
+        CalendarStateManager.shared.silentlyUpdateDoor(updatedDoor)
     }
 }
 

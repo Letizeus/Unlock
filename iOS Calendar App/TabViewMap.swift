@@ -30,7 +30,6 @@ struct TabViewMap: View {
                         Rectangle()
                             .fill(theme.roadStyle.color)
                             .frame(width: theme.roadStyle.width)
-                            .frame(maxHeight: .infinity)
                         
                         // Vertical stack of checkpoint nodes representing each door
                         LazyVStack(spacing: theme.roadStyle.nodeSpacing) {
