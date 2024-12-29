@@ -4,11 +4,11 @@ struct MainView: View {
     
     // MARK: - Properties
     
-    @StateObject private var themeManager = ThemeManager()
-    @Environment(\.colorScheme) var colorScheme // Reads whether the user's system is in light or dark mode
+    @Environment(\.colorScheme) var colorScheme // Detects system color scheme changes
+    @StateObject private var themeManager = ThemeManager() // Manages theme updates for the entire app
+    @StateObject private var stateManager = CalendarStateManager.shared // Global calendar state manager - source of truth for door states
     
     @State private var selectedTab = Tab.calendar
-    @State private var currentCalendar: HolidayCalendar = HolidayCalendar.createDefault()
     
     // MARK: - View Body
     
@@ -35,7 +35,7 @@ struct MainView: View {
     // MARK: - Tab Views
     
     private var calendarTab: some View {
-        TabViewCalendar(calendar: currentCalendar) // Use the currentCalendar state
+        TabViewCalendar(calendar: stateManager.calendar) // Use the currentCalendar state
             .tabItem {
                 Label(Tab.calendar.title, systemImage: Tab.calendar.icon)
             }
@@ -43,7 +43,7 @@ struct MainView: View {
     }
     
     private var mapTab: some View {
-        TabViewMap(calendar: currentCalendar)
+        TabViewMap(calendar: stateManager.calendar)
             .tabItem {
                 Label(Tab.map.title, systemImage: Tab.map.icon)
             }
@@ -52,7 +52,7 @@ struct MainView: View {
     
     private var editorTab: some View {
         TabViewEditor(onSaveCalendar: { newCalendar in
-            currentCalendar = newCalendar // Update the currentCalendar state
+            stateManager.calendar = newCalendar // Update the currentCalendar state
             selectedTab = .calendar // Switch to calendar tab after saving
         })
         .tabItem {

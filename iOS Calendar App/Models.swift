@@ -104,6 +104,28 @@ enum GridLayoutMode: String, CaseIterable, Codable {
     }
 }
 
+// MARK: - UnlockMode
+// Defines how doors in the calendar should unlock
+enum UnlockMode {
+    case daily     // Doors unlock one per day
+    case specific  // Each door has a specific unlock date
+    
+    var description: String {
+        switch self {
+            case .daily: return "Daily"
+            case .specific: return "Specific Dates"
+        }
+    }
+}
+
+// MARK: - CountdownInfo
+// Holds information for countdown display
+struct CountdownInfo {
+    var days: Int = 0
+    var hours: Int = 0
+    var minutes: Int = 0
+}
+
 // MARK: - Tab
 // Defines the available tabs in the main navigation
 enum Tab {
@@ -126,28 +148,6 @@ enum Tab {
             case .editor: return "pencil"
         }
     }
-}
-
-// MARK: - UnlockMode
-// Defines how doors in the calendar should unlock
-enum UnlockMode {
-    case daily     // Doors unlock one per day
-    case specific  // Each door has a specific unlock date
-    
-    var description: String {
-        switch self {
-            case .daily: return "Daily"
-            case .specific: return "Specific Dates"
-        }
-    }
-}
-
-// MARK: - CountdownInfo
-// Holds information for countdown display
-struct CountdownInfo {
-    var days: Int = 0
-    var hours: Int = 0
-    var minutes: Int = 0
 }
 
 // MARK: - CalendarError

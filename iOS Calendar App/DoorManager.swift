@@ -1,8 +1,11 @@
 import SwiftUI
+import Combine
+import SwiftData
 
-// Manages the state and animations for door interactions
+// MARK: - DoorOpeningManager
+// Manages the state and animations for an individual door
+// Each door instance (in both map and calendar view) has its own manager
 class DoorOpeningManager: ObservableObject {
-    
     @Published var door: CalendarDoor
     @Published var isShowingContent = false // Controls content sheet presentation
     @Published var doorRotation = 0.0
@@ -15,6 +18,9 @@ class DoorOpeningManager: ObservableObject {
     init(door: CalendarDoor, isAnyDoorOpening: Binding<Bool>) {
         self.door = door
         self._isAnyDoorOpening = isAnyDoorOpening
+        
+        // Immediately update state on init
+        CalendarStateManager.shared.addObserver(self)
     }
     
     func handleDoorTap(completion: @escaping () -> Void) {
@@ -36,6 +42,9 @@ class DoorOpeningManager: ObservableObject {
             self.door.hasBeenOpened = true
             self.door.isUnlocked = true
             
+            // Propagate state change to other views
+            CalendarStateManager.shared.silentlyUpdateDoor(self.door)
+            
             // Reset door after a brief delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
@@ -47,12 +56,18 @@ class DoorOpeningManager: ObservableObject {
         }
     }
     
+    // Cleanup: remove this manager from receiving updates when view is destroyed
+    deinit {
+        CalendarStateManager.shared.removeObserver(self)
+    }
+    
     // Checks if the door should be unlocked
     func updateUnlockState() {
         door.isUnlocked = Calendar.current.startOfDay(for: Date()) >= Calendar.current.startOfDay(for: door.unlockDate)
     }
 }
 
+// MARK: - DoorInteractionModifier
 // Shared view modifier for door interaction
 struct DoorInteractionModifier: ViewModifier {
     @ObservedObject var manager: DoorOpeningManager
@@ -91,6 +106,7 @@ struct DoorInteractionModifier: ViewModifier {
     }
 }
 
+// MARK: - ViewExtension
 // Extension on View to provide a convenient way to add door interaction behavior
 // This allows us to use the .doorInteraction() modifier on any view
 extension View {
