@@ -30,6 +30,7 @@ struct MainView: View {
         // Provide the theme through the environment
         .environment(\.calendarTheme, themeManager.calendarTheme)
         .environment(\.editorTheme, themeManager.editorTheme)
+        .environment(\.mapTheme, themeManager.mapTheme)
     }
     
     // MARK: - Tab Views
