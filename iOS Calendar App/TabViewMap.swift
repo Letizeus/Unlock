@@ -46,6 +46,7 @@ struct TabViewMap: View {
                         .padding(.vertical, geometry.size.height/6)
                     }
                 }
+                .scrollIndicators(.hidden)
                 // When the view appears, automatically scroll to the current node
                 .onAppear {
                     Task { @MainActor in

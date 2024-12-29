@@ -247,6 +247,7 @@ struct TabViewEditor: View {
                         }
                     }
                 }
+                .scrollIndicators(.hidden)
                 .frame(maxHeight: theme.previewStyle.maxHeight)
             }
         }

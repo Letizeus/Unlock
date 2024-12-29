@@ -46,6 +46,7 @@ struct TabViewCalendar: View {
                                     .padding(.top, theme.padding.top)
                                     .padding(.bottom, theme.padding.bottom)
                             }
+                            .scrollIndicators(.hidden)
                             // When the view appears, automatically scroll to the current door
                             .onAppear {
                                 Task { @MainActor in
