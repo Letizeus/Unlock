@@ -10,7 +10,6 @@ private func formatDate(_ date: Date) -> String {
 
 // MARK: - TabViewEditor
 
-// DoorPreviewCell
 // A view cell that displays a preview of a calendar door in the editor
 // Used in the calendar editor interface to show door content types
 struct DoorPreviewCell: View {
@@ -49,7 +48,6 @@ struct DoorPreviewCell: View {
 
 // MARK: - TabViewCalendar
 
-// CountdownCell
 // Reusable view component for displaying a countdown value and its label
 // Used to show days, hours, or minutes remaining until the next door unlock
 struct CountdownCell: View {
@@ -74,7 +72,6 @@ struct CountdownCell: View {
 
 // MARK: -
 
-// DoorViewCell
 // View representing an individual door in the calendar
 struct DoorViewCell: View {
     
@@ -180,7 +177,6 @@ struct DoorViewCell: View {
 }
 // MARK: - TabViewMap
 
-// CheckpointNodeView
 // CheckpointNodeView represents a single node (door) in the map journey visualization.
 struct CheckpointNodeView: View {
     
