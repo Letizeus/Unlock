@@ -9,6 +9,8 @@ struct TabViewEditor: View {
     
     // MARK: - Properties
     
+    @StateObject private var stateManager = CalendarStateManager.shared
+    
     // Basic Calendar Settings
     @State private var calendarTitle = ""
     @State private var startDate = Date()
@@ -27,6 +29,7 @@ struct TabViewEditor: View {
     @State private var doors: [CalendarDoor] = []
     @State private var selectedDoor: CalendarDoor?
     @State private var isEditingDoor = false
+    @State private var editedDoors: [UUID: CalendarDoor] = [:] // Tracks temporary door edits
     
     // Computed property to get the number of days between start and end dates
     private var daysBetweenDates: Int {
@@ -75,10 +78,10 @@ struct TabViewEditor: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                        saveButton
+                    saveButton
                 }
                 ToolbarItem(placement: .topBarLeading) {
-                        previewButton
+                    previewButton
                 }
             }
             .onAppear(perform: generateDoors) // Generate initial doors when view appears
@@ -112,11 +115,14 @@ struct TabViewEditor: View {
     
     // Save button that becomes enabled when calendar has title and doors
     private var saveButton: some View {
-        Button(action: saveCalendar) {
+        Button(action: {
+            applyEdits() // Applies all edits
+            saveCalendar() // Saves the calendar
+        }) {
             Text("Save & Use")
-                .foregroundColor(calendarTitle.isEmpty || doors.isEmpty ? 
-                           theme.text.opacity(0.4) :  // Disabled state
-                           theme.accent)              // Enabled state
+                .foregroundColor(calendarTitle.isEmpty || doors.isEmpty ?
+                            theme.text.opacity(0.4) :  // Disabled state
+                            theme.accent)              // Enabled state
         }
         .disabled(calendarTitle.isEmpty || doors.isEmpty)
     }
@@ -191,6 +197,7 @@ struct TabViewEditor: View {
                         .cornerRadius(theme.cornerRadius)
                 } else {
                     Label("Select Image", systemImage: "photo")
+                        .font(theme.bodyFont)
                         .frame(maxWidth: .infinity)
                         .frame(height: theme.imagePickerStyle.previewHeight / 2)
                         .background(theme.imagePickerStyle.placeholderColor)
@@ -239,7 +246,7 @@ struct TabViewEditor: View {
                     let columns = Array(repeating: GridItem(.flexible(), spacing: theme.spacing), count: gridColumns)
                     LazyVGrid(columns: columns, spacing: theme.spacing) {
                         ForEach(doors) { door in
-                            DoorPreviewCell(door: door)
+                            DoorPreviewCell(door: getCurrentDoor(door))
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     selectedDoor = door
@@ -267,6 +274,8 @@ struct TabViewEditor: View {
     private func saveCalendar() {
         let calendar = createPreviewCalendar()
         onSaveCalendar(calendar)
+        
+        stateManager.calendar = calendar // Updates the state manager with the new calendar
     }
     
     // Generates door entries based on current settings
@@ -291,6 +300,7 @@ struct TabViewEditor: View {
                 hasBeenOpened: false
             )
         }
+        editedDoors = [:]  // Clears temporary edits when generating new doors
     }
 
     // Creates a preview calendar instance with current settings
@@ -305,6 +315,18 @@ struct TabViewEditor: View {
             gridColumns: gridColumns,
             backgroundImageData: backgroundData
         )
+    }
+    
+    // Gets the current content of a door (either edited or original)
+    private func getCurrentDoor(_ door: CalendarDoor) -> CalendarDoor {
+        editedDoors[door.id] ?? door
+    }
+    
+    // Applies all temporary edits when saving
+    private func applyEdits() {
+        doors = doors.map { door in
+            editedDoors[door.id] ?? door
+        }
     }
 }
 

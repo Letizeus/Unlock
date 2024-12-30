@@ -88,7 +88,7 @@ struct DoorEditorView: View {
                 .font(theme.bodyFont)
             } header: {
                 Text("Unlock Date")
-                    .font(.headline) // Note: When added to Protocol, Editor crashes
+                    .font(theme.headlineFont)
                     .foregroundColor(theme.text)
             }
             .listRowBackground(theme.secondary)
@@ -116,7 +116,7 @@ struct DoorEditorView: View {
                 }
             } header: {
                 Text("Content Type")
-                    .font(.headline) // Note: When added to Protocol, Editor crashes
+                    .font(theme.headlineFont)
             }
             .listRowBackground(theme.secondary)
         }
@@ -177,10 +177,12 @@ struct DoorEditorView: View {
                     .cornerRadius(theme.cornerRadius)
             }
         }
-        .onChange(of: selectedImageItem) { _, item in
+        .background(theme.secondary)
+        .cornerRadius(theme.cornerRadius)
+        .onChange(of: selectedImageItem) { _, _ in
             Task {
                 // Try to load the selected image as transferable data
-                if let data = try? await item?.loadTransferable(type: Data.self) {
+                if let data = try? await selectedImageItem?.loadTransferable(type: Data.self) {
                     selectedImage = UIImage(data: data) // Convert the raw data into a UIImage if possible
                 }
             }
@@ -205,12 +207,29 @@ struct DoorEditorView: View {
         }
     }
     
-    // MARK: - Helper Methods
+    // MARK: - Helper Functions
     
     // Saves the current changes to the door
     private func saveChanges() {
         var updatedDoor = door
-        updatedDoor.content = contentType
+        
+        // Updates content based on type
+        switch contentType {
+        case .text:
+            updatedDoor.content = .text(textContent)
+        case .image:
+            if let image = selectedImage,
+               let imageData = image.jpegData(compressionQuality: 1) {
+                let filename = "door_\(door.number)_\(UUID().uuidString).jpg" // Generates a unique filename for the image
+                UserDefaults.standard.set(imageData, forKey: filename) // Saves image data using UserDefaults
+                updatedDoor.content = .image(filename)
+            }
+        case .video(let url):
+            updatedDoor.content = .video(url)
+        case .map(let lat, let long):
+            updatedDoor.content = .map(latitude: lat, longitude: long)
+        }
+        
         // Only update unlock date if in specific mode
         if unlockMode == .specific {
             updatedDoor.unlockDate = unlockDate

@@ -5,7 +5,8 @@ import SwiftUI
 class CalendarStateManager: ObservableObject {
     static let shared = CalendarStateManager()
     
-    @Published var calendar: HolidayCalendar // The source of truth for calendar data
+    // The source of truth for calendar data
+    @Published var calendar: HolidayCalendar
     
     // Weak reference collection of observers to prevent memory leaks
     // Used to track DoorOpeningManager instances that need state updates

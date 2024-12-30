@@ -104,8 +104,15 @@ struct DoorContentView: View {
             switch content {
             case .text(let text):
                 textContent(text)
-            case .image(let imageName):
-                imageContent(imageName)
+            case .image(let filename):
+                // Loads image from UserDefaults
+                if let imageData = UserDefaults.standard.data(forKey: filename),
+                   let uiImage = UIImage(data: imageData) {
+                    imageContent(uiImage: uiImage)
+                } else {
+                    // Fallback for missing image
+                    missingImageContent
+                }
             case .video(let videoURL):
                 videoContent(videoURL)
             case .map(let latitude, let longitude):
@@ -127,34 +134,38 @@ struct DoorContentView: View {
     }
     
     // Displays image content with tap-to-expand functionality
-    private func imageContent(_ imageName: String) -> some View {
-        GeometryReader { geometry in
+    private func imageContent(uiImage: UIImage) -> some View {
+        GeometryReader { geo in
             VStack {
-                if let uiImage = UIImage(named: imageName) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: isImageExpanded ? geometry.size.width : geometry.size.width * 0.8)
-                        .cornerRadius(theme.cornerRadius)
-                        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                                isImageExpanded.toggle()
-                            }
-                        }
-                } else {
-                    // Fallback view when image cannot be loaded
-                    Image(systemName: "photo")
-                        .font(.system(size: 40))
-                        .foregroundColor(theme.text.opacity(0.5))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 200)
-                        .background(theme.secondary)
-                        .cornerRadius(theme.cornerRadius)
-                }
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .cornerRadius(theme.cornerRadius)
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
             }
         }
         .frame(height: 200)
+    }
+    
+    // Fallback view for missing images
+    private var missingImageContent: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "photo.slash")
+                .font(.system(size: 40))
+                .foregroundColor(theme.text.opacity(0.5))
+            Text("Image not available")
+                .font(theme.bodyFont)
+                .foregroundColor(theme.text.opacity(0.7))
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 200)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(theme.secondary)
+                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+        )
+        .padding(.horizontal, 16)
     }
     
     // Displays a placeholder for video content
