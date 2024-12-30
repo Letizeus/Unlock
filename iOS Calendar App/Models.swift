@@ -136,6 +136,13 @@ enum DoorContent: Codable, Hashable {
     }
 }
 
+// MARK: - EnhancedDoorContent (UNUSED)
+// Enhanced content type to support multiple content types simultaneously
+enum EnhancedDoorContent: Codable, Hashable {
+    case single(DoorContent)
+    case combined(text: String, image: String?)
+}
+
 // MARK: - Reaction
 // Represents a single reaction to a calendar door
 // Stores information about who made the reaction and when
@@ -212,7 +219,7 @@ enum Tab {
     }
 }
 
-// MARK: - CalendarError
+// MARK: - CalendarError (UNUSED)
 // Defines possible errors that can occur during calendar operations
 enum CalendarError: LocalizedError {
     case invalidDate

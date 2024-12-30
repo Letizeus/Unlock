@@ -42,7 +42,7 @@ protocol DoorInteraction {
     func updateUnlockState()
 }
 
-// MARK: - Settings Protocols
+// MARK: - Settings Protocols (UNUSED)
 
 // Protocol defining the core functionality for managing calendar content
 // Implementers of this protocol can save, load, export, and import calendar data

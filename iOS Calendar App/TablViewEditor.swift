@@ -50,6 +50,7 @@ struct TabViewEditor: View {
                         basicInfoSection
                         backgroundImageSection
                         previewSection
+                        exportButton
                     }
                     .padding(theme.padding)
                 }
@@ -230,9 +231,15 @@ struct TabViewEditor: View {
     // Section showing door preview grid
     private var previewSection: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
-            Text("Preview")
-                .font(theme.headlineFont)
-                .foregroundColor(theme.text)
+            HStack {
+                Text("Preview")
+                    .font(theme.headlineFont)
+                    .foregroundColor(theme.text)
+                
+                Spacer()
+                
+                clearButton
+            }
             
             if doors.isEmpty {
                 HStack {
@@ -268,6 +275,45 @@ struct TabViewEditor: View {
         TabViewCalendar(calendar: createPreviewCalendar())
     }
     
+    // Removes all edited content and regenerates doors
+    private var clearButton: some View {
+        Button(action: {
+            editedDoors.removeAll()
+            generateDoors() // Regenerate doors without preserving edits
+        }) {
+            Text("Clear")
+                .foregroundColor(theme.accent)
+        }
+    }
+    
+    // Export section that allows users to export their calendar configuration
+    private var exportButton: some View {
+        VStack(alignment: .leading, spacing: theme.spacing) {
+            Text("Export")
+                .font(theme.headlineFont)
+                .foregroundColor(theme.text)
+            
+            Button(action: {
+                // Placeholder for export functionality
+            }) {
+                HStack {
+                    Image(systemName: "square.and.arrow.up")
+                    Text("Export Calendar")
+                        .font(theme.bodyFont)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(theme.padding)
+                .background(theme.accent)
+                .foregroundColor(.white)
+                .cornerRadius(theme.cornerRadius)
+            }
+            .disabled(doors.isEmpty)
+        }
+        .padding(theme.padding)
+        .background(theme.secondary)
+        .cornerRadius(theme.cornerRadius)
+    }
+    
     // MARK: - Helper Functions
     
     // Saves the current calendar configuration
@@ -278,29 +324,52 @@ struct TabViewEditor: View {
         stateManager.calendar = calendar // Updates the state manager with the new calendar
     }
     
-    // Generates door entries based on current settings
+    // Clears temporary edits when generating new doors
+    
+    // Generates door entries based on current settings while also preserving edits
     private func generateDoors() {
         let calendar = Calendar.current
         
-        // Updates door count based on date range in daily mode
         if unlockMode == .daily {
             doorCount = daysBetweenDates
         }
         
-        doors = (1...doorCount).map { number in
+        // Creates a mapping of door numbers to their edited content, including both edited and original content
+        var doorNumberToContent: [Int: DoorContent] = [:]
+        // First, preserve all existing door content (both edited and non-edited)
+        for door in doors {
+            if let editedDoor = editedDoors[door.id] {
+                doorNumberToContent[door.number] = editedDoor.content
+            } else {
+                doorNumberToContent[door.number] = door.content
+            }
+        }
+        
+        let newDoors = (1...doorCount).map { number in
             let unlockDate = unlockMode == .daily
                 ? calendar.date(byAdding: .day, value: number - 1, to: startDate) ?? startDate
                 : startDate // For specific mode, default to start date
-                
-            return CalendarDoor(
+            
+            // If we have edited content for this door number, use it
+            let content = doorNumberToContent[number] ?? .text("Add content for door \(number)")
+            
+            let newDoor = CalendarDoor(
                 number: number,
                 unlockDate: unlockDate,
                 isUnlocked: false,
-                content: .text("Add content for door \(number)"),
+                content: content,
                 hasBeenOpened: false
             )
+            
+            // If this is an edited door, update our editedDoors dictionary with the new door instance
+            if doorNumberToContent[number] != nil {
+                editedDoors[newDoor.id] = newDoor
+            }
+            
+            return newDoor
         }
-        editedDoors = [:]  // Clears temporary edits when generating new doors
+        
+        doors = newDoors
     }
 
     // Creates a preview calendar instance with current settings

@@ -26,6 +26,8 @@ struct DoorContentView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: theme.spacing) {
+                    banner
+                    
                     // Display selected reaction at the top if one exists
                     if !door.reactions.isEmpty {
                         reactionCountsView
@@ -36,26 +38,7 @@ struct DoorContentView: View {
                     contentView
                         .padding(.horizontal, theme.padding.leading)
                     
-                    // Reaction button (only shown if user hasn't reacted)
-                    if !door.hasReacted(userId: userId) {
-                        Button(action: { showReactionSheet = true }) {
-                            Label("Add Reaction", systemImage: "heart")
-                                .font(theme.bodyFont)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 10)
-                                .background(theme.accent)
-                                .cornerRadius(20)
-                        }
-                        .padding(.top, theme.spacing)
-                    }
-                    
-                    if door.hasReacted(userId: userId) {
-                        Text("Thanks for spreading love!")
-                            .font(theme.bodyFont)
-                            .foregroundColor(theme.text.opacity(0.6))
-                            .padding(.top, theme.spacing)
-                    }
+                    reactionControls
                     
                     Spacer(minLength: theme.spacing)
                 }
@@ -65,11 +48,18 @@ struct DoorContentView: View {
             .background(theme.background)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                // Leading: Share Button
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: { /* Share functionality placeholder */ }) {
+                        Image(systemName: "square.and.arrow.up")
+                            .foregroundStyle(.blue)
+                    }
+                }
+                // Trailing: Close Button
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(theme.text.opacity(0.6))
-                            .font(.system(size: 24))
                     }
                 }
             }
@@ -80,6 +70,24 @@ struct DoorContentView: View {
     }
     
     // MARK: - UI Components
+    
+    // Banner that always shows at the top
+    private var banner: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "star.fill")
+                .font(.system(size: 44))
+                .foregroundStyle(theme.accent)
+            
+            Text("Your Special Gift for Day \(door.number)")
+                .font(theme.subtitleFont.bold())
+                .foregroundColor(theme.text)
+                .multilineTextAlignment(.center)
+        }
+        .padding()
+        .frame(maxWidth: .infinity)
+        .cornerRadius(theme.cornerRadius)
+        .padding(.horizontal)
+    }
     
     // Displays counts of all reactions for this door
     private var reactionCountsView: some View {
@@ -204,6 +212,31 @@ struct DoorContentView: View {
         .frame(maxWidth: .infinity)
         .background(theme.secondary)
         .cornerRadius(theme.cornerRadius)
+    }
+    
+    // Reaction controls section
+    private var reactionControls: some View {
+        VStack(spacing: theme.spacing) {
+            // Reaction button (only shown if user hasn't reacted)
+            if !door.hasReacted(userId: userId) {
+                Button(action: { showReactionSheet = true }) {
+                    Label("Add Reaction", systemImage: "heart")
+                        .font(theme.bodyFont)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(theme.accent)
+                        .cornerRadius(20)
+                }
+            }
+            
+            if door.hasReacted(userId: userId) {
+                Text("Thanks for spreading love!")
+                    .font(theme.bodyFont)
+                    .foregroundColor(theme.text.opacity(0.6))
+            }
+        }
+        .padding(.top, theme.spacing)
     }
         
     // Sheet that appears when user wants to add a reaction
