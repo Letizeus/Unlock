@@ -279,7 +279,26 @@ struct TabViewEditor: View {
     private var clearButton: some View {
         Button(action: {
             editedDoors.removeAll()
-            generateDoors() // Regenerate doors without preserving edits
+            // Generate fresh doors with default content
+            let calendar = Calendar.current
+            
+            if unlockMode == .daily {
+                doorCount = daysBetweenDates
+            }
+            
+            doors = (1...doorCount).map { number in
+                let unlockDate = unlockMode == .daily
+                    ? calendar.date(byAdding: .day, value: number - 1, to: startDate) ?? startDate
+                    : startDate
+                    
+                return CalendarDoor(
+                    number: number,
+                    unlockDate: unlockDate,
+                    isUnlocked: false,
+                    content: .text("Add content for door \(number)"),
+                    hasBeenOpened: false
+                )
+            }
         }) {
             Text("Clear")
                 .foregroundColor(theme.accent)
