@@ -256,7 +256,8 @@ struct TabViewEditor: View {
                             DoorPreviewCell(door: getCurrentDoor(door))
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    selectedDoor = door
+                                    // Always use the current door state when editing
+                                    selectedDoor = getCurrentDoor(door)
                                 }
                         }
                     }
@@ -343,8 +344,6 @@ struct TabViewEditor: View {
         stateManager.calendar = calendar // Updates the state manager with the new calendar
     }
     
-    // Clears temporary edits when generating new doors
-    
     // Generates door entries based on current settings while also preserving edits
     private func generateDoors() {
         let calendar = Calendar.current
@@ -379,11 +378,6 @@ struct TabViewEditor: View {
                 content: content,
                 hasBeenOpened: false
             )
-            
-            // If this is an edited door, update our editedDoors dictionary with the new door instance
-            if doorNumberToContent[number] != nil {
-                editedDoors[newDoor.id] = newDoor
-            }
             
             return newDoor
         }
