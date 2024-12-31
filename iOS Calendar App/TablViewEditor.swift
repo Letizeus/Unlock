@@ -338,7 +338,22 @@ struct TabViewEditor: View {
     
     // Saves the current calendar configuration
     private func saveCalendar() {
-        let calendar = createPreviewCalendar()
+        // Update unlock states before saving
+        let currentDate = Calendar.current.startOfDay(for: Date())
+        let updatedDoors = doors.map { door in
+            var updatedDoor = door
+            updatedDoor.isUnlocked = currentDate >= Calendar.current.startOfDay(for: door.unlockDate)
+            return updatedDoor
+        }
+
+        let calendar = HolidayCalendar(
+            title: calendarTitle.isEmpty ? "Preview Calendar" : calendarTitle,
+            startDate: startDate,
+            endDate: endDate,
+            doors: updatedDoors,
+            gridColumns: gridColumns,
+            backgroundImageData: selectedBackgroundImage?.jpegData(compressionQuality: 1)
+        )
         onSaveCalendar(calendar)
         
         stateManager.calendar = calendar // Updates the state manager with the new calendar
@@ -387,13 +402,20 @@ struct TabViewEditor: View {
 
     // Creates a preview calendar instance with current settings
     private func createPreviewCalendar() -> HolidayCalendar {
-        let backgroundData = selectedBackgroundImage?.jpegData(compressionQuality: 1.0)
+        // Update unlock states before creating preview
+        let currentDate = Calendar.current.startOfDay(for: Date())
+        let updatedDoors = doors.map { door in
+            var updatedDoor = door
+            updatedDoor.isUnlocked = currentDate >= Calendar.current.startOfDay(for: door.unlockDate)
+            return updatedDoor
+        }
+        let backgroundData = selectedBackgroundImage?.jpegData(compressionQuality: 1)
         
         return HolidayCalendar(
             title: calendarTitle.isEmpty ? "Preview Calendar" : calendarTitle,
             startDate: startDate,
             endDate: endDate,
-            doors: doors,
+            doors: updatedDoors,
             gridColumns: gridColumns,
             backgroundImageData: backgroundData
         )

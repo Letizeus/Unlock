@@ -34,8 +34,13 @@ struct TabViewCalendar: View {
                             .padding(.top, theme.padding.top)
                             .padding(.bottom, theme.padding.bottom)
                         
-                        countdownView
-                            .padding(.bottom, theme.padding.bottom)
+                        if areAllDoorsUnlocked() {
+                            completionView
+                                .padding(.bottom, theme.padding.bottom)
+                        } else {
+                            countdownView
+                                .padding(.bottom, theme.padding.bottom)
+                        }
                         Divider()
                             .background(theme.text)
                             .padding(.horizontal, theme.spacing)
@@ -96,6 +101,34 @@ struct TabViewCalendar: View {
         }
     }
     
+    // A view that displays a celebratory message when all doors have been unlocked
+    private var completionView: some View {
+        VStack(spacing: theme.spacing) {
+            Image(systemName: "trophy.circle.fill")
+                .font(.system(size: 44))
+                .foregroundColor(theme.accent)
+            
+            Text("Congratulations!")
+                .font(theme.titleFont.bold())
+                .foregroundColor(theme.text)
+            
+            Text("You've unlocked all the doors!")
+                .font(theme.bodyFont)
+                .foregroundColor(theme.text.opacity(0.8))
+            
+            Text("Thanks for sharing this journey")
+                .font(theme.bodyFont)
+                .foregroundColor(theme.text.opacity(0.6))
+        }
+        .padding()
+        .background {
+            // Semi-transparent background container
+            RoundedRectangle(cornerRadius: theme.cornerRadius)
+                .fill(theme.countdownStyle.backgroundColor)
+                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
+        }
+    }
+    
     // A view that displays the complete countdown timer for the next door
     // Combines multiple CountdownCells with separators and descriptive text
     private var countdownView: some View {
@@ -146,6 +179,14 @@ struct TabViewCalendar: View {
     }
     
     // MARK: - Helper Functions
+    
+    // Checks if all doors in the calendar have been unlocked
+    // Returns true if every door's isUnlocked property is true, false otherwise
+    // Used to determine whether to show the completion view or countdown
+    private func areAllDoorsUnlocked() -> Bool {
+        let result = calendar.doors.allSatisfy { $0.isUnlocked }
+        return result
+    }
     
     // Finds the door that corresponds to the current date
     private func findCurrentDoor() -> CalendarDoor? {
