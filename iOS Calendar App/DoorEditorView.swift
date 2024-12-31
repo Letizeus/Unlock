@@ -13,7 +13,7 @@ struct DoorEditorView: View {
     let unlockMode: UnlockMode
     
     @State private var contentType: DoorContent // The current type of content being edited
-    
+
     @State private var textContent = "" // Text content when content type is .text
     // Selected image for image content type
     @State private var selectedImage: UIImage?
@@ -157,6 +157,9 @@ struct DoorEditorView: View {
             .scrollContentBackground(.hidden)
             .background(theme.background)
             .cornerRadius(theme.cornerRadius)
+            .onChange(of: textContent) { _, newValue in
+                contentType = .text(newValue)
+            }
     }
     
     // Image selector for image content type
