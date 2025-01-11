@@ -45,8 +45,6 @@ struct DoorEditorView: View {
             }
         case .video(let url):
             _textContent = State(initialValue: url)
-        case .map(_, _):
-            _textContent = State(initialValue: "")
         }
     }
     
@@ -114,7 +112,6 @@ struct DoorEditorView: View {
                         Text("Text").tag(DoorContent.text(textContent))
                         Text("Image").tag(DoorContent.image(""))
                         Text("Video").tag(DoorContent.video(""))
-                        Text("Map").tag(DoorContent.map(latitude: 0, longitude: 0))
                     }
                     .font(theme.bodyFont)
                 }
@@ -235,8 +232,6 @@ struct DoorEditorView: View {
             }
         case .video(let url):
             updatedDoor.content = .video(url)
-        case .map(let lat, let long):
-            updatedDoor.content = .map(latitude: lat, longitude: long)
         }
         
         // Only update unlock date if in specific mode

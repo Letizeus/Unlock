@@ -129,23 +129,14 @@ enum DoorContent: Codable, Hashable {
     case text(String)
     case image(String)
     case video(String)
-    case map(latitude: Double, longitude: Double)
     
     var contentType: String {
         switch self {
             case .text: return "Text"
             case .image: return "Image"
             case .video: return "Video"
-            case .map: return "Map"
         }
     }
-}
-
-// MARK: - EnhancedDoorContent (UNUSED)
-// Enhanced content type to support multiple content types simultaneously
-enum EnhancedDoorContent: Codable, Hashable {
-    case single(DoorContent)
-    case combined(text: String, image: String?)
 }
 
 // MARK: - Reaction

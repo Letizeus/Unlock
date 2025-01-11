@@ -124,8 +124,6 @@ struct DoorContentView: View {
                 }
             case .video(let videoURL):
                 videoContent(videoURL)
-            case .map(let latitude, let longitude):
-                locationContent(latitude: latitude, longitude: longitude)
             }
         }
     }
@@ -194,25 +192,6 @@ struct DoorContentView: View {
                     }
                 }
         }
-    }
-    
-    // Displays location information with coordinates
-    private func locationContent(latitude: Double, longitude: Double) -> some View {
-        VStack(spacing: theme.spacing / 2) {
-            Image(systemName: "map")
-                .font(.system(size: 44))
-                .foregroundColor(theme.accent)
-            Text("Location")
-                .font(theme.bodyFont)
-            Text("Lat: \(String(format: "%.4f", latitude))")
-                .font(theme.bodyFont)
-            Text("Long: \(String(format: "%.4f", longitude))")
-                .font(theme.bodyFont)
-        }
-        .padding(theme.padding)
-        .frame(maxWidth: .infinity)
-        .background(theme.secondary)
-        .cornerRadius(theme.cornerRadius)
     }
     
     // Reaction controls section
