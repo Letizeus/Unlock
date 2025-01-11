@@ -134,20 +134,33 @@ struct TabViewEditor: View {
             Text("Basic Information")
                 .font(theme.headlineFont)
                 .foregroundColor(theme.text)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
             TextField("Calendar Title", text: $calendarTitle)
                 .textFieldStyle(.roundedBorder)
                 .font(theme.bodyFont)
             
             // Unlock mode selection
-            Picker("Unlock Mode", selection: $unlockMode) {
-                Text(UnlockMode.daily.description).tag(UnlockMode.daily)
-                Text(UnlockMode.specific.description).tag(UnlockMode.specific)
+            VStack(alignment: .leading, spacing: theme.spacing) {
+                Text("Unlock Mode")
+                    .font(theme.bodyFont)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                
+                Picker("Unlock Mode", selection: $unlockMode) {
+                    Text(UnlockMode.daily.description).tag(UnlockMode.daily)
+                    Text(UnlockMode.specific.description).tag(UnlockMode.specific)
+                }
+                .pickerStyle(.segmented)
             }
-            .pickerStyle(.segmented)
             
-            VStack(alignment: .leading) {
+            // Layout Style selection
+            VStack(alignment: .leading, spacing: theme.spacing) {
                 Text("Layout Style (not working)")
                     .font(theme.bodyFont)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                
                 Picker("Layout Mode", selection: $layoutMode) {
                     Text(GridLayoutMode.uniform.description).tag(GridLayoutMode.uniform)
                     Text(GridLayoutMode.random.description).tag(GridLayoutMode.random)
@@ -173,6 +186,8 @@ struct TabViewEditor: View {
             HStack {
                 Text("Grid Columns:")
                     .font(theme.bodyFont)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
                 Stepper("\(gridColumns)", value: $gridColumns, in: 2...Constants.Calendar.maxGridColumns)
                     .font(theme.bodyFont)
             }
@@ -235,6 +250,8 @@ struct TabViewEditor: View {
                 Text("Preview")
                     .font(theme.headlineFont)
                     .foregroundColor(theme.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
                 
                 Spacer()
                 
@@ -246,6 +263,8 @@ struct TabViewEditor: View {
                     Text("Add doors to see preview")
                         .foregroundColor(theme.text.opacity(0.6))
                         .font(theme.bodyFont)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.75)
                     Spacer()
                 }
             } else {

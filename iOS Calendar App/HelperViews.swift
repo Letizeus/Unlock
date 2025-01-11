@@ -32,13 +32,19 @@ struct DoorPreviewCell: View {
                         .font(theme.subtitleFont)
                         .bold()
                         .foregroundColor(theme.text)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                     Text(door.content.contentType)
                         .font(theme.footnoteFont)
                         .foregroundColor(theme.text.opacity(0.6))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                     Text(formatDate(door.unlockDate))
                         .font(theme.footnoteFont)
                         .foregroundColor(theme.text.opacity(0.6))
                         .padding(.top, 2)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                 }
             }
         }
@@ -62,11 +68,15 @@ struct CountdownCell: View {
             Text(String(format: "%02d", value)) // Add leading zero
                 .font(theme.titleFont.bold())
                 .foregroundStyle(theme.text)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
             Text(label)
                 .font(theme.bodyFont)
                 .foregroundStyle(theme.text.opacity(0.8))
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
         }
-        .frame(width: theme.countdownStyle.cellWidth)
+        .frame(minWidth: theme.countdownStyle.cellWidth)
     }
 }
 
@@ -226,6 +236,8 @@ struct CheckpointNodeView: View {
             Text(formatDate(manager.door.unlockDate))
                 .font(theme.bodyFont)
                 .frame(width: theme.dateLabelStyle.width)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             
             Spacer()
             
@@ -261,6 +273,8 @@ struct CheckpointNodeView: View {
                 .font(theme.bodyFont)
                 .foregroundColor(theme.text.opacity(0.6))
                 .frame(width: theme.dateLabelStyle.width)
+                .lineLimit(2)
+                .minimumScaleFactor(0.5)
         }
         .doorInteraction(manager: manager) {
             isAnyDoorOpening = false

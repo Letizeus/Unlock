@@ -25,6 +25,7 @@ struct CalendarApp: App {
                 // Inject theme values into the environment for child views to access
                 .environment(\.calendarTheme, themeManager.calendarTheme)
                 .environment(\.editorTheme, themeManager.editorTheme)
+                .environment(\.mapTheme, themeManager.mapTheme)
         }
         .modelContainer(sharedModelContainer)
     }

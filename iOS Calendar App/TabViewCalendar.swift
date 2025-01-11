@@ -16,6 +16,12 @@ struct TabViewCalendar: View {
     @State private var countdown = CountdownInfo() // Current countdown information (days, hours, minutes)
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()// Timer that updates the countdown every second
     
+    // MARK: - Initialization
+    
+    init(calendar: HolidayCalendar) {
+        self.calendar = calendar
+    }
+    
     // MARK: - View Body
     
     var body: some View {
@@ -144,6 +150,7 @@ struct TabViewCalendar: View {
             Text("until Door \(findNextDoor()?.number ?? 0)!")
                 .foregroundStyle(theme.text)
                 .font(theme.bodyFont)
+                .multilineTextAlignment(.center)
         }
         .padding()
         .background {
@@ -220,6 +227,15 @@ struct TabViewCalendar: View {
             from: Date(),
             to: nextDoor.unlockDate
         )
+        
+        // If countdown reaches 00:00:00, update door states
+        if components.day == 0 && components.hour == 0 && components.minute == 0 {
+            for door in calendar.doors {
+                var updatedDoor = door
+                updatedDoor.updateUnlockState()
+                CalendarStateManager.shared.silentlyUpdateDoor(updatedDoor)
+            }
+        }
         
         countdown = CountdownInfo(
             days: components.day ?? 0,

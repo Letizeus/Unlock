@@ -97,6 +97,11 @@ struct CalendarDoor: Identifiable, Codable {
         self.reactions = []
     }
     
+    // Updates the door's unlock state based on the current date
+    mutating func updateUnlockState() {
+        isUnlocked = Calendar.current.startOfDay(for: Date()) >= Calendar.current.startOfDay(for: unlockDate)
+    }
+    
     // Adds a new reaction to the door
     mutating func addReaction(_ emoji: String, userId: String) {
         let reaction = Reaction(emoji: emoji, userId: userId)

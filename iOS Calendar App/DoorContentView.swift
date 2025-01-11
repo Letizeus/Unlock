@@ -11,7 +11,6 @@ struct DoorContentView: View {
     var door: CalendarDoor
     let onReactionAdded: (String) -> Void // Callback function called when user adds a new reaction
     
-    @State private var isImageExpanded = false // State for image expansion animation
     @State private var showReactionSheet = false // Controls the presentation of the reaction sheet
     @State private var hasReacted = false
     
@@ -77,6 +76,8 @@ struct DoorContentView: View {
             Image(systemName: "star.fill")
                 .font(.system(size: 44))
                 .foregroundStyle(theme.accent)
+                .minimumScaleFactor(0.75)
+                .lineLimit(2)
             
             Text("Your Special Gift for Day \(door.number)")
                 .font(theme.subtitleFont.bold())
@@ -246,6 +247,8 @@ struct DoorContentView: View {
                 .font(theme.titleFont.bold())
                 .foregroundColor(theme.text)
                 .padding(.top)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
             
             // Grid of available reactions
             HStack(spacing: theme.spacing) {

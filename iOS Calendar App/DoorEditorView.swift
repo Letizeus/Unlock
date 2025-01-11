@@ -90,6 +90,8 @@ struct DoorEditorView: View {
                 Text("Unlock Date")
                     .font(theme.headlineFont)
                     .foregroundColor(theme.text)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             }
             .listRowBackground(theme.secondary)
         }
@@ -105,6 +107,8 @@ struct DoorEditorView: View {
                 HStack {
                     Text("Type")
                         .foregroundColor(theme.text)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
                     Spacer() // This pushes the picker to the right
                     Picker("", selection: $contentType) {
                         Text("Text").tag(DoorContent.text(textContent))
@@ -117,6 +121,8 @@ struct DoorEditorView: View {
             } header: {
                 Text("Content Type")
                     .font(theme.headlineFont)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             }
             .listRowBackground(theme.secondary)
         }
