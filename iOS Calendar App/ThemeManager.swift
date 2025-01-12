@@ -4,6 +4,8 @@ import Foundation
 // Manages theme state and updates across the entire application
 // Uses ObservableObject to allow views to react to theme changes
 class ThemeManager: ObservableObject {
+    static let shared = ThemeManager()
+    
     // private(set) allows reading from outside but only writing from within this class
     @Published private(set) var calendarTheme: CalendarTheme
     @Published private(set) var editorTheme: EditorTheme

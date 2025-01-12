@@ -5,8 +5,8 @@ import Foundation
 struct HolidayCalendar: Identifiable, Codable {
     var id = UUID()
     var title: String
-    let startDate: Date
-    let endDate: Date
+    var startDate: Date
+    var endDate: Date
     var doors: [CalendarDoor]
     var gridColumns: Int
     var backgroundImageData: Data?
@@ -19,29 +19,6 @@ struct HolidayCalendar: Identifiable, Codable {
         self.doors = doors
         self.gridColumns = gridColumns
         self.backgroundImageData = backgroundImageData
-    }
-    
-    // cleanup function to remove old images in door
-    func cleanupUnusedImages() {
-        // Gets all image filenames currently in use
-        let currentImageFiles = Set(doors.compactMap { door -> String? in
-            if case .image(let filename) = door.content {
-                return filename
-            }
-            return nil
-        })
-        
-        // Gets all saved image keys from UserDefaults
-        let defaults = UserDefaults.standard
-        let allKeys = defaults.dictionaryRepresentation().keys
-        
-        // Removes any image data that's no longer referenced
-        // We only look at keys starting with "door_" as these are our image identifiers (defined in DoorEditorView - saveChanges())
-        for key in allKeys {
-            if key.starts(with: "door_") && !currentImageFiles.contains(key) {
-                defaults.removeObject(forKey: key)
-            }
-        }
     }
     
     // Creates a sample holiday calendar for preview
@@ -72,6 +49,18 @@ struct HolidayCalendar: Identifiable, Codable {
             endDate: dates.last ?? Date(),
             doors: doors,
             gridColumns: Constants.Calendar.defaultGridColumns
+        )
+    }
+    
+    // Creates a copy of the calendar
+    func copy() -> HolidayCalendar {
+        HolidayCalendar(
+            title: self.title,
+            startDate: self.startDate,
+            endDate: self.endDate,
+            doors: self.doors,
+            gridColumns: self.gridColumns,
+            backgroundImageData: self.backgroundImageData
         )
     }
 }

@@ -5,7 +5,7 @@ struct MainView: View {
     // MARK: - Properties
     
     @Environment(\.colorScheme) var colorScheme // Detects system color scheme changes
-    @StateObject private var themeManager = ThemeManager() // Manages theme updates for the entire app
+    @StateObject private var themeManager = ThemeManager.shared // Manages theme updates for the entire app
     @StateObject private var stateManager = CalendarStateManager.shared // Global calendar state manager - source of truth for door states
     
     @State private var selectedTab = Tab.calendar

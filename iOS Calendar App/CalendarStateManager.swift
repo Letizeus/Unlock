@@ -6,14 +6,23 @@ class CalendarStateManager: ObservableObject {
     static let shared = CalendarStateManager()
     
     // The source of truth for calendar data
-    @Published var calendar: HolidayCalendar
+    @Published var calendar: HolidayCalendar {
+        didSet {
+            save() // Saves calendar data whenever it changes
+        }
+    }
     
     // Weak reference collection of observers to prevent memory leaks
     // Used to track DoorOpeningManager instances that need state updates
     private var observers = NSHashTable<AnyObject>.weakObjects()
     
     private init() {
-        self.calendar = HolidayCalendar.createDefault()
+        // Tries to load saved calendar, or create default one if none exists
+        if let savedCalendar = AppStorage.shared.loadCalendar() {
+            self.calendar = savedCalendar
+        } else {
+            self.calendar = HolidayCalendar.createDefault()
+        }
     }
     
     // Registers a door manager to receive state updates
@@ -32,12 +41,31 @@ class CalendarStateManager: ObservableObject {
         if let index = calendar.doors.firstIndex(where: { $0.id == updatedDoor.id }) {
             calendar.doors[index] = updatedDoor // Update the master calendar's data
             
-            // Notify only the observers (door managers) that are displaying this specific door
+            // Notifies only the observers (door managers) that are displaying this specific door
             for case let observer as DoorOpeningManager in observers.allObjects {
                 if observer.door.id == updatedDoor.id {
                     observer.door = updatedDoor
                 }
             }
+            save()
         }
+    }
+    
+    // MARK: - Storage Operations
+        
+    // Saves the current calendar data
+    private func save() {
+        try? AppStorage.shared.saveCalendar(calendar)
+    }
+    
+    // Imports a new calendar and sets it as the current calendar
+    func importCalendar(_ newCalendar: HolidayCalendar) {
+        calendar = newCalendar
+        save()
+    }
+    
+    // Exports the current calendar data
+    func exportCalendar() throws -> Data {
+        return try AppStorage.shared.exportCalendar(calendar)
     }
 }

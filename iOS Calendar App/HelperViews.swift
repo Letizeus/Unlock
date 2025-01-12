@@ -34,11 +34,13 @@ struct DoorPreviewCell: View {
                         .foregroundColor(theme.text)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
-                    Text(door.content.contentType)
-                        .font(theme.footnoteFont)
+                    
+                    contentIcon
+                        .font(.system(size: 20))
                         .foregroundColor(theme.text.opacity(0.6))
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
+                    
                     Text(formatDate(door.unlockDate))
                         .font(theme.footnoteFont)
                         .foregroundColor(theme.text.opacity(0.6))
@@ -49,6 +51,17 @@ struct DoorPreviewCell: View {
             }
         }
         .aspectRatio(1, contentMode: .fit)
+    }
+    
+    private var contentIcon: Image {
+        switch door.content {
+        case .text:
+            Image(systemName: "text.bubble")
+        case .image:
+            Image(systemName: "photo")
+        case .video:
+            Image(systemName: "video.fill")
+        }
     }
 }
 

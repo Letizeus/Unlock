@@ -1,4 +1,5 @@
 import SwiftUI
+import AVKit
 
 // View for displaying the content behind an opened door
 struct DoorContentView: View {
@@ -18,6 +19,8 @@ struct DoorContentView: View {
     
     // Generate a simple device ID (only a temp solution)
     private let userId = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
+    
+    @State private var isLoadingVideo = false // Indicates if a video is currently loading
     
     // MARK: - View Body
     
@@ -114,21 +117,25 @@ struct DoorContentView: View {
             case .text(let text):
                 textContent(text)
             case .image(let filename):
-                // Loads image from UserDefaults
-                if let imageData = UserDefaults.standard.data(forKey: filename),
+                // Loads image from AppStorage
+                if let imageData = AppStorage.shared.loadMedia(identifier: filename),
                    let uiImage = UIImage(data: imageData) {
                     imageContent(uiImage: uiImage)
                 } else {
-                    // Fallback for missing image
                     missingImageContent
                 }
-            case .video(let videoURL):
-                videoContent(videoURL)
+            case .video(let filename):
+                // Loads video from AppStorage
+                if let videoData = AppStorage.shared.loadMedia(identifier: filename) {
+                    videoContent(videoData: videoData)
+                } else {
+                    missingVideoContent
+                }
             }
         }
     }
     
-    // Displays text content with proper formatting and styling
+    // Displays text content
     private func textContent(_ text: String) -> some View {
         Text(text)
             .font(theme.bodyFont)
@@ -140,7 +147,7 @@ struct DoorContentView: View {
             .cornerRadius(theme.cornerRadius)
     }
     
-    // Displays image content with tap-to-expand functionality
+    // Displays image content
     private func imageContent(uiImage: UIImage) -> some View {
         GeometryReader { geo in
             VStack {
@@ -175,23 +182,71 @@ struct DoorContentView: View {
         .padding(.horizontal, 16)
     }
     
-    // Displays a placeholder for video content
-    private func videoContent(_ videoURL: String) -> some View {
-        VStack {
-            RoundedRectangle(cornerRadius: theme.cornerRadius)
-                .fill(theme.secondary)
-                .aspectRatio(16/9, contentMode: .fit)
-                .overlay {
-                    VStack(spacing: theme.spacing) {
-                        Image(systemName: "play.circle.fill")
-                            .font(.system(size: 44))
-                            .foregroundColor(theme.accent)
-                        Text("Video Content")
+    // Displays video content
+    private func videoContent(videoData: Data) -> some View {
+        GeometryReader { geo in
+            VStack {
+                if isLoadingVideo {
+                    // Displays a loading indicator while the video is being prepared
+                    VStack {
+                        ProgressView()
+                            .padding(.bottom, 4)
+                        Text("Preparing Video...")
                             .font(theme.bodyFont)
-                            .foregroundColor(theme.text.opacity(0.6))
+                            .foregroundColor(theme.text)
+                    }
+                    .frame(width: geo.size.width, height: geo.size.height)
+                } else {
+                    // Creates a temporary file URL for the video data
+                    let temporaryFileURL = AppStorage.shared.createTemporaryVideoFile(with: videoData)
+                    
+                    // If the temporary file URL is successfully created, display the video player
+                    if let videoURL = temporaryFileURL {
+                        VideoPlayer(player: AVPlayer(url: videoURL))
+                            .aspectRatio(16/9, contentMode: .fit)
+                            .cornerRadius(theme.cornerRadius)
+                            .onDisappear {
+                                // Clean up the temporary video file when the view disappears
+                                try? FileManager.default.removeItem(at: videoURL)
+                            }
+                            .frame(width: geo.size.width, height: geo.size.height)
+                            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                    } else {
+                        // If the temporary file URL creation fails, display the missing video content
+                        missingVideoContent
+                            .frame(width: geo.size.width, height: geo.size.height)
                     }
                 }
+            }
         }
+        .frame(height: 200)
+        .onAppear {
+            isLoadingVideo = true
+            // Adds a small delay to let the UI update
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                isLoadingVideo = false
+            }
+        }
+    }
+    
+    // Fallback view for missing videos
+    private var missingVideoContent: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "video.slash")
+                .font(.system(size: 40))
+                .foregroundColor(theme.text.opacity(0.5))
+            Text("Video not available")
+                .font(theme.bodyFont)
+                .foregroundColor(theme.text.opacity(0.7))
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 200)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(theme.secondary)
+                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+        )
+        .padding(.horizontal, 16)
     }
     
     // Reaction controls section
@@ -261,6 +316,8 @@ struct DoorContentView: View {
         .presentationDetents([.height(250)])
     }
 }
+
+// MARK: - Helper Functions
 
 // MARK: - Preview
 

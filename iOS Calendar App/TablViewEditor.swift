@@ -421,7 +421,7 @@ struct TabViewEditor: View {
 
     // Creates a preview calendar instance with current settings
     private func createPreviewCalendar() -> HolidayCalendar {
-        // Update unlock states before creating preview
+        // Updates unlock states before creating preview
         let currentDate = Calendar.current.startOfDay(for: Date())
         let updatedDoors = doors.map { door in
             var updatedDoor = door

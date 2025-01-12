@@ -5,6 +5,7 @@ import SwiftData
 struct CalendarApp: App {
     
     @StateObject private var themeManager = ThemeManager() // Manages theme-related state across the app
+    @StateObject private var stateManager = CalendarStateManager.shared // Manages global calendar state
     
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
@@ -22,10 +23,14 @@ struct CalendarApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                // Inject theme values into the environment for child views to access
+                // Injects theme values into the environment for child views to access
                 .environment(\.calendarTheme, themeManager.calendarTheme)
                 .environment(\.editorTheme, themeManager.editorTheme)
                 .environment(\.mapTheme, themeManager.mapTheme)
+                .onAppear {
+                    // Cleanup any unused media files when app launches
+                    AppStorage.shared.cleanupUnusedMedia()
+                }
         }
         .modelContainer(sharedModelContainer)
     }

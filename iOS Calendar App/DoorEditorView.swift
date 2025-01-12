@@ -1,4 +1,5 @@
 import SwiftUI
+import AVKit
 import PhotosUI
 
 struct DoorEditorView: View {
@@ -18,6 +19,12 @@ struct DoorEditorView: View {
     // Selected image for image content type
     @State private var selectedImage: UIImage?
     @State private var selectedImageItem: PhotosPickerItem?
+    // Selected video for video content type
+    @State private var selectedVideo: Data?
+    @State private var selectedVideoItem: PhotosPickerItem?
+    @State private var videoPlayer: AVPlayer?
+    @State private var isLoadingVideo = false
+    @State private var isVideoPreviewReady = false
     
     // Date management
     @State private var unlockDate: Date
@@ -37,14 +44,31 @@ struct DoorEditorView: View {
         
         // Initialize content based on type
         switch door.content {
-        case .text(let text):
-            _textContent = State(initialValue: text)
-        case .image(let path):
-            if let image = UIImage(named: path) {
-                _selectedImage = State(initialValue: image)
-            }
-        case .video(let url):
-            _textContent = State(initialValue: url)
+            case .text(let text):
+                _textContent = State(initialValue: text)
+            case .image(let filename):
+                if let imageData = AppStorage.shared.loadMedia(identifier: filename),
+                   let image = UIImage(data: imageData) {
+                    _selectedImage = State(initialValue: image)
+                } else {
+                    _selectedImage = State(initialValue: nil)
+                }
+            case .video(let filename):
+                if let videoData = AppStorage.shared.loadMedia(identifier: filename) {
+                    _selectedVideo = State(initialValue: videoData)
+                    let temporaryFileURL = AppStorage.shared.createTemporaryVideoFile(with: videoData)
+                    if let videoURL = temporaryFileURL {
+                        _videoPlayer = State(initialValue: AVPlayer(url: videoURL))
+                        _isVideoPreviewReady = State(initialValue: true)
+                    } else {
+                        _videoPlayer = State(initialValue: nil)
+                        _isVideoPreviewReady = State(initialValue: false)
+                    }
+                } else {
+                    _selectedVideo = State(initialValue: nil)
+                    _videoPlayer = State(initialValue: nil)
+                    _isVideoPreviewReady = State(initialValue: false)
+                }
         }
     }
     
@@ -138,11 +162,8 @@ struct DoorEditorView: View {
                         textEditor
                     case .image:
                         imageSelector
-                    default:
-                        Text("Content type not implemented yet")
-                            .font(theme.bodyFont)
-                            .foregroundColor(theme.text.opacity(0.6))
-                        Spacer()
+                    case .video:
+                        videoSelector
                     }
                 }
             }
@@ -195,6 +216,64 @@ struct DoorEditorView: View {
         }
     }
     
+    // Video selector view for video content type
+    private var videoSelector: some View {
+        PhotosPicker(selection: $selectedVideoItem, matching: .videos) {
+            if isLoadingVideo {
+                // If the video is currently loading, show a loading indicator
+                VStack {
+                    ProgressView()
+                        .padding(.bottom, 4)
+                    Text("Loading Video...")
+                        .font(theme.bodyFont)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: theme.imagePickerStyle.previewHeight)
+                .background(theme.imagePickerStyle.placeholderColor)
+                .cornerRadius(theme.cornerRadius)
+            } else if let player = videoPlayer, isVideoPreviewReady {
+                // If the video player is available and the preview is ready, show the video player
+                VideoPlayer(player: player)
+                    .aspectRatio(16/9, contentMode: .fit)
+                    .cornerRadius(theme.cornerRadius)
+            } else {
+                // If no video is selected or the preview is not ready, show a placeholder view
+                Label("Select Video", systemImage: "video")
+                    .font(theme.bodyFont)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: theme.imagePickerStyle.previewHeight)
+                    .background(theme.imagePickerStyle.placeholderColor)
+                    .cornerRadius(theme.cornerRadius)
+            }
+        }
+        .onChange(of: selectedVideoItem) { _, _ in
+            Task {
+                isLoadingVideo = true
+                isVideoPreviewReady = false
+                videoPlayer?.pause()
+                videoPlayer = nil
+                
+                // Tries to load the selected video as transferable data
+                if let data = try? await selectedVideoItem?.loadTransferable(type: Data.self) {
+                    selectedVideo = data
+                    
+                    // Creates temporary file for preview
+                    let temporaryFileURL = AppStorage.shared.createTemporaryVideoFile(with: data)
+                    if let videoURL = temporaryFileURL {
+                        let player = AVPlayer(url: videoURL)
+                        videoPlayer = player
+                        isVideoPreviewReady = true
+                    }
+                }
+                isLoadingVideo = false
+            }
+        }
+        .onDisappear {
+            videoPlayer?.pause()
+            videoPlayer = nil
+        }
+    }
+    
     // Toolbar items for navigation and saving
     private var toolbarContent: some ToolbarContent {
         Group {
@@ -221,23 +300,28 @@ struct DoorEditorView: View {
         
         // Updates content based on type
         switch contentType {
-        case .text:
-            updatedDoor.content = .text(textContent)
-        case .image:
-            if let image = selectedImage,
-               let imageData = image.jpegData(compressionQuality: 1) {
-                let filename = "door_\(door.number)_\(UUID().uuidString).jpg" // Generates a unique filename for the image
-                UserDefaults.standard.set(imageData, forKey: filename) // Saves image data using UserDefaults
-                updatedDoor.content = .image(filename)
-            }
-        case .video(let url):
-            updatedDoor.content = .video(url)
+            case .text:
+                updatedDoor.content = .text(textContent)
+            case .image:
+                if let image = selectedImage,
+                    let imageData = image.jpegData(compressionQuality: 1) {
+                    let filename = "door_\(door.number)_image_\(UUID().uuidString)" // Generates a unique filename for the image
+                    try? AppStorage.shared.saveMedia(data: imageData, identifier: filename)
+                    updatedDoor.content = .image(filename)
+                }
+            case .video:
+                if let videoData = selectedVideo {
+                    let filename = "door_\(door.number)_video_\(UUID().uuidString)" // Generates a unique filename for the video
+                    try? AppStorage.shared.saveMedia(data: videoData, identifier: filename)
+                    updatedDoor.content = .video(filename)
+                }
         }
         
         // Only update unlock date if in specific mode
         if unlockMode == .specific {
             updatedDoor.unlockDate = unlockDate
         }
+        
         onSaveDoor(updatedDoor)
         dismiss()
     }
