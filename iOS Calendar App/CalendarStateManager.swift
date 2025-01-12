@@ -57,15 +57,4 @@ class CalendarStateManager: ObservableObject {
     private func save() {
         try? AppStorage.shared.saveCalendar(calendar)
     }
-    
-    // Imports a new calendar and sets it as the current calendar
-    func importCalendar(_ newCalendar: HolidayCalendar) {
-        calendar = newCalendar
-        save()
-    }
-    
-    // Exports the current calendar data
-    func exportCalendar() throws -> Data {
-        return try AppStorage.shared.exportCalendar(calendar)
-    }
 }

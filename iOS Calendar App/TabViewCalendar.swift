@@ -191,8 +191,7 @@ struct TabViewCalendar: View {
     // Returns true if every door's isUnlocked property is true, false otherwise
     // Used to determine whether to show the completion view or countdown
     private func areAllDoorsUnlocked() -> Bool {
-        let result = calendar.doors.allSatisfy { $0.isUnlocked }
-        return result
+        calendar.doors.allSatisfy { $0.isUnlocked }
     }
     
     // Finds the door that corresponds to the current date

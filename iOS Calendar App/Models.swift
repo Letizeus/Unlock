@@ -145,6 +145,33 @@ struct Reaction: Identifiable, Codable {
     }
 }
 
+// MARK: - EditorModel
+// Represents the state and configuration of the calendar editor interface
+struct EditorModel: Codable {
+    var calendarTitle: String = ""
+    var startDate: Date = Date()
+    var endDate: Date = Date().addingTimeInterval(24 * 60 * 60 * 31)
+    var doorCount: Int = Constants.Calendar.defaultDoorCount
+    var gridColumns: Int = Constants.Calendar.defaultGridColumns // Controls how many doors appear in each row of the calendar view
+    var unlockMode: UnlockMode = .daily
+    var layoutMode: GridLayoutMode = .uniform
+    var doors: [CalendarDoor] = []
+    var backgroundImageData: Data?
+    
+    // Creates a HolidayCalendar instance from the current editor state
+    // This is used when saving or previewing the calendar
+    func createCalendar() -> HolidayCalendar {
+        HolidayCalendar(
+            title: calendarTitle.isEmpty ? "Preview Calendar" : calendarTitle,
+            startDate: startDate,
+            endDate: endDate,
+            doors: doors,
+            gridColumns: gridColumns,
+            backgroundImageData: backgroundImageData
+        )
+    }
+}
+
 // MARK: - GridLayoutMode
 enum GridLayoutMode: String, CaseIterable, Codable {
     case uniform = "Uniform"
@@ -160,7 +187,7 @@ enum GridLayoutMode: String, CaseIterable, Codable {
 
 // MARK: - UnlockMode
 // Defines how doors in the calendar should unlock
-enum UnlockMode {
+enum UnlockMode: Codable {
     case daily     // Doors unlock one per day
     case specific  // Each door has a specific unlock date
     

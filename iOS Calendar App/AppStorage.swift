@@ -41,18 +41,40 @@ class AppStorage {
         calendarDirectory.appendingPathComponent("current_calendar.json")
     }
     
-    // Saves a calendar
+    // Saves the calendar
     func saveCalendar(_ calendar: HolidayCalendar) throws {
         let encoder = JSONEncoder()
         let data = try encoder.encode(calendar)
         try data.write(to: calendarURL)
     }
     
-    // Attempts to load a previously saved calendar
+    // Attempts to load a previously saved calendar from storage
     func loadCalendar() -> HolidayCalendar? {
         guard let data = try? Data(contentsOf: calendarURL) else { return nil }
         let decoder = JSONDecoder()
         return try? decoder.decode(HolidayCalendar.self, from: data)
+    }
+    
+    // MARK: - Editor Calendar Storage
+    
+    // Defines the file path for the current editor's JSON representation
+    // Uses a fixed filename to always represent the most recent editor
+    private var editorStateURL: URL {
+        documentsDirectory.appendingPathComponent("editor_state.json")
+    }
+    
+    // Saves the editor
+    func saveEditorState(_ state: EditorModel) throws {
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(state)
+        try data.write(to: editorStateURL)
+    }
+    
+    // Attempts to load the previously saved editor state from storage
+    func loadEditorState() -> EditorModel? {
+        guard let data = try? Data(contentsOf: editorStateURL) else { return nil }
+        let decoder = JSONDecoder()
+        return try? decoder.decode(EditorModel.self, from: data)
     }
     
     // MARK: - Media Storage
@@ -90,61 +112,8 @@ class AppStorage {
     }
     
     // MARK: - Calendar Export/Import
+
     
-    // Prepares a calendar for export by bundling media files
-    // Creates a new version of the calendar with embedded media data
-    func exportCalendar(_ calendar: HolidayCalendar) throws -> Data {
-        // When exporting, we need to include media files
-        var exportCalendar = calendar
-        
-        // Bundles media files with the calendar
-        for (index, door) in calendar.doors.enumerated() {
-            switch door.content {
-            case .image(let filename), .video(let filename):
-                if let mediaData = loadMedia(identifier: filename) {
-                    // Embeds the media data directly in the export
-                    let newFilename = "export_\(door.id.uuidString)_\(filename)"
-                    try saveMedia(data: mediaData, identifier: newFilename)
-                    
-                    // Updates the door's content to use the new filename
-                    switch door.content {
-                    case .image:
-                        exportCalendar.doors[index].content = .image(newFilename)
-                    case .video:
-                        exportCalendar.doors[index].content = .video(newFilename)
-                    default:
-                        break
-                    }
-                }
-            default:
-                break
-            }
-        }
-        
-        let encoder = JSONEncoder()
-        return try encoder.encode(exportCalendar)
-    }
-    
-    // Imports a calendar from exported data
-    func importCalendar(from data: Data) throws -> HolidayCalendar {
-        let decoder = JSONDecoder()
-        let calendar = try decoder.decode(HolidayCalendar.self, from: data)
-        
-        // Process and save any media files that came with the calendar
-        for door in calendar.doors {
-            switch door.content {
-            case .image(let filename), .video(let filename):
-                if let mediaData = loadMedia(identifier: filename) {
-                    let newFilename = "import_\(door.id.uuidString)_\(filename)"
-                    try saveMedia(data: mediaData, identifier: newFilename)
-                }
-            default:
-                break
-            }
-        }
-        
-        return calendar
-    }
     
     // MARK: - Cleanup
     
