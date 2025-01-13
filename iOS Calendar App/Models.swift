@@ -70,7 +70,7 @@ struct HolidayCalendar: Identifiable, Codable {
 
 // MARK: - CalendarDoor
 // Represents an individual door in the holiday calendar
-struct CalendarDoor: Identifiable, Codable, Equatable {
+struct CalendarDoor: Identifiable, Codable {
     var id = UUID()
     let number: Int
     var unlockDate: Date // Date when the door becomes unlockable
@@ -117,7 +117,7 @@ struct CalendarDoor: Identifiable, Codable, Equatable {
 
 // MARK: - DoorContent
 // Defines different types of content that can be behind a door
-enum DoorContent: Codable, Hashable, Equatable {
+enum DoorContent: Codable, Hashable {
     case text(String)
     case image(String)
     case video(String)
@@ -134,7 +134,7 @@ enum DoorContent: Codable, Hashable, Equatable {
 // MARK: - Reaction
 // Represents a single reaction to a calendar door
 // Stores information about who made the reaction and when
-struct Reaction: Identifiable, Codable, Equatable {
+struct Reaction: Identifiable, Codable {
     let id: UUID
     let emoji: String
     let userId: String // Uses device ID for simplicity, but could be expanded to use actual user IDs

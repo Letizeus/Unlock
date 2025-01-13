@@ -304,7 +304,7 @@ struct TabViewEditor: View {
         }
     }
     
-    // Files section that allows users to export or reset their calendar configuration or import an external calendar
+    // Files section that allows users to reset editor, export or delete their calendar or import an external one
     private var filesButton: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
             Text("Files")
@@ -340,13 +340,30 @@ struct TabViewEditor: View {
             }) {
                 HStack {
                     Image(systemName: "arrow.counterclockwise")
-                    Text("Reset Calendar")
+                    Text("Reset Editor")
                         .font(theme.bodyFont)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(theme.padding)
                 .background(theme.accent.opacity(0.4))
                 .foregroundColor(theme.accent)
+                .cornerRadius(theme.cornerRadius)
+            }
+            
+            Button(action: {
+                let defaultCalendar = HolidayCalendar.createDefault()
+                CalendarStateManager.shared.reset(with: defaultCalendar)
+                onSaveCalendar(defaultCalendar)
+            }) {
+                HStack {
+                    Image(systemName: "trash")
+                    Text("Delete Current Calendar")
+                        .font(theme.bodyFont)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(theme.padding)
+                .background(Color.red.opacity(0.75))
+                .foregroundColor(.white)
                 .cornerRadius(theme.cornerRadius)
             }
         }
