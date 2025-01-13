@@ -64,18 +64,18 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
             captionFont: .caption,
             
             // Color Palette
-            primary: Color(red: 94/255, green: 92/255, blue: 230/255),  // Same purple for consistency
+            primary: .main,
             secondary: Color.black.opacity(0.05),
-            background: Color(red: 242/255, green: 242/255, blue: 247/255),  // Light iOS background
-            text: Color(red: 28/255, green: 28/255, blue: 30/255),  // Dark text for contrast
-            accent: Color(red: 94/255, green: 92/255, blue: 230/255),  // Same accent
+            background: .lightBackground,
+            text: .newDarkText,
+            accent: .main,
             
             // Door Styling
             doorStyle: DoorStyle(
                 lockedBackground: Color.white.opacity(0.7),
-                unlockedBackground: Color(red: 94/255, green: 92/255, blue: 230/255).opacity(0.2),
-                todayBackground: Color(red: 94/255, green: 92/255, blue: 230/255).opacity(0.4),
-                completedBackground: Color(red: 94/255, green: 92/255, blue: 230/255),
+                unlockedBackground: .main.opacity(0.2),
+                todayBackground: .main.opacity(0.4),
+                completedBackground: .main,
                 borderColor: Color.black.opacity(0.2),
                 borderWidth: 1.5
             ),
@@ -83,7 +83,7 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
             // Countdown Styling
             countdownStyle: CountdownStyle(
                 cellWidth: 75,
-                separatorColor: Color(red: 28/255, green: 28/255, blue: 30/255).opacity(0.8),
+                separatorColor: .newDarkGray.opacity(0.8),
                 backgroundColor: Color.white.opacity(0.7)
             )
         )
@@ -106,18 +106,18 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
             captionFont: .caption,
             
             // Color Palette
-            primary: Color(red: 94/255, green: 92/255, blue: 230/255),  // Modern purple
+            primary: .main,  // Modern purple
             secondary: Color(UIColor.secondarySystemBackground),
             background: Color(UIColor.systemBackground),
             text: .white,
-            accent: Color(red: 94/255, green: 92/255, blue: 230/255),  // Matching accent (Same as primary color)
+            accent: .main,
             
             // Door Styling
             doorStyle: DoorStyle(
-                lockedBackground: Color(red: 44/255, green: 44/255, blue: 46/255).opacity(0.7),  // Dark gray, slightly lighter than background
-                unlockedBackground: Color(red: 94/255, green: 92/255, blue: 230/255).opacity(0.2),
-                todayBackground: Color(red: 94/255, green: 92/255, blue: 230/255).opacity(0.4),
-                completedBackground: Color(red: 94/255, green: 92/255, blue: 230/255),
+                lockedBackground: .newDarkGray.opacity(0.7),
+                unlockedBackground: .main.opacity(0.2),
+                todayBackground: .main.opacity(0.4),
+                completedBackground: .main,
                 borderColor: Color.white.opacity(0.1),
                 borderWidth: 1.5
             ),
@@ -126,7 +126,7 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
             countdownStyle: CountdownStyle(
                 cellWidth: 75,
                 separatorColor: Color.white.opacity(0.8),
-                backgroundColor: Color(red: 44/255, green: 44/255, blue: 46/255).opacity(0.7) // Dark gray
+                backgroundColor: .newDarkGray.opacity(0.7)
             )
         )
     }
@@ -264,7 +264,7 @@ struct MapTheme: ViewTheme, Typography, ColorPalette {
             footnoteFont: .footnote,
             captionFont: .caption,
             
-            primary: Color(red: 94/255, green: 92/255, blue: 230/255),
+            primary: .main,
             secondary: Color(UIColor.secondarySystemBackground),
             background: Color(UIColor.systemBackground),
             text: .primary,
@@ -278,7 +278,7 @@ struct MapTheme: ViewTheme, Typography, ColorPalette {
             
             checkpointStyle: CheckpointStyle(
                 size: 80,
-                unlockedColor: Color(red: 94/255, green: 92/255, blue: 230/255),
+                unlockedColor: .main,
                 lockedColor: Color.white.opacity(0.7),
                 completedColor: .yellow,
                 iconSize: 30,

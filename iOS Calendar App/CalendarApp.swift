@@ -27,10 +27,6 @@ struct CalendarApp: App {
                 .environment(\.calendarTheme, themeManager.calendarTheme)
                 .environment(\.editorTheme, themeManager.editorTheme)
                 .environment(\.mapTheme, themeManager.mapTheme)
-                .onAppear {
-                    // Cleanup any unused media files when app launches
-                    AppStorage.shared.cleanupUnusedMedia()
-                }
         }
         .modelContainer(sharedModelContainer)
     }

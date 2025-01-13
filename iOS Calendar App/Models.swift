@@ -172,6 +172,13 @@ struct EditorModel: Codable {
     }
 }
 
+// MARK: - CalendarBundle
+// Creates a bundle structure to include media files
+struct CalendarBundle: Codable {
+    var calendar: HolidayCalendar
+    var mediaFiles: [String: Data]  // filename -> file data
+}
+
 // MARK: - GridLayoutMode
 enum GridLayoutMode: String, CaseIterable, Codable {
     case uniform = "Uniform"
@@ -227,24 +234,6 @@ enum Tab {
             case .calendar: return "house.fill"
             case .map: return "map"
             case .editor: return "pencil"
-        }
-    }
-}
-
-// MARK: - CalendarError (UNUSED)
-// Defines possible errors that can occur during calendar operations
-enum CalendarError: LocalizedError {
-    case invalidDate
-    case invalidContent
-    case exportFailed
-    case importFailed
-    
-    var errorDescription: String? {
-        switch self {
-            case .invalidDate: return "Invalid date provided"
-            case .invalidContent: return "Invalid content format"
-            case .exportFailed: return "Failed to export calendar"
-            case .importFailed: return "Failed to import calendar"
         }
     }
 }

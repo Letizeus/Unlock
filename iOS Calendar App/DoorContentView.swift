@@ -22,6 +22,8 @@ struct DoorContentView: View {
     
     @State private var isLoadingVideo = false // Indicates if a video is currently loading
     
+    @State private var isFullscreen = false // Indicates if an image is currently in full-screen
+    
     // MARK: - View Body
     
     var body: some View {
@@ -150,22 +152,42 @@ struct DoorContentView: View {
     // Displays image content
     private func imageContent(uiImage: UIImage) -> some View {
         GeometryReader { geo in
-            VStack {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFit()
+                .cornerRadius(theme.cornerRadius)
+                .frame(width: geo.size.width, height: geo.size.height)
+                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                .onTapGesture {
+                    isFullscreen = true
+                }
+        }
+        .frame(height: UIScreen.main.bounds.width / (uiImage.size.width / uiImage.size.height))
+        .fullScreenCover(isPresented: $isFullscreen) {
+            ZStack {
+                Color.black.ignoresSafeArea()
                 Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFit()
-                    .cornerRadius(theme.cornerRadius)
-                    .frame(width: geo.size.width, height: geo.size.height)
-                    .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                    .ignoresSafeArea()
+            }
+            .overlay(alignment: .topTrailing) {
+                Button {
+                    isFullscreen = false
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(theme.subtitleFont)
+                        .foregroundStyle(theme.text.opacity(0.6))
+                        .padding()
+                }
             }
         }
-        .frame(height: 200)
     }
     
     // Fallback view for missing images
     private var missingImageContent: some View {
         VStack(spacing: 12) {
-            Image(systemName: "photo.slash")
+            Image(systemName: "livephoto.slash")
                 .font(.system(size: 40))
                 .foregroundColor(theme.text.opacity(0.5))
             Text("Image not available")
@@ -202,11 +224,11 @@ struct DoorContentView: View {
                     
                     // If the temporary file URL is successfully created, display the video player
                     if let videoURL = temporaryFileURL {
-                        VideoPlayer(player: AVPlayer(url: videoURL))
+                        VideoViewController(url: videoURL)
                             .aspectRatio(16/9, contentMode: .fit)
                             .cornerRadius(theme.cornerRadius)
                             .onDisappear {
-                                // Clean up the temporary video file when the view disappears
+                                // Cleans up the temporary video file when the view disappears
                                 try? FileManager.default.removeItem(at: videoURL)
                             }
                             .frame(width: geo.size.width, height: geo.size.height)
@@ -219,7 +241,7 @@ struct DoorContentView: View {
                 }
             }
         }
-        .frame(height: 200)
+        .frame(height: UIScreen.main.bounds.width * 9/16)
         .onAppear {
             isLoadingVideo = true
             // Adds a small delay to let the UI update
@@ -317,7 +339,26 @@ struct DoorContentView: View {
     }
 }
 
-// MARK: - Helper Functions
+// MARK: - Controllers
+
+// Represents a UIViewController wrapper around AVPlayerViewController
+// This enables native iOS video playback with full controls including fullscreen support
+struct VideoViewController: UIViewControllerRepresentable {
+    let url: URL
+    
+    // Creates and configures the AVPlayerViewController
+    func makeUIViewController(context: Context) -> AVPlayerViewController {
+        let controller = AVPlayerViewController()
+        let player = AVPlayer(url: url)
+        controller.player = player
+        controller.showsPlaybackControls = true
+        return controller
+    }
+    
+    // Required by UIViewControllerRepresentable but unused in our case
+    // Called when the SwiftUI view updates
+    func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
+}
 
 // MARK: - Preview
 

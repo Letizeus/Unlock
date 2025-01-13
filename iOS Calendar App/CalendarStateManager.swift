@@ -57,4 +57,11 @@ class CalendarStateManager: ObservableObject {
     private func save() {
         try? AppStorage.shared.saveCalendar(calendar)
     }
+    
+    // Resets the entire calendar state manager with a new calendar
+    func reset(with newCalendar: HolidayCalendar) {
+        observers.removeAllObjects() // Clear all observers
+        calendar = newCalendar
+        try? AppStorage.shared.saveCalendar(calendar)
+    }
 }

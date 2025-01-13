@@ -37,7 +37,7 @@ class AppStorage {
     
     // Defines the file path for the current calendar's JSON representation
     // Uses a fixed filename to always represent the most recent calendar
-    private var calendarURL: URL {
+    var calendarURL: URL {
         calendarDirectory.appendingPathComponent("current_calendar.json")
     }
     
@@ -112,35 +112,49 @@ class AppStorage {
     }
     
     // MARK: - Calendar Export/Import
-
     
-    
-    // MARK: - Cleanup
-    
-    // Removes media files that are no longer referenced by the current calendar
-    // Helps prevent unnecessary storage consumption
-    func cleanupUnusedMedia() {
-        guard let calendar = loadCalendar() else { return }
+    // Prepares a calendar for export by bundling media files
+    // Creates a new version of the calendar with embedded media data
+    func exportCalendar(_ calendar: HolidayCalendar) throws -> (Data, String) {
+        // Sets up filename
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: Date())
+        let cleanTitle = calendar.title.replacingOccurrences(of: "[^a-zA-Z0-9]", with: "_", options: .regularExpression)
+        let filename = "Calendar_\(cleanTitle)_\(dateString).cal"
         
-        // Gets all media files in the media directory
-        let mediaFiles = try? fileManager.contentsOfDirectory(at: mediaDirectory, includingPropertiesForKeys: nil)
-        
-        // Gets all media filenames currently in use by the calendar
-        let usedFiles = Set(calendar.doors.compactMap { door -> String? in
+        // Collects all media files
+        var mediaFiles: [String: Data] = [:]
+        for door in calendar.doors {
             switch door.content {
             case .image(let filename), .video(let filename):
-                return filename
+                if let mediaData = loadMedia(identifier: filename) {
+                    mediaFiles[filename] = mediaData
+                }
             default:
-                return nil
-            }
-        })
-        
-        // Deletes any media files not referenced by current calendar
-        mediaFiles?.forEach { url in
-            let filename = url.lastPathComponent
-            if !usedFiles.contains(filename) {
-                try? fileManager.removeItem(at: url)
+                break
             }
         }
+        
+        // Creates and encodes the bundle
+        let bundle = CalendarBundle(calendar: calendar, mediaFiles: mediaFiles)
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(bundle)
+        
+        return (data, filename)
+    }
+
+    // Imports a calendar from exported data
+    func importCalendar(from data: Data) throws -> HolidayCalendar {
+        let decoder = JSONDecoder()
+        let bundle = try decoder.decode(CalendarBundle.self, from: data)
+        
+        // Saves all media files first
+        for (filename, mediaData) in bundle.mediaFiles {
+            try saveMedia(data: mediaData, identifier: filename)
+        }
+        
+        // The calendar in the bundle already has all the correct states
+        return bundle.calendar
     }
 }

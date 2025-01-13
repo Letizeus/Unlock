@@ -17,6 +17,8 @@ struct TabViewEditor: View {
     
     @State private var selectedDoor: CalendarDoor? // Currently selected door for editing
     
+    @State private var showingImporter = false
+    
     let onSaveCalendar: (HolidayCalendar) -> Void // Callback for when calendar is saved
     
     // Computed property to get days between start and end dates
@@ -38,7 +40,7 @@ struct TabViewEditor: View {
                         basicInfoSection
                         backgroundImageSection
                         previewSection
-                        exportButton
+                        filesButton
                     }
                     .padding(theme.padding)
                 }
@@ -278,7 +280,6 @@ struct TabViewEditor: View {
     // Removes all edited content and regenerates doors
     private var clearButton: some View {
         Button(action: {
-            // Clears edited content first
             let currentDoorCount = stateManager.model.unlockMode == .daily ? daysBetweenDates : stateManager.model.doorCount
             
             // Creates fresh doors with default content
@@ -303,15 +304,19 @@ struct TabViewEditor: View {
         }
     }
     
-    // Export & Reset section that allows users to export or reset their calendar configuration
-    private var exportButton: some View {
+    // Files section that allows users to export or reset their calendar configuration or import an external calendar
+    private var filesButton: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
-            Text("Export & Reset")
+            Text("Files")
                 .font(theme.headlineFont)
                 .foregroundColor(theme.text)
             
             Button(action: {
-                // Export functionality to be implemented
+                do {
+                    try stateManager.exportCalendar()
+                } catch {
+                    print("Error exporting calendar: \(error)")
+                }
             }) {
                 HStack {
                     Image(systemName: "square.and.arrow.up")
@@ -325,6 +330,8 @@ struct TabViewEditor: View {
                 .cornerRadius(theme.cornerRadius)
             }
             .disabled(stateManager.model.doors.isEmpty)
+            
+            importButton
             
             // Reset Button
             Button(action: {
@@ -346,6 +353,75 @@ struct TabViewEditor: View {
         .padding(theme.padding)
         .background(theme.secondary)
         .cornerRadius(theme.cornerRadius)
+    }
+    
+    private var importButton: some View {
+        Button(action: { showingImporter = true }) {
+            HStack {
+                Image(systemName: "square.and.arrow.down")
+                Text("Import Calendar")
+                    .font(theme.bodyFont)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(theme.padding)
+            .background(theme.accent)
+            .foregroundColor(.white)
+            .cornerRadius(theme.cornerRadius)
+        }
+        .fileImporter(
+            isPresented: $showingImporter,
+            allowedContentTypes: [.holidayCalendar],
+            allowsMultipleSelection: false
+        ) { result in
+            switch result {
+            case .success(let urls):
+                guard let url = urls.first else { return }
+                
+                guard url.startAccessingSecurityScopedResource() else {
+                    print("Failed to access the file")
+                    return
+                }
+                
+                defer {
+                    url.stopAccessingSecurityScopedResource()
+                }
+                
+                do {
+                    let data = try Data(contentsOf: url)
+                    
+                    try? FileManager.default.removeItem(at: AppStorage.shared.calendarURL) // clears the existing state in AppStorage
+                    
+                    let calendar = try AppStorage.shared.importCalendar(from: data)
+                    
+                    // Creates a fresh calendar with reset states
+                    let resetCalendar = HolidayCalendar(
+                        title: calendar.title,
+                        startDate: calendar.startDate,
+                        endDate: calendar.endDate,
+                        doors: calendar.doors.map { door in
+                            CalendarDoor(
+                                number: door.number,
+                                unlockDate: door.unlockDate,
+                                isUnlocked: Calendar.current.startOfDay(for: Date()) >= Calendar.current.startOfDay(for: door.unlockDate),
+                                content: door.content,
+                                hasBeenOpened: door.hasBeenOpened
+                            )
+                        },
+                        gridColumns: calendar.gridColumns,
+                        backgroundImageData: calendar.backgroundImageData
+                    )
+                    
+                    DispatchQueue.main.async {
+                        CalendarStateManager.shared.reset(with: resetCalendar) // Resets the entire state manager
+                        self.onSaveCalendar(resetCalendar)
+                    }
+                } catch {
+                    print("Error importing calendar: \(error.localizedDescription)")
+                }
+            case .failure(let error):
+                print("Error selecting file: \(error.localizedDescription)")
+            }
+        }
     }
     
     // MARK: - Helper Functions
