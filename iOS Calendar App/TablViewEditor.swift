@@ -350,6 +350,7 @@ struct TabViewEditor: View {
                 .cornerRadius(theme.cornerRadius)
             }
             
+            // Delete Button
             Button(action: {
                 let defaultCalendar = HolidayCalendar.createDefault()
                 CalendarStateManager.shared.reset(with: defaultCalendar)
