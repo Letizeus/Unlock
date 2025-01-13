@@ -14,15 +14,13 @@ struct DoorContentView: View {
     
     @State private var showReactionSheet = false // Controls the presentation of the reaction sheet
     @State private var hasReacted = false
-    
     private let reactions = ["❤️", "👍🏼", "🎁", "⭐️", "🤩"]
+    
+    @State private var isLoadingVideo = false // Indicates if a video is currently loading
+    @State private var isFullscreen = false // Indicates if an image is currently in full-screen
     
     // Generate a simple device ID (only a temp solution)
     private let userId = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
-    
-    @State private var isLoadingVideo = false // Indicates if a video is currently loading
-    
-    @State private var isFullscreen = false // Indicates if an image is currently in full-screen
     
     // MARK: - View Body
     
@@ -31,22 +29,22 @@ struct DoorContentView: View {
             ScrollView {
                 VStack(spacing: theme.spacing) {
                     banner
+                        .padding(.horizontal, theme.padding.leading)
                     
                     // Display selected reaction at the top if one exists
                     if !door.reactions.isEmpty {
                         reactionCountsView
-                            .padding(.top, theme.spacing)
+                            .padding(.horizontal, theme.padding.leading)
                     }
                     
                     // Main content
                     contentView
-                        .padding(.horizontal, theme.padding.leading)
                     
                     reactionControls
+                        .padding(.horizontal, theme.padding.leading)
                     
                     Spacer(minLength: theme.spacing)
                 }
-                .padding(.vertical, theme.spacing)
             }
             .scrollContentBackground(.hidden)
             .background(theme.background)
@@ -147,6 +145,7 @@ struct DoorContentView: View {
             .frame(maxWidth: .infinity)
             .background(theme.secondary)
             .cornerRadius(theme.cornerRadius)
+            .padding(.horizontal, theme.padding.leading)
     }
     
     // Displays image content
@@ -162,7 +161,7 @@ struct DoorContentView: View {
                     isFullscreen = true
                 }
         }
-        .frame(height: UIScreen.main.bounds.width / (uiImage.size.width / uiImage.size.height))
+        .frame(height: (UIScreen.main.bounds.width / (uiImage.size.width / uiImage.size.height)) - (theme.padding.leading + theme.padding.trailing))
         .fullScreenCover(isPresented: $isFullscreen) {
             ZStack {
                 Color.black.ignoresSafeArea()
@@ -241,7 +240,7 @@ struct DoorContentView: View {
                 }
             }
         }
-        .frame(height: UIScreen.main.bounds.width * 9/16)
+        .frame(height: (UIScreen.main.bounds.width * 9/16) - theme.padding.leading)
         .onAppear {
             isLoadingVideo = true
             // Adds a small delay to let the UI update
