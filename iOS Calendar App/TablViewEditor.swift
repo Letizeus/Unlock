@@ -231,7 +231,7 @@ struct TabViewEditor: View {
     private var previewSection: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
             HStack {
-                Text("Preview")
+                Text("Doors")
                     .font(theme.headlineFont)
                     .foregroundColor(theme.text)
                 

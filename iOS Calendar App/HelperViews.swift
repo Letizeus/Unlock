@@ -125,7 +125,7 @@ struct DoorViewCell: View {
         if isToday || !manager.door.isUnlocked {
             return theme.text
         } else {
-            return theme.accent
+            return theme.accent.mix(with: theme.text, by: 0.5)
         }
     }
     

@@ -74,7 +74,7 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
             doorStyle: DoorStyle(
                 lockedBackground: Color.white.opacity(0.7),
                 unlockedBackground: .main.opacity(0.2),
-                todayBackground: .main.opacity(0.4),
+                todayBackground: .main.opacity(0.6),
                 completedBackground: .main,
                 borderColor: Color.black.opacity(0.2),
                 borderWidth: 1.5
@@ -116,7 +116,7 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
             doorStyle: DoorStyle(
                 lockedBackground: .newDarkGray.opacity(0.7),
                 unlockedBackground: .main.opacity(0.2),
-                todayBackground: .main.opacity(0.4),
+                todayBackground: .main.opacity(0.6),
                 completedBackground: .main,
                 borderColor: Color.white.opacity(0.1),
                 borderWidth: 1.5
