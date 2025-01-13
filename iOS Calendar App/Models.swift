@@ -28,7 +28,10 @@ struct HolidayCalendar: Identifiable, Codable {
             let components = DateComponents(
                 year: Constants.Calendar.defaultYear,
                 month: Constants.Calendar.defaultMonth,
-                day: day
+                day: day,
+                hour: 0,
+                minute: 0,
+                second: 0
             )
             return Calendar.current.date(from: components) ?? Date()
         }
@@ -67,7 +70,7 @@ struct HolidayCalendar: Identifiable, Codable {
 
 // MARK: - CalendarDoor
 // Represents an individual door in the holiday calendar
-struct CalendarDoor: Identifiable, Codable {
+struct CalendarDoor: Identifiable, Codable, Equatable {
     var id = UUID()
     let number: Int
     var unlockDate: Date // Date when the door becomes unlockable
@@ -88,7 +91,7 @@ struct CalendarDoor: Identifiable, Codable {
     
     // Updates the door's unlock state based on the current date
     mutating func updateUnlockState() {
-        isUnlocked = Calendar.current.startOfDay(for: Date()) >= Calendar.current.startOfDay(for: unlockDate)
+        isUnlocked = Date() >= unlockDate
     }
     
     // Adds a new reaction to the door
@@ -114,7 +117,7 @@ struct CalendarDoor: Identifiable, Codable {
 
 // MARK: - DoorContent
 // Defines different types of content that can be behind a door
-enum DoorContent: Codable, Hashable {
+enum DoorContent: Codable, Hashable, Equatable {
     case text(String)
     case image(String)
     case video(String)
@@ -131,7 +134,7 @@ enum DoorContent: Codable, Hashable {
 // MARK: - Reaction
 // Represents a single reaction to a calendar door
 // Stores information about who made the reaction and when
-struct Reaction: Identifiable, Codable {
+struct Reaction: Identifiable, Codable, Equatable {
     let id: UUID
     let emoji: String
     let userId: String // Uses device ID for simplicity, but could be expanded to use actual user IDs
@@ -161,11 +164,19 @@ struct EditorModel: Codable {
     // Creates a HolidayCalendar instance from the current editor state
     // This is used when saving or previewing the calendar
     func createCalendar() -> HolidayCalendar {
-        HolidayCalendar(
+        let currentDate = Calendar.current.startOfDay(for: Date())
+        // Creates doors with proper unlock states
+        let updatedDoors = doors.map { door in
+            var updatedDoor = door
+            updatedDoor.isUnlocked = Calendar.current.startOfDay(for: door.unlockDate) <= currentDate
+            return updatedDoor
+        }
+        
+        return HolidayCalendar(
             title: calendarTitle.isEmpty ? "Preview Calendar" : calendarTitle,
             startDate: startDate,
             endDate: endDate,
-            doors: doors,
+            doors: updatedDoors,
             gridColumns: gridColumns,
             backgroundImageData: backgroundImageData
         )

@@ -2,17 +2,13 @@ import SwiftUI
 
 struct TabViewCalendar: View {
     
-    class CalendarViewModel: ObservableObject {
-        @Published var isAnyDoorOpening = false
-    }
-    
     @Environment(\.calendarTheme) private var theme // Access the calendar theme from the environment
     @Environment(\.colorScheme) var colorScheme
     
     // MARK: - Properties
     
     let calendar: HolidayCalendar // The calendar data model containing all doors and their content
-    @StateObject private var viewModel = CalendarViewModel() // Only one door at once
+    @State private var isAnyDoorOpening = false // Only one door at once
     @State private var countdown = CountdownInfo() // Current countdown information (days, hours, minutes)
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()// Timer that updates the countdown every second
     
@@ -178,7 +174,7 @@ struct TabViewCalendar: View {
             spacing: theme.spacing
         ) {
             ForEach(calendar.doors) { door in
-                DoorViewCell(isAnyDoorOpening: $viewModel.isAnyDoorOpening, door: door)
+                DoorViewCell(isAnyDoorOpening: $isAnyDoorOpening, door: door)
                     .aspectRatio(1, contentMode: .fit) // Maintain square shape
             }
         }
@@ -205,25 +201,32 @@ struct TabViewCalendar: View {
     
     // Finds the next unopened door that can be unlocked
     private func findNextDoor() -> CalendarDoor? {
-        let now = Calendar.current.startOfDay(for: Date())
+        let now = Date()
         return calendar.doors
             .filter { door in
-                let doorDate = Calendar.current.startOfDay(for: door.unlockDate)
-                return doorDate > now && !door.isUnlocked
+                door.unlockDate > now && !door.hasBeenOpened
             }
             .min { $0.unlockDate < $1.unlockDate }
     }
     
     // Updates the countdown timer values based on the next unlockable door
     private func updateCountdown() {
+        if areAllDoorsUnlocked() {
+            countdown = CountdownInfo()
+            return
+        }
+        
         guard let nextDoor = findNextDoor() else {
             countdown = CountdownInfo()
             return
         }
         
+        let now = Date()
+        
+        // Calculates full date components between now and the unlock date
         let components = Calendar.current.dateComponents(
             [.day, .hour, .minute],
-            from: Date(),
+            from: now,
             to: nextDoor.unlockDate
         )
         

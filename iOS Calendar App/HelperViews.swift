@@ -188,6 +188,16 @@ struct DoorViewCell: View {
                             .font(theme.subtitleFont)
                             .bold()
                             .foregroundStyle(textColor)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                            .multilineTextAlignment(.center)
+                        
+                        Text(formatDate(manager.door.unlockDate))
+                            .font(theme.footnoteFont)
+                            .foregroundStyle(textColor.opacity(0.8))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                            .multilineTextAlignment(.center)
                     }
                 }
             )

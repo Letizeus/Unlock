@@ -5,17 +5,13 @@ import SwiftUI
 // creating a path-like progression through the calendar content.
 struct TabViewMap: View {
     
-    class MapViewModel: ObservableObject {
-        @Published var isAnyDoorOpening = false
-    }
-    
     @Environment(\.mapTheme) private var theme
     
     // MARK: - Properties
     
     let calendar: HolidayCalendar // The calendar data model containing all doors and their content
     
-    @StateObject private var viewModel = MapViewModel() // Only one door at once
+    @State private var isAnyDoorOpening = false // Only one door at once
     
     // MARK: - View Body
     
@@ -35,7 +31,7 @@ struct TabViewMap: View {
                         LazyVStack(spacing: theme.roadStyle.nodeSpacing) {
                             ForEach(calendar.doors) { door in
                                 CheckpointNodeView(
-                                    isAnyDoorOpening: $viewModel.isAnyDoorOpening,
+                                    isAnyDoorOpening: $isAnyDoorOpening,
                                     door: door
                                 )
                             }

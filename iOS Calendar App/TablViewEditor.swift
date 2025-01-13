@@ -427,7 +427,6 @@ struct TabViewEditor: View {
     // MARK: - Helper Functions
     
     // Saves the current calendar configuration and notifies the parent view
-    // Only enabled when the calendar has a title and at least one door
     private func saveCalendar() {
         let calendar = stateManager.model.createCalendar()
         onSaveCalendar(calendar)
@@ -442,22 +441,38 @@ struct TabViewEditor: View {
             stateManager.model.doorCount = daysBetweenDates
         }
         
-        // Creates new doors while preserving existing content where possible
+        // Stores existing door content and unlock dates
         var doorNumberToContent: [Int: DoorContent] = [:]
+        var doorNumberToUnlockDate: [Int: Date] = [:]
         for door in stateManager.model.doors {
             doorNumberToContent[door.number] = door.content
+            doorNumberToUnlockDate[door.number] = door.unlockDate
         }
         
         let newDoors = (1...stateManager.model.doorCount).map { number in
-            let unlockDate = stateManager.model.unlockMode == .daily
-                ? calendar.date(byAdding: .day, value: number - 1, to: stateManager.model.startDate)
-                    ?? stateManager.model.startDate
-                    : stateManager.model.startDate // For specific mode, default to start date
+            let unlockDate: Date
+            if stateManager.model.unlockMode == .daily {
+                // Sets unlock date to midnight of the corresponding day
+                let baseDate = calendar.date(byAdding: .day, value: number - 1, to: stateManager.model.startDate) ?? stateManager.model.startDate
+                let components = calendar.dateComponents([.year, .month, .day], from: baseDate)
+                unlockDate = calendar.date(from: components) ?? baseDate
+            } else {
+                // Specific mode: Keep existing unlock date if available, otherwise use sequential dates
+                if let existingDate = doorNumberToUnlockDate[number] {
+                    // Keeps existing unlock date for edited doors
+                    unlockDate = existingDate
+                } else {
+                    // For new doors, set default sequential dates
+                    let baseDate = calendar.date(byAdding: .day, value: number - 1, to: stateManager.model.startDate) ?? stateManager.model.startDate
+                    let components = calendar.dateComponents([.year, .month, .day], from: baseDate)
+                    unlockDate = calendar.date(from: components) ?? baseDate
+                }
+            }
             
             // If we have edited content for this door number, use it
             let content = doorNumberToContent[number] ?? .text("Add content for door \(number)")
             
-            let isUnlocked = calendar.startOfDay(for: unlockDate) <= currentDate
+            let isUnlocked = unlockDate <= currentDate
             
             return CalendarDoor(
                 number: number,
