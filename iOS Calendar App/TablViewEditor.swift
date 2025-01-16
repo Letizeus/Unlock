@@ -22,7 +22,7 @@ struct TabViewEditor: View {
     let onSaveCalendar: (HolidayCalendar) -> Void // Callback for when calendar is saved
     
     // Computed property to get days between start and end dates
-    private var daysBetweenDates: Int {
+     private var daysBetweenDates: Int {
         (Calendar.current.dateComponents([.day],
             from: stateManager.model.startDate,
             to: stateManager.model.endDate).day ?? 0) + 1
@@ -148,10 +148,13 @@ struct TabViewEditor: View {
             if stateManager.model.unlockMode == .daily {
                 DatePicker("Start Date",
                           selection: $stateManager.model.startDate,
+                          in: ...stateManager.model.endDate,
                           displayedComponents: .date)
                     .font(theme.bodyFont)
+                
                 DatePicker("End Date",
                           selection: $stateManager.model.endDate,
+                          in: stateManager.model.startDate...,
                           displayedComponents: .date)
                     .font(theme.bodyFont)
             }
