@@ -71,8 +71,10 @@ struct TabViewCalendar: View {
                 }
             }
         }
-        // Initialize countdown immediately when view appears
-        .onAppear(perform: updateCountdown)
+        .onAppear {
+            updateCountdown() // Initialize countdown immediately when view appears
+            scheduleNotifications()
+        }
         // Update countdown every second using the timer publisher
         .onReceive(timer) { _ in
             updateCountdown()
