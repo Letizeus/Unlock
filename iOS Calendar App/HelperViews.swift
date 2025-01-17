@@ -205,7 +205,7 @@ struct DoorViewCell: View {
                 RoundedRectangle(cornerRadius: theme.cornerRadius)
                     .stroke(theme.doorStyle.borderColor, lineWidth: theme.doorStyle.borderWidth)
             )
-            .shadow(color: Color.black.opacity(manager.door.isUnlocked ? 0.3 : 0.15), radius: 5, x: 0, y: 3)
+            .shadow(color: theme.doorStyle.shadowColor.opacity(manager.door.isUnlocked ? 0.3 : 0.15), radius: 5, x: 0, y: 3)
     }
 }
 // MARK: - TabViewMap

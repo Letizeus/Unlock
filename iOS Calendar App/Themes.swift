@@ -31,12 +31,14 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
         let completedBackground: Color
         let borderColor: Color
         let borderWidth: CGFloat
+        let shadowColor: Color
     }
     
     struct CountdownStyle {
         let cellWidth: CGFloat
         let separatorColor: Color
         let backgroundColor: Color
+        let shadowColor: Color
     }
     
     let doorStyle: DoorStyle
@@ -77,14 +79,16 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
                 todayBackground: .main.opacity(0.6),
                 completedBackground: .main,
                 borderColor: Color.black.opacity(0.2),
-                borderWidth: 1.5
+                borderWidth: 1.5,
+                shadowColor: .black
             ),
             
             // Countdown Styling
             countdownStyle: CountdownStyle(
                 cellWidth: 75,
                 separatorColor: .newDarkGray.opacity(0.8),
-                backgroundColor: Color.white.opacity(0.7)
+                backgroundColor: Color.white.opacity(0.7),
+                shadowColor: .black
             )
         )
     }
@@ -119,14 +123,16 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
                 todayBackground: .main.opacity(0.6),
                 completedBackground: .main,
                 borderColor: Color.white.opacity(0.1),
-                borderWidth: 1.5
+                borderWidth: 1.5,
+                shadowColor: .white
             ),
             
             // Countdown Styling
             countdownStyle: CountdownStyle(
                 cellWidth: 75,
                 separatorColor: Color.white.opacity(0.8),
-                backgroundColor: .newDarkGray.opacity(0.7)
+                backgroundColor: .newDarkGray.opacity(0.7),
+                shadowColor: .white
             )
         )
     }
