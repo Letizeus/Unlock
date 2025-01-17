@@ -245,6 +245,15 @@ struct TabViewCalendar: View {
             minutes: components.minute ?? 0
         )
     }
+    
+    // Schedules notifications for upcoming doors
+    private func scheduleNotifications() {
+        calendar.doors
+            .filter { $0.unlockDate > Date() && !$0.hasBeenOpened }
+            .forEach { door in
+                NotificationManager.shared.scheduleDoorNotifications(for: door)
+            }
+    }
 }
 
 // MARK: - Preview

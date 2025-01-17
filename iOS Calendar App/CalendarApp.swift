@@ -7,6 +7,10 @@ struct CalendarApp: App {
     @StateObject private var themeManager = ThemeManager() // Manages theme-related state across the app
     @StateObject private var stateManager = CalendarStateManager.shared // Manages global calendar state
     
+    init() {
+        NotificationManager.shared.requestPermission()
+    }
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Item.self,
