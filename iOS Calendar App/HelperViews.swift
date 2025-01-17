@@ -142,7 +142,7 @@ struct DoorViewCell: View {
         ZStack {
             suprise
                 .opacity(1 - manager.doorOpacity)
-                .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
+                .shadow(color: theme.doorStyle.shadowColor.opacity(0.2), radius: 6, x: 0, y: 3)
             // Door front
             doorFront
                 .opacity(manager.doorOpacity)
@@ -169,7 +169,6 @@ struct DoorViewCell: View {
                     .font(.system(size: 24))
                     .foregroundColor(theme.accent)
             )
-            .shadow(radius: 5)
     }
     
     // The front face of the door including number and completion status
