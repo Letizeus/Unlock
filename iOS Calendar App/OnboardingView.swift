@@ -45,14 +45,14 @@ struct WelcomeView: View {
                         Spacer()
                     }
                     
-                    // "UNLOCK" text with scale and slide animation
+                    // "Unlock" text with scale and slide animation
                     Text("Unlock")
                         .bold()
                         .foregroundStyle(.main)
                         .font(.system(size: 72))
                         .minimumScaleFactor(0.75)
                         .lineLimit(1)
-                        .scaleEffect(showUnlock ? 1 : 0.8, anchor: .leading)
+                        .scaleEffect(showUnlock ? 1.2 : 0.8, anchor: .leading)
                         .offset(y: showUnlock ? 0 : 30)
                         .opacity(showUnlock ? 1 : 0)
                 }
@@ -138,7 +138,7 @@ struct WelcomeView: View {
         withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.3)) {
             showWelcome = true
         }
-        // UNLOCK text animation with stronger spring effect
+        // Unlock text animation with stronger spring effect
         withAnimation(.spring(response: 0.7, dampingFraction: 0.7).delay(0.8)) {
             showUnlock = true
         }
@@ -186,12 +186,12 @@ struct HomeView: View {
             .padding(.bottom, 40)
             
             // Options
-            VStack(spacing: 16) {
+            VStack(spacing: 25) {
                 // Import Calendar Option
                 OptionButton(
                     icon: "square.and.arrow.down.fill",
                     title: "Import calendar",
-                    subtitle: "Open an existing calendar file",
+                    subtitle: "Open an existing calendar file.",
                     isAnimated: optionsAnimation[0]
                 ) {
                     showingImporter = true
@@ -201,7 +201,7 @@ struct HomeView: View {
                 OptionButton(
                     icon: "calendar",
                     title: "Use empty calendar",
-                    subtitle: "Start with an empty calendar setup",
+                    subtitle: "Load an empty calendar setup.",
                     isAnimated: optionsAnimation[1]
                 ) {
                     useDefaultCalendar()
@@ -211,7 +211,7 @@ struct HomeView: View {
                 OptionButton(
                     icon: "pencil",
                     title: "Create your own",
-                    subtitle: "Design a custom calendar from scratch",
+                    subtitle: "Design a custom calendar from scratch.",
                     isAnimated: optionsAnimation[2]
                 ) {
                     createNewCalendar()

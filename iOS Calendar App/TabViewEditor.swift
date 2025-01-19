@@ -38,7 +38,8 @@ struct TabViewEditor: View {
                 ScrollView {
                     VStack(spacing: theme.spacing) {
                         basicInfoSection
-                        StyleSection
+                        backgroundStyleSection
+                        doorStyleSection
                         previewSection
                         filesButton
                     }
@@ -171,10 +172,10 @@ struct TabViewEditor: View {
         .cornerRadius(theme.cornerRadius)
     }
     
-    // Section for Style selection
-    private var StyleSection: some View {
+    // Section for background style selection
+    private var backgroundStyleSection: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
-            Text("Background & Doors Style")
+            Text("Background Style")
                 .font(theme.headlineFont)
                 .foregroundColor(theme.text)
             
@@ -187,8 +188,8 @@ struct TabViewEditor: View {
             
             // Shows color picker or image picker based on selection
             if stateManager.model.backgroundType == .color {
-                HStack {
-                    Text("Select background color")
+                HStack(alignment: .center) {
+                    Text("Select Background Color")
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .font(theme.bodyFont)
                     
@@ -218,16 +219,7 @@ struct TabViewEditor: View {
                     }
                 }
             }
-            Divider()
-                .padding(.vertical, theme.spacing)
-            
-            HStack {
-                Text("Select Door color")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .font(theme.bodyFont)
-                ColorPicker("Door Color", selection: $stateManager.model.doorColor, supportsOpacity: false)
-                    .labelsHidden()
-            }
+
         }
         .padding(theme.padding)
         .background(theme.secondary)
@@ -249,6 +241,26 @@ struct TabViewEditor: View {
                     stateManager.model.backgroundColor = .clear // Clears the background color when switching to image mode
                 }
         }
+    }
+    
+    // Section for door style selection
+    private var doorStyleSection: some View {
+        VStack(alignment: .leading, spacing: theme.spacing) {
+            Text("Door Style")
+                .font(theme.headlineFont)
+                .foregroundColor(theme.text)
+            
+            HStack(alignment: .center) {
+                Text("Select Door Color")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(theme.bodyFont)
+                ColorPicker("Door Color", selection: $stateManager.model.doorColor, supportsOpacity: false)
+                    .labelsHidden()
+            }
+        }
+        .padding(theme.padding)
+        .background(theme.secondary)
+        .cornerRadius(theme.cornerRadius)
     }
     
     // Button to show full calendar preview
