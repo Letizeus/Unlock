@@ -46,7 +46,7 @@ struct WelcomeView: View {
                     }
                     
                     // "UNLOCK" text with scale and slide animation
-                    Text("UNLOCK")
+                    Text("Unlock")
                         .bold()
                         .foregroundStyle(.main)
                         .font(.system(size: 72))
@@ -62,7 +62,7 @@ struct WelcomeView: View {
                     // Feature items
                     featureItem(icon: Tab.calendar.icon,
                               title: "Your Journey",
-                              description: "Complete calendars created by other users for your specific journey.")
+                                description: "Complete calendars from other users by opening doors and embrace creative content.")
                     
                     featureItem(icon: Tab.editor.icon,
                               title: "Your Creativity",
@@ -272,6 +272,7 @@ struct HomeView: View {
                         Text(subtitle)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
+                            .multilineTextAlignment(.leading)
                     }
                     
                     Spacer()
@@ -327,9 +328,7 @@ struct HomeView: View {
            let window = windowScene.windows.first {
             let mainView = MainView(initialTab: selectedTab)
             
-            withAnimation(.easeInOut(duration: 0.3)) {
-                window.rootViewController = UIHostingController(rootView: mainView)
-            }
+            window.rootViewController = UIHostingController(rootView: mainView)
         }
     }
     
@@ -381,7 +380,8 @@ struct HomeView: View {
                     },
                     gridColumns: calendar.gridColumns,
                     backgroundImageData: calendar.backgroundImageData,
-                    backgroundColor: calendar.backgroundColor
+                    backgroundColor: calendar.backgroundColor,
+                    doorColor: calendar.doorColor
                 )
                 
                 // Updates state and complete onboarding

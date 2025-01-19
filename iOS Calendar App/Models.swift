@@ -13,6 +13,7 @@ struct HolidayCalendar: Identifiable, Codable {
     var gridColumns: Int
     var backgroundImageData: Data?
     var codableBackgroundColor: CodableColor?
+    var codableDoorColor: CodableColor?
     
     // Public interface for backgroundColor
     var backgroundColor: Color {
@@ -20,7 +21,13 @@ struct HolidayCalendar: Identifiable, Codable {
         set { codableBackgroundColor = CodableColor(newValue) }
     }
     
-    init(title: String, startDate: Date, endDate: Date, doors: [CalendarDoor], gridColumns: Int = 4, backgroundImageData: Data? = nil, backgroundColor: Color = .clear) {
+    // Public interface for doorColor
+    var doorColor: Color {
+        get { codableDoorColor?.color ?? .clear }
+        set { codableDoorColor = CodableColor(newValue) }
+    }
+    
+    init(title: String, startDate: Date, endDate: Date, doors: [CalendarDoor], gridColumns: Int = 4, backgroundImageData: Data? = nil, backgroundColor: Color = .clear, doorColor: Color = .clear) {
         self.id = UUID()
         self.title = title
         self.startDate = startDate
@@ -29,6 +36,7 @@ struct HolidayCalendar: Identifiable, Codable {
         self.gridColumns = gridColumns
         self.backgroundImageData = backgroundImageData
         self.codableBackgroundColor = CodableColor(backgroundColor)
+        self.codableDoorColor = CodableColor(doorColor)
     }
     
     // Creates a sample holiday calendar for preview
@@ -74,7 +82,8 @@ struct HolidayCalendar: Identifiable, Codable {
             doors: self.doors,
             gridColumns: self.gridColumns,
             backgroundImageData: self.backgroundImageData,
-            backgroundColor: self.backgroundColor
+            backgroundColor: self.backgroundColor,
+            doorColor: self.doorColor
         )
     }
 }
@@ -89,8 +98,14 @@ struct CalendarDoor: Identifiable, Codable {
     var content: DoorContent
     var hasBeenOpened: Bool
     var reactions: [Reaction] // Array of reactions that users have added to this door
+    var codableColor: CodableColor?
+    
+    var color: Color {
+        get { codableColor?.color ?? .clear }
+        set { codableColor = CodableColor(newValue) }
+    }
         
-    init(number: Int, unlockDate: Date, isUnlocked: Bool, content: DoorContent, hasBeenOpened: Bool) {
+    init(number: Int, unlockDate: Date, isUnlocked: Bool, content: DoorContent, hasBeenOpened: Bool, color: Color = .clear) {
         self.id = UUID()
         self.number = number
         self.unlockDate = unlockDate
@@ -98,6 +113,7 @@ struct CalendarDoor: Identifiable, Codable {
         self.content = content
         self.hasBeenOpened = false
         self.reactions = []
+        self.codableColor = CodableColor(color)
     }
     
     // Updates the door's unlock state based on the current date
@@ -172,11 +188,18 @@ struct EditorModel: Codable {
     var doors: [CalendarDoor] = []
     var backgroundImageData: Data?
     var codableBackgroundColor: CodableColor?
+    var codableDoorColor: CodableColor?
     
     // Public interface for backgroundColor
     var backgroundColor: Color {
         get { codableBackgroundColor?.color ?? .clear }
         set { codableBackgroundColor = CodableColor(newValue) }
+    }
+    
+    // Public interface for doorColor
+    var doorColor: Color {
+        get { codableDoorColor?.color ?? .clear }
+        set { codableDoorColor = CodableColor(newValue) }
     }
     
     // Creates a HolidayCalendar instance from the current editor state
@@ -197,7 +220,8 @@ struct EditorModel: Codable {
             doors: updatedDoors,
             gridColumns: gridColumns,
             backgroundImageData: backgroundImageData,
-            backgroundColor: backgroundColor
+            backgroundColor: backgroundColor,
+            doorColor: doorColor
         )
     }
 }

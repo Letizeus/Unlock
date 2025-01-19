@@ -102,6 +102,9 @@ struct TabViewCalendar: View {
             } else {
                 // Uses background color if set, otherwise use theme background
                 calendar.backgroundColor
+                    .overlay {
+                        Color(colorScheme == .dark ? .black : .white).opacity(0.4)
+                    }
                     .ignoresSafeArea()
             }
         }
@@ -178,7 +181,7 @@ struct TabViewCalendar: View {
             spacing: theme.spacing
         ) {
             ForEach(calendar.doors) { door in
-                DoorViewCell(isAnyDoorOpening: $isAnyDoorOpening, door: door)
+                DoorViewCell(isAnyDoorOpening: $isAnyDoorOpening, door: door, calendar: calendar)
                     .aspectRatio(1, contentMode: .fit) // Maintain square shape
             }
         }

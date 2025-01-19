@@ -104,6 +104,7 @@ struct DoorViewCell: View {
     
     @Binding var isAnyDoorOpening: Bool
     @StateObject private var manager: DoorOpeningManager
+    let calendar: HolidayCalendar
     
     private var isToday: Bool {
         Calendar.current.isDate(manager.door.unlockDate, inSameDayAs: Date())
@@ -111,11 +112,11 @@ struct DoorViewCell: View {
     
     private var backgroundColor: Color {
         if manager.door.hasBeenOpened {
-            return theme.doorStyle.completedBackground
+            return calendar.doorColor != .clear ? calendar.doorColor : theme.doorStyle.completedBackground
         } else if isToday {
-            return theme.doorStyle.todayBackground
+            return calendar.doorColor != .clear ? calendar.doorColor.opacity(0.6) : theme.doorStyle.todayBackground
         } else if manager.door.isUnlocked {
-            return theme.doorStyle.unlockedBackground
+            return calendar.doorColor != .clear ? calendar.doorColor.opacity(0.2) : theme.doorStyle.unlockedBackground
         } else {
             return theme.doorStyle.lockedBackground
         }
@@ -125,15 +126,17 @@ struct DoorViewCell: View {
         if isToday || !manager.door.isUnlocked {
             return theme.text
         } else {
-            return theme.accent.mix(with: theme.text, by: 0.5)
+            let baseColor = calendar.doorColor != .clear ? calendar.doorColor : theme.accent
+            return baseColor.mix(with: theme.text, by: 0.5)
         }
     }
     
     // Initialization
     
-    init(isAnyDoorOpening: Binding<Bool>, door: CalendarDoor) {
+    init(isAnyDoorOpening: Binding<Bool>, door: CalendarDoor, calendar: HolidayCalendar) {
         self._isAnyDoorOpening = isAnyDoorOpening
         self._manager = StateObject(wrappedValue: DoorOpeningManager(door: door, isAnyDoorOpening: isAnyDoorOpening))
+        self.calendar = calendar
     }
     
     // View Body

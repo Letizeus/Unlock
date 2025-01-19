@@ -38,7 +38,7 @@ struct TabViewEditor: View {
                 ScrollView {
                     VStack(spacing: theme.spacing) {
                         basicInfoSection
-                        backgroundImageSection
+                        StyleSection
                         previewSection
                         filesButton
                     }
@@ -171,15 +171,12 @@ struct TabViewEditor: View {
         .cornerRadius(theme.cornerRadius)
     }
     
-    // Section for background image selection
-    private var backgroundImageSection: some View {
+    // Section for Style selection
+    private var StyleSection: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
-            Text("Style")
+            Text("Background & Doors Style")
                 .font(theme.headlineFont)
                 .foregroundColor(theme.text)
-            
-            Text("Background")
-                .font(theme.bodyFont)
             
             // Background type picker
             Picker("Background Type", selection: $stateManager.model.backgroundType) {
@@ -190,13 +187,18 @@ struct TabViewEditor: View {
             
             // Shows color picker or image picker based on selection
             if stateManager.model.backgroundType == .color {
-                ColorPicker("Background Color", selection: $stateManager.model.backgroundColor)
-                    .labelsHidden()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .onChange(of: stateManager.model.backgroundColor) { _, _ in
-                        // Clears the background image when a color is selected
-                        stateManager.model.backgroundImageData = nil
+                HStack {
+                    Text("Select background color")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .font(theme.bodyFont)
+                    
+                    ColorPicker("Background Color", selection: $stateManager.model.backgroundColor, supportsOpacity: false)
+                        .labelsHidden()
+                        .onChange(of: stateManager.model.backgroundColor) { _, _ in
+                            // Clears the background image when a color is selected
+                            stateManager.model.backgroundImageData = nil
                     }
+                }
             } else {
                 PhotosPicker(selection: $selectedImageItem, matching: .images) {
                     if let imageData = stateManager.model.backgroundImageData,
@@ -215,6 +217,16 @@ struct TabViewEditor: View {
                             .cornerRadius(theme.cornerRadius)
                     }
                 }
+            }
+            Divider()
+                .padding(.vertical, theme.spacing)
+            
+            HStack {
+                Text("Select Door color")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(theme.bodyFont)
+                ColorPicker("Door Color", selection: $stateManager.model.doorColor, supportsOpacity: false)
+                    .labelsHidden()
             }
         }
         .padding(theme.padding)
@@ -449,7 +461,8 @@ struct TabViewEditor: View {
                         },
                         gridColumns: calendar.gridColumns,
                         backgroundImageData: calendar.backgroundImageData,
-                        backgroundColor: calendar.backgroundColor
+                        backgroundColor: calendar.backgroundColor,
+                        doorColor: calendar.doorColor
                     )
                     
                     DispatchQueue.main.async {
