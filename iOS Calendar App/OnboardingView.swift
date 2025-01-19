@@ -200,8 +200,8 @@ struct HomeView: View {
                 // Default Calendar Option
                 OptionButton(
                     icon: "calendar",
-                    title: "Use default calendar",
-                    subtitle: "Start with a basic calendar setup with no content",
+                    title: "Use empty calendar",
+                    subtitle: "Start with an empty calendar setup",
                     isAnimated: optionsAnimation[1]
                 ) {
                     useDefaultCalendar()
