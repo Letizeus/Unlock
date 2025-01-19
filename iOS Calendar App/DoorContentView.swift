@@ -160,14 +160,15 @@ struct DoorContentView: View {
             Image(uiImage: uiImage)
                 .resizable()
                 .scaledToFit()
+                .frame(width: geo.size.width)
                 .cornerRadius(theme.cornerRadius)
-                .frame(width: geo.size.width, height: geo.size.height)
                 .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                 .onTapGesture {
                     isFullscreen = true
                 }
         }
-        .frame(height: (UIScreen.main.bounds.width / (uiImage.size.width / uiImage.size.height)) - (theme.padding.leading + theme.padding.trailing))
+        .padding(.horizontal, theme.padding.leading)
+        .frame(height: (UIScreen.main.bounds.width - (theme.padding.leading + theme.padding.trailing)) * uiImage.size.height / uiImage.size.width)
         .fullScreenCover(isPresented: $isFullscreen) {
             ZStack {
                 Color.black.ignoresSafeArea()
@@ -222,7 +223,9 @@ struct DoorContentView: View {
                             .font(theme.bodyFont)
                             .foregroundColor(theme.text)
                     }
-                    .frame(width: geo.size.width, height: geo.size.height)
+                    .frame(width: geo.size.width, height: geo.size.width * 9/16)
+                    .background(theme.secondary)
+                    .cornerRadius(theme.cornerRadius)
                 } else {
                     // Creates a temporary file URL for the video data
                     let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: videoData)
@@ -230,7 +233,7 @@ struct DoorContentView: View {
                     // If the temporary file URL is successfully created, display the video player
                     if let videoURL = temporaryFileURL {
                         VideoViewController(url: videoURL)
-                            .aspectRatio(16/9, contentMode: .fit)
+                            .frame(width: geo.size.width, height: geo.size.width * 9/16)
                             .cornerRadius(theme.cornerRadius)
                             .onDisappear {
                                 // Cleans up the temporary video file when the view disappears
@@ -246,7 +249,8 @@ struct DoorContentView: View {
                 }
             }
         }
-        .frame(height: (UIScreen.main.bounds.width * 9/16) - theme.padding.leading)
+        .padding(.horizontal, theme.padding.leading)
+        .frame(height: (UIScreen.main.bounds.width - (theme.padding.leading + theme.padding.trailing)) * 9/16)
         .onAppear {
             isLoadingVideo = true
             // Adds a small delay to let the UI update
