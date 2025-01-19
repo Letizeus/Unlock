@@ -19,6 +19,10 @@ struct DoorContentView: View {
     @State private var isLoadingVideo = false // Indicates if a video is currently loading
     @State private var isFullscreen = false // Indicates if an image is currently in full-screen
     
+    // States for tracking share sheet presentation
+    @State private var isShareSheetPresented = false
+    @State private var shareItems: [Any] = []
+    
     // Generate a simple device ID (only a temp solution)
     private let userId = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
     
@@ -50,13 +54,15 @@ struct DoorContentView: View {
             .background(theme.background)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-//                // Leading: Share Button
-//                ToolbarItem(placement: .topBarLeading) {
-//                    Button(action: { /* Share functionality placeholder */ }) {
-//                        Image(systemName: "square.and.arrow.up")
-//                            .foregroundStyle(.blue)
-//                    }
-//                }
+                // Leading: Share Button
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        shareContent()
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .foregroundStyle(.blue)
+                    }
+                }
                 // Trailing: Close Button
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { dismiss() }) {
@@ -335,6 +341,57 @@ struct DoorContentView: View {
         .padding(theme.padding)
         .presentationBackground(theme.secondary)
         .presentationDetents([.height(250)])
+    }
+    
+    // MARK: - Helper Functions
+    
+    // Prepares and presents a system share sheet for the door's content
+    private func shareContent() {
+        var itemsToShare: [Any] = [] // Array to collect all items that will be shared
+        
+        // Handles different types of door content
+        switch content {
+        case .text(let text):
+            if let temporaryURL = AppData.shared.createTemporaryTextFile(text, doorNumber: door.number) {
+                itemsToShare.append(temporaryURL)
+            }
+            
+        case .image(let filename):
+            if let imageData = AppData.shared.loadMedia(identifier: filename),
+               let uiImage = UIImage(data: imageData) {
+                if let temporaryFileURL = AppData.shared.createTemporaryImageFile(uiImage, doorNumber: door.number) {
+                    itemsToShare.append(temporaryFileURL)
+                }
+            }
+            
+        case .video(let filename):
+            if let videoData = AppData.shared.loadMedia(identifier: filename),
+               let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: videoData) {
+                itemsToShare.append(temporaryFileURL)
+            }
+        }
+        
+        guard !itemsToShare.isEmpty else { return } // Only proceed if we have items to share
+        
+        // Creates the system share sheet
+        let activityVC = UIActivityViewController(
+            activityItems: itemsToShare,
+            applicationActivities: nil
+        )
+        
+        // Gets access to the app's window and root view controller
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootViewController = windowScene.windows.first?.rootViewController else {
+            return
+        }
+        
+        // Finds the topmost presented view controller
+        var topController = rootViewController
+        while let presented = topController.presentedViewController {
+            topController = presented
+        }
+        
+        topController.present(activityVC, animated: true) // Presents the share sheet
     }
 }
 
