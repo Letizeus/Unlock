@@ -115,7 +115,6 @@ struct TabViewCalendar: View {
         VStack(spacing: theme.spacing) {
             Image(systemName: "trophy.circle.fill")
                 .font(.system(size: 44))
-                .foregroundColor(theme.accent)
             
             Text("Congratulations!")
                 .font(theme.titleFont.bold())
@@ -124,10 +123,6 @@ struct TabViewCalendar: View {
             Text("You've unlocked all the doors!")
                 .font(theme.bodyFont)
                 .foregroundColor(theme.text.opacity(0.8))
-            
-            Text("Thanks for sharing this journey")
-                .font(theme.bodyFont)
-                .foregroundColor(theme.text.opacity(0.6))
         }
         .padding()
         .background {

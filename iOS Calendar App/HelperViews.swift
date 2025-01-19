@@ -114,9 +114,9 @@ struct DoorViewCell: View {
         if manager.door.hasBeenOpened {
             return calendar.doorColor != .clear ? calendar.doorColor : theme.doorStyle.completedBackground
         } else if isToday {
-            return calendar.doorColor != .clear ? calendar.doorColor.opacity(0.6) : theme.doorStyle.todayBackground
+            return calendar.doorColor != .clear ? calendar.doorColor.opacity(0.8) : theme.doorStyle.todayBackground
         } else if manager.door.isUnlocked {
-            return calendar.doorColor != .clear ? calendar.doorColor.opacity(0.2) : theme.doorStyle.unlockedBackground
+            return calendar.doorColor != .clear ? calendar.doorColor.opacity(0.5) : theme.doorStyle.unlockedBackground
         } else {
             return theme.doorStyle.lockedBackground
         }
