@@ -224,6 +224,7 @@ enum UnlockMode: Codable {
 }
 
 // MARK: - BackgroundType
+// Defines the different types of backgrounds that can be used in a calendar
 enum BackgroundType: Codable {
     case color
     case image

@@ -274,6 +274,7 @@ struct TabViewEditor: View {
         .cornerRadius(theme.cornerRadius)
     }
     
+    // Generates a scrollable grid view of door previews for the calendar editor
     private var doorsGrid: some View {
         ScrollView {
             let columns = Array(repeating: GridItem(.flexible(), spacing: theme.spacing),
