@@ -57,7 +57,7 @@ struct HolidayCalendar: Identifiable, Codable {
         }
         
         return HolidayCalendar(
-            title: "Calendar \(Constants.Calendar.defaultYear)",
+            title: "Empty Calendar",
             startDate: dates.first ?? Date(),
             endDate: dates.last ?? Date(),
             doors: doors,
