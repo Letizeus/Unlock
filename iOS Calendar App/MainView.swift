@@ -23,6 +23,7 @@ struct MainView: View {
             calendarTab
             mapTab
             editorTab
+            libraryTab
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SwitchToEditorTab"))) { _ in
             selectedTab = .editor
@@ -68,6 +69,14 @@ struct MainView: View {
             Label(Tab.editor.title, systemImage: Tab.editor.icon)
         }
         .tag(Tab.editor)
+    }
+    
+    private var libraryTab: some View {
+        TabViewLibrary()
+            .tabItem {
+                Label(Tab.library.title, systemImage: Tab.library.icon)
+            }
+            .tag(Tab.library)
     }
 }
 

@@ -262,18 +262,27 @@ struct CountdownInfo {
     var minutes: Int = 0
 }
 
+// MARK: - CalendarType
+// Defines the possible types of calendars that can appear in the library
+enum CalendarType {
+    case exported
+    case imported
+}
+
 // MARK: - Tab
 // Defines the available tabs in the main navigation
 enum Tab: String {
     case calendar
     case map
     case editor
+    case library
     
     var title: String {
         switch self {
             case .calendar: return "Calendar"
             case .map: return "Map"
             case .editor: return "Editor"
+            case .library: return "Library"
         }
     }
     
@@ -282,6 +291,7 @@ enum Tab: String {
             case .calendar: return "calendar"
             case .map: return "map"
             case .editor: return "pencil"
+            case .library: return "folder"
         }
     }
 }

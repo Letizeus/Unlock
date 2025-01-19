@@ -415,6 +415,8 @@ struct HomeView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
     OnboardingView(hasCompletedOnboarding: .constant(true))
 }
