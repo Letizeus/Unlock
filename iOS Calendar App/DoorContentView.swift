@@ -82,7 +82,7 @@ struct DoorContentView: View {
                 .minimumScaleFactor(0.75)
                 .lineLimit(2)
             
-            Text("Your Special Gift for Day \(door.number)")
+            Text("Door \(door.number)")
                 .font(theme.subtitleFont.bold())
                 .foregroundColor(theme.text)
                 .multilineTextAlignment(.center)
@@ -287,7 +287,7 @@ struct DoorContentView: View {
             }
             
             if door.hasReacted(userId: userId) {
-                Text("Thanks for spreading love!")
+                Text("Thanks for reacting!")
                     .font(theme.bodyFont)
                     .foregroundColor(theme.text.opacity(0.6))
             }
