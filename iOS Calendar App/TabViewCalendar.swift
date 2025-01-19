@@ -100,7 +100,9 @@ struct TabViewCalendar: View {
                         .position(x: geo.size.width / 2, y: geo.size.height / 2) // Center the image in the available space
                 }
             } else {
-                theme.background
+                // Uses background color if set, otherwise use theme background
+                calendar.backgroundColor
+                    .ignoresSafeArea()
             }
         }
     }

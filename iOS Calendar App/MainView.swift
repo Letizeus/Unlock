@@ -10,6 +10,12 @@ struct MainView: View {
     
     @State private var selectedTab = Tab.calendar
     
+    // MARK: - Initialization
+    
+    init(initialTab: Tab = .calendar) {
+        _selectedTab = State(initialValue: initialTab)
+    }
+    
     // MARK: - View Body
     
     var body: some View {
@@ -18,7 +24,10 @@ struct MainView: View {
             mapTab
             editorTab
         }
-        // Update theme when colorScheme changes
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SwitchToEditorTab"))) { _ in
+            selectedTab = .editor
+        }
+        // Updates theme when colorScheme changes
         .onAppear {
             themeManager.updateForColorScheme(colorScheme)
             UITabBar.appearance().scrollEdgeAppearance = UITabBarAppearance()
@@ -26,7 +35,7 @@ struct MainView: View {
         .onChange(of: colorScheme) { _, newValue in
             themeManager.updateForColorScheme(newValue)
         }
-        // Provide the theme through the environment
+        // Provides the theme through the environment
         .environment(\.calendarTheme, themeManager.calendarTheme)
         .environment(\.editorTheme, themeManager.editorTheme)
         .environment(\.mapTheme, themeManager.mapTheme)
@@ -35,7 +44,7 @@ struct MainView: View {
     // MARK: - Tab Views
     
     private var calendarTab: some View {
-        TabViewCalendar(calendar: stateManager.calendar) // Use the currentCalendar state
+        TabViewCalendar(calendar: stateManager.calendar) // Uses the currentCalendar state
             .tabItem {
                 Label(Tab.calendar.title, systemImage: Tab.calendar.icon)
             }
@@ -52,8 +61,8 @@ struct MainView: View {
     
     private var editorTab: some View {
         TabViewEditor(onSaveCalendar: { newCalendar in
-            stateManager.calendar = newCalendar // Update the currentCalendar state
-            selectedTab = .calendar // Switch to calendar tab after saving
+            stateManager.calendar = newCalendar // Updates the currentCalendar state
+            selectedTab = .calendar // Switches to calendar tab after saving
         })
         .tabItem {
             Label(Tab.editor.title, systemImage: Tab.editor.icon)

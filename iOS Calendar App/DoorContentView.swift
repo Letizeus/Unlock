@@ -117,16 +117,16 @@ struct DoorContentView: View {
             case .text(let text):
                 textContent(text)
             case .image(let filename):
-                // Loads image from AppStorage
-                if let imageData = AppStorage.shared.loadMedia(identifier: filename),
+                // Loads image from AppData
+                if let imageData = AppData.shared.loadMedia(identifier: filename),
                    let uiImage = UIImage(data: imageData) {
                     imageContent(uiImage: uiImage)
                 } else {
                     missingImageContent
                 }
             case .video(let filename):
-                // Loads video from AppStorage
-                if let videoData = AppStorage.shared.loadMedia(identifier: filename) {
+                // Loads video from AppData
+                if let videoData = AppData.shared.loadMedia(identifier: filename) {
                     videoContent(videoData: videoData)
                 } else {
                     missingVideoContent
@@ -219,7 +219,7 @@ struct DoorContentView: View {
                     .frame(width: geo.size.width, height: geo.size.height)
                 } else {
                     // Creates a temporary file URL for the video data
-                    let temporaryFileURL = AppStorage.shared.createTemporaryVideoFile(with: videoData)
+                    let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: videoData)
                     
                     // If the temporary file URL is successfully created, display the video player
                     if let videoURL = temporaryFileURL {

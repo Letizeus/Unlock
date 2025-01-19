@@ -1,4 +1,6 @@
 import Foundation
+import UIKit
+import SwiftUICore
 
 // MARK: - HolidayCalendar
 // Represents a complete holiday calendar with multiple doors
@@ -10,8 +12,15 @@ struct HolidayCalendar: Identifiable, Codable {
     var doors: [CalendarDoor]
     var gridColumns: Int
     var backgroundImageData: Data?
+    var codableBackgroundColor: CodableColor?
     
-    init(title: String, startDate: Date, endDate: Date, doors: [CalendarDoor], gridColumns: Int = 4, backgroundImageData: Data? = nil) {
+    // Public interface for backgroundColor
+    var backgroundColor: Color {
+        get { codableBackgroundColor?.color ?? .clear }
+        set { codableBackgroundColor = CodableColor(newValue) }
+    }
+    
+    init(title: String, startDate: Date, endDate: Date, doors: [CalendarDoor], gridColumns: Int = 4, backgroundImageData: Data? = nil, backgroundColor: Color = .clear) {
         self.id = UUID()
         self.title = title
         self.startDate = startDate
@@ -19,6 +28,7 @@ struct HolidayCalendar: Identifiable, Codable {
         self.doors = doors
         self.gridColumns = gridColumns
         self.backgroundImageData = backgroundImageData
+        self.codableBackgroundColor = CodableColor(backgroundColor)
     }
     
     // Creates a sample holiday calendar for preview
@@ -63,7 +73,8 @@ struct HolidayCalendar: Identifiable, Codable {
             endDate: self.endDate,
             doors: self.doors,
             gridColumns: self.gridColumns,
-            backgroundImageData: self.backgroundImageData
+            backgroundImageData: self.backgroundImageData,
+            backgroundColor: self.backgroundColor
         )
     }
 }
@@ -157,9 +168,16 @@ struct EditorModel: Codable {
     var doorCount: Int = Constants.Calendar.defaultDoorCount
     var gridColumns: Int = Constants.Calendar.defaultGridColumns // Controls how many doors appear in each row of the calendar view
     var unlockMode: UnlockMode = .daily
-    var layoutMode: GridLayoutMode = .uniform
+    var backgroundType: BackgroundType = .image
     var doors: [CalendarDoor] = []
     var backgroundImageData: Data?
+    var codableBackgroundColor: CodableColor?
+    
+    // Public interface for backgroundColor
+    var backgroundColor: Color {
+        get { codableBackgroundColor?.color ?? .clear }
+        set { codableBackgroundColor = CodableColor(newValue) }
+    }
     
     // Creates a HolidayCalendar instance from the current editor state
     // This is used when saving or previewing the calendar
@@ -178,7 +196,8 @@ struct EditorModel: Codable {
             endDate: endDate,
             doors: updatedDoors,
             gridColumns: gridColumns,
-            backgroundImageData: backgroundImageData
+            backgroundImageData: backgroundImageData,
+            backgroundColor: backgroundColor
         )
     }
 }
@@ -188,19 +207,6 @@ struct EditorModel: Codable {
 struct CalendarBundle: Codable {
     var calendar: HolidayCalendar
     var mediaFiles: [String: Data]  // filename -> file data
-}
-
-// MARK: - GridLayoutMode
-enum GridLayoutMode: String, CaseIterable, Codable {
-    case uniform = "Uniform"
-    case random = "Different Sizes"
-    
-    var description: String {
-        switch self {
-            case .uniform: return "Uniform"
-            case .random: return "Different Sizes"
-        }
-    }
 }
 
 // MARK: - UnlockMode
@@ -217,6 +223,12 @@ enum UnlockMode: Codable {
     }
 }
 
+// MARK: - BackgroundType
+enum BackgroundType: Codable {
+    case color
+    case image
+}
+
 // MARK: - CountdownInfo
 // Holds information for countdown display
 struct CountdownInfo {
@@ -227,14 +239,14 @@ struct CountdownInfo {
 
 // MARK: - Tab
 // Defines the available tabs in the main navigation
-enum Tab {
+enum Tab: String {
     case calendar
     case map
     case editor
     
     var title: String {
         switch self {
-            case .calendar: return "Home"
+            case .calendar: return "Calendar"
             case .map: return "Map"
             case .editor: return "Editor"
         }
@@ -242,9 +254,61 @@ enum Tab {
     
     var icon: String {
         switch self {
-            case .calendar: return "house.fill"
+            case .calendar: return "calendar"
             case .map: return "map"
             case .editor: return "pencil"
         }
+    }
+}
+
+// MARK: - OnboardingStep
+// Represents the different steps in the onboarding flow
+// Controls which view is displayed to the user during onboarding
+enum OnboardingStep {
+    case welcome
+    case home
+}
+
+// MARK: - CodableColor
+// Wraps a Color and makes it codable
+struct CodableColor: Codable {
+    let color: Color
+    
+    init(_ color: Color) {
+        self.color = color
+    }
+    
+    // Enum defining the coding keys for encoding/decoding
+    private enum CodingKeys: String, CodingKey {
+        case red, green, blue, alpha
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let red = try container.decode(Double.self, forKey: .red)
+        let green = try container.decode(Double.self, forKey: .green)
+        let blue = try container.decode(Double.self, forKey: .blue)
+        let alpha = try container.decode(Double.self, forKey: .alpha)
+        
+        self.color = Color(.sRGB, red: red, green: green, blue: blue, opacity: alpha)
+    }
+    
+    // Method for encoding a CodableColor to JSON
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        // Converts the Color to a UIColor to access its RGBA components
+        let uiColor = UIColor(self.color)
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        
+        // Encodes the RGBA values as Double
+        try container.encode(Double(red), forKey: .red)
+        try container.encode(Double(green), forKey: .green)
+        try container.encode(Double(blue), forKey: .blue)
+        try container.encode(Double(alpha), forKey: .alpha)
     }
 }

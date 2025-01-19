@@ -1,37 +1,19 @@
 import SwiftUI
 import SwiftData
 
+// Main entry point for the Holiday Calendar application
 @main
 struct CalendarApp: App {
-    
-    @StateObject private var themeManager = ThemeManager() // Manages theme-related state across the app
-    @StateObject private var stateManager = CalendarStateManager.shared // Manages global calendar state
-    
-    init() {
-        NotificationManager.shared.requestPermission()
-    }
-    
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false // Tracks whether the user has completed the onboarding process
     
     var body: some Scene {
         WindowGroup {
-            MainView()
-                // Injects theme values into the environment for child views to access
-                .environment(\.calendarTheme, themeManager.calendarTheme)
-                .environment(\.editorTheme, themeManager.editorTheme)
-                .environment(\.mapTheme, themeManager.mapTheme)
+            // Shows either onboarding or main app based on onboarding completion state
+            if hasCompletedOnboarding {
+                MainView()
+            } else {
+                OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
+            }
         }
-        .modelContainer(sharedModelContainer)
     }
 }

@@ -2,8 +2,8 @@ import SwiftUI
 import SwiftData
 
 // Handles all data persistence operations for the app
-class AppStorage {
-    static let shared = AppStorage()
+class AppData {
+    static let shared = AppData()
     
     private let fileManager = FileManager.default // Uses FileManager for file system operations
     

@@ -48,7 +48,7 @@ class NotificationManager: NSObject, ObservableObject {
     
     // Schedules two notifications for a door:
     // 1. A reminder 10 minutes before the door unlocks
-    // 2. A notification when the door becomes available
+    // 2. A notification when the door becomes unlocked
     func scheduleDoorNotifications(for door: CalendarDoor) {
         guard hasPermission else { return }
         

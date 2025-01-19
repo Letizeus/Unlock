@@ -18,7 +18,7 @@ class CalendarStateManager: ObservableObject {
     
     private init() {
         // Tries to load saved calendar, or create default one if none exists
-        if let savedCalendar = AppStorage.shared.loadCalendar() {
+        if let savedCalendar = AppData.shared.loadCalendar() {
             self.calendar = savedCalendar
         } else {
             self.calendar = HolidayCalendar.createDefault()
@@ -55,13 +55,13 @@ class CalendarStateManager: ObservableObject {
         
     // Saves the current calendar data
     private func save() {
-        try? AppStorage.shared.saveCalendar(calendar)
+        try? AppData.shared.saveCalendar(calendar)
     }
     
     // Resets the entire calendar state manager with a new calendar
     func reset(with newCalendar: HolidayCalendar) {
         observers.removeAllObjects() // Clears all observers
         calendar = newCalendar
-        try? AppStorage.shared.saveCalendar(calendar)
+        try? AppData.shared.saveCalendar(calendar)
     }
 }

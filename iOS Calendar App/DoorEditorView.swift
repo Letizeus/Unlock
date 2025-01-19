@@ -47,16 +47,16 @@ struct DoorEditorView: View {
             case .text(let text):
                 _textContent = State(initialValue: text)
             case .image(let filename):
-                if let imageData = AppStorage.shared.loadMedia(identifier: filename),
+                if let imageData = AppData.shared.loadMedia(identifier: filename),
                    let image = UIImage(data: imageData) {
                     _selectedImage = State(initialValue: image)
                 } else {
                     _selectedImage = State(initialValue: nil)
                 }
             case .video(let filename):
-                if let videoData = AppStorage.shared.loadMedia(identifier: filename) {
+                if let videoData = AppData.shared.loadMedia(identifier: filename) {
                     _selectedVideo = State(initialValue: videoData)
-                    let temporaryFileURL = AppStorage.shared.createTemporaryVideoFile(with: videoData)
+                    let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: videoData)
                     if let videoURL = temporaryFileURL {
                         _videoPlayer = State(initialValue: AVPlayer(url: videoURL))
                         _isVideoPreviewReady = State(initialValue: true)
@@ -258,7 +258,7 @@ struct DoorEditorView: View {
                     selectedVideo = data
                     
                     // Creates temporary file for preview
-                    let temporaryFileURL = AppStorage.shared.createTemporaryVideoFile(with: data)
+                    let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: data)
                     if let videoURL = temporaryFileURL {
                         let player = AVPlayer(url: videoURL)
                         videoPlayer = player
@@ -306,13 +306,13 @@ struct DoorEditorView: View {
                 if let image = selectedImage,
                     let imageData = image.jpegData(compressionQuality: 1) {
                     let filename = "door_\(door.number)_image_\(UUID().uuidString)" // Generates a unique filename for the image
-                    try? AppStorage.shared.saveMedia(data: imageData, identifier: filename)
+                    try? AppData.shared.saveMedia(data: imageData, identifier: filename)
                     updatedDoor.content = .image(filename)
                 }
             case .video:
                 if let videoData = selectedVideo {
                     let filename = "door_\(door.number)_video_\(UUID().uuidString)" // Generates a unique filename for the video
-                    try? AppStorage.shared.saveMedia(data: videoData, identifier: filename)
+                    try? AppData.shared.saveMedia(data: videoData, identifier: filename)
                     updatedDoor.content = .video(filename)
                 }
         }

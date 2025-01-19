@@ -132,18 +132,6 @@ struct TabViewEditor: View {
                 .pickerStyle(.segmented)
             }
             
-            // Layout mode selection
-            VStack(alignment: .leading, spacing: theme.spacing) {
-                Text("Layout Style")
-                    .font(theme.bodyFont)
-                
-                Picker("Layout Mode", selection: $stateManager.model.layoutMode) {
-                    Text(GridLayoutMode.uniform.description).tag(GridLayoutMode.uniform)
-                    Text(GridLayoutMode.random.description).tag(GridLayoutMode.random)
-                }
-                .pickerStyle(.segmented)
-            }
-            
             // Date selection for daily unlock mode
             if stateManager.model.unlockMode == .daily {
                 DatePicker("Start Date",
@@ -186,25 +174,46 @@ struct TabViewEditor: View {
     // Section for background image selection
     private var backgroundImageSection: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
-            Text("Background Image")
+            Text("Style")
                 .font(theme.headlineFont)
                 .foregroundColor(theme.text)
             
-            PhotosPicker(selection: $selectedImageItem, matching: .images) {
-                if let imageData = stateManager.model.backgroundImageData,
-                   let uiImage = UIImage(data: imageData) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxHeight: theme.imagePickerStyle.previewHeight)
-                        .cornerRadius(theme.cornerRadius)
-                } else {
-                    Label("Select Image", systemImage: "photo")
-                        .font(theme.bodyFont)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: theme.imagePickerStyle.previewHeight / 2)
-                        .background(theme.imagePickerStyle.placeholderColor)
-                        .cornerRadius(theme.cornerRadius)
+            Text("Background")
+                .font(theme.bodyFont)
+            
+            // Background type picker
+            Picker("Background Type", selection: $stateManager.model.backgroundType) {
+                Text("Image").tag(BackgroundType.image)
+                Text("Color").tag(BackgroundType.color)
+            }
+            .pickerStyle(.segmented)
+            
+            // Shows color picker or image picker based on selection
+            if stateManager.model.backgroundType == .color {
+                ColorPicker("Background Color", selection: $stateManager.model.backgroundColor)
+                    .labelsHidden()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .onChange(of: stateManager.model.backgroundColor) { _, _ in
+                        // Clears the background image when a color is selected
+                        stateManager.model.backgroundImageData = nil
+                    }
+            } else {
+                PhotosPicker(selection: $selectedImageItem, matching: .images) {
+                    if let imageData = stateManager.model.backgroundImageData,
+                       let uiImage = UIImage(data: imageData) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxHeight: theme.imagePickerStyle.previewHeight)
+                            .cornerRadius(theme.cornerRadius)
+                    } else {
+                        Label("Select Image", systemImage: "photo")
+                            .font(theme.bodyFont)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: theme.imagePickerStyle.previewHeight / 2)
+                            .background(theme.imagePickerStyle.placeholderColor)
+                            .cornerRadius(theme.cornerRadius)
+                    }
                 }
             }
         }
@@ -216,8 +225,17 @@ struct TabViewEditor: View {
                 // Tries to load the selected image as transferable data
                 if let data = try? await newValue?.loadTransferable(type: Data.self) {
                     stateManager.model.backgroundImageData = data // Converts the raw data into a UIImage if possible
+                    stateManager.model.backgroundType = .image // Switches to image mode when an image is selected
                 }
             }
+        }
+        .onChange(of: stateManager.model.backgroundType) { _, newValue in
+            switch newValue {
+                case .color:
+                    stateManager.model.backgroundImageData = nil // Clears the background image when switching to color mode
+                case .image:
+                    stateManager.model.backgroundColor = .clear // Clears the background color when switching to image mode
+                }
         }
     }
     
@@ -410,9 +428,9 @@ struct TabViewEditor: View {
                 do {
                     let data = try Data(contentsOf: url)
                     
-                    try? FileManager.default.removeItem(at: AppStorage.shared.calendarURL) // clears the existing state in AppStorage
+                    try? FileManager.default.removeItem(at: AppData.shared.calendarURL) // clears the existing state in AppStorage
                     
-                    let calendar = try AppStorage.shared.importCalendar(from: data)
+                    let calendar = try AppData.shared.importCalendar(from: data)
                     
                     // Creates a fresh calendar with reset states
                     let resetCalendar = HolidayCalendar(
@@ -429,7 +447,8 @@ struct TabViewEditor: View {
                             )
                         },
                         gridColumns: calendar.gridColumns,
-                        backgroundImageData: calendar.backgroundImageData
+                        backgroundImageData: calendar.backgroundImageData,
+                        backgroundColor: calendar.backgroundColor
                     )
                     
                     DispatchQueue.main.async {

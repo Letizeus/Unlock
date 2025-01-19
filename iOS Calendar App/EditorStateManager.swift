@@ -14,7 +14,7 @@ class EditorStateManager: ObservableObject {
     
     // Loads saved state if available, otherwise creates default state
     private init() {
-        if let savedModel = AppStorage.shared.loadEditorState() {
+        if let savedModel = AppData.shared.loadEditorState() {
             self.model = savedModel
         } else {
             self.model = EditorModel()
@@ -24,7 +24,7 @@ class EditorStateManager: ObservableObject {
     // Saves the current editor state to storage
     // Called automatically when model changes
     private func save() {
-        try? AppStorage.shared.saveEditorState(model)
+        try? AppData.shared.saveEditorState(model)
     }
     
     // Resets the editor state to default values
@@ -39,7 +39,7 @@ class EditorStateManager: ObservableObject {
     func exportCalendar() throws {
         let calendar = model.createCalendar() // Creates a calendar instance from the current editor model
         
-        let (exportData, filename) = try AppStorage.shared.exportCalendar(calendar) // Gets export data and generated filename from AppStorage
+        let (exportData, filename) = try AppData.shared.exportCalendar(calendar) // Gets export data and generated filename from AppStorage
         
         // Creates a temporary file URL
         let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
