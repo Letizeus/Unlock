@@ -30,7 +30,7 @@ struct TabViewLibrary: View {
                     importedCalendarsView
                 }
             }
-            .navigationTitle("Library - in Progress")
+            .navigationTitle("Library - In Progress")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { showingImporter = true }) {
