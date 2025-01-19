@@ -50,13 +50,13 @@ struct DoorContentView: View {
             .background(theme.background)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                // Leading: Share Button
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: { /* Share functionality placeholder */ }) {
-                        Image(systemName: "square.and.arrow.up")
-                            .foregroundStyle(.blue)
-                    }
-                }
+//                // Leading: Share Button
+//                ToolbarItem(placement: .topBarLeading) {
+//                    Button(action: { /* Share functionality placeholder */ }) {
+//                        Image(systemName: "square.and.arrow.up")
+//                            .foregroundStyle(.blue)
+//                    }
+//                }
                 // Trailing: Close Button
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: { dismiss() }) {
