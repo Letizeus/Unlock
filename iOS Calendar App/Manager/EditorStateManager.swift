@@ -70,9 +70,9 @@ class EditorStateManager: ObservableObject {
 
 // MARK: - Extensions
 
-// This extension on the UTType struct defines a custom Uniform Type Identifier (UTI) for holiday calendar files.
+// This extension on the UTType struct defines a custom Uniform Type Identifier (UTI) for Unlock Calendar files.
 extension UTType {
     static var holidayCalendar: UTType {
-        UTType(exportedAs: "com.holiday.calendar")
+        UTType(exportedAs: "com.unlock.calendar")
     }
 }

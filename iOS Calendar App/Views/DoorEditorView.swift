@@ -84,6 +84,7 @@ struct DoorEditorView: View {
                     }
                     contentTypeSection
                     contentSection
+                    markdownSection
                 }
                 .padding(theme.padding)
             }
@@ -152,10 +153,46 @@ struct DoorEditorView: View {
         .cornerRadius(theme.cornerRadius)
     }
     
+    // Section for handy markdown information
+    private var markdownSection: some View {
+        VStack(alignment: .leading, spacing: theme.spacing) {
+            Section {
+                VStack {
+                    HStack(alignment: .top) {
+                        Text("*Italic*")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text(verbatim: "*italic text*")
+                    }
+                    Divider()
+                    HStack(alignment: .top) {
+                        Text("**Bold**")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text(verbatim: "**bold text**")
+                    }
+                    Divider()
+                    HStack(alignment: .top) {
+                        Text("`code`")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text(verbatim: "`code`")
+                    }
+                }
+                
+            } header: {
+                Text("Markdown information")
+                    .font(theme.headlineFont)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+            }
+        }
+        .padding(theme.padding)
+        .background(theme.secondary)
+        .cornerRadius(theme.cornerRadius)
+    }
+    
     // Section for editing the content based on selected type
     private var contentSection: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
-            Section("Content") {
+            Section() {
                 HStack {
                     switch contentType {
                     case .text:
@@ -166,6 +203,11 @@ struct DoorEditorView: View {
                         videoSelector
                     }
                 }
+            } header: {
+                Text("Content")
+                    .font(theme.headlineFont)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
             }
         }
         .padding(theme.padding)

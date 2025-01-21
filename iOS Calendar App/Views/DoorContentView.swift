@@ -143,15 +143,30 @@ struct DoorContentView: View {
     
     // Displays text content
     private func textContent(_ text: String) -> some View {
-        Text(text)
-            .font(theme.bodyFont)
-            .foregroundColor(theme.text)
-            .multilineTextAlignment(.center)
-            .padding(theme.padding)
-            .frame(maxWidth: .infinity)
-            .background(theme.secondary)
-            .cornerRadius(theme.cornerRadius)
-            .padding(.horizontal, theme.padding.leading)
+        // Convert String to attributed string
+        
+        var attrString: AttributedString = ""
+        
+        do {
+            // Using special markdown parsing options, so \n e.g. works in the attributed string
+            attrString = try AttributedString(markdown: text, options: AttributedString.MarkdownParsingOptions(interpretedSyntax:
+                    .inlineOnlyPreservingWhitespace))
+        } catch {
+            // Catch error when converting fails
+            print("Failed to create attributed String")
+        }
+        
+        return VStack(spacing: theme.spacing) {
+            Text(attrString)
+                .foregroundColor(theme.text)
+                .multilineTextAlignment(.leading)
+                .padding(theme.padding)
+                .frame(maxWidth: .infinity)
+                .background(theme.secondary)
+                .cornerRadius(theme.cornerRadius)
+                .padding(.horizontal, theme.padding.leading)
+        }
+        
     }
     
     // Displays image content
@@ -425,12 +440,12 @@ struct VideoViewController: UIViewControllerRepresentable {
 #Preview {
     NavigationStack {
         DoorContentView(
-            content: .text("✨ Lorem ipsum dolor sit amet! ✨\n\nConsectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 🌟"),
+            content: .text("✨ **Lorem ipsum dolor sit amet**!✨ \n\nConsectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 🌟"),
             door: CalendarDoor(
                 number: 1,
                 unlockDate: Date(),
                 isUnlocked: true,
-                content: .text("✨ Lorem ipsum dolor sit amet! ✨\n\nConsectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 🌟"),
+                content: .text("✨ **Lorem ipsum dolor sit amet**! \n\n✨Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 🌟"),
                 hasBeenOpened: true
             ),
             onReactionAdded: { _ in }
