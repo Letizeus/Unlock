@@ -28,9 +28,6 @@ struct MainView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SwitchToEditorTab"))) { _ in
             selectedTab = .editor
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SwitchToCalendarTab"))) { _ in
-            selectedTab = .calendar
-        }
         // Updates theme when colorScheme changes
         .onAppear {
             themeManager.updateForColorScheme(colorScheme)
