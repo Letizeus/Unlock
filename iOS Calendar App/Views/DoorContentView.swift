@@ -243,7 +243,7 @@ struct DoorContentView: View {
                     .cornerRadius(theme.cornerRadius)
                 } else {
                     // Creates a temporary file URL for the video data
-                    let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: videoData)
+                    let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: videoData, doorNumber: 0)
                     
                     // If the temporary file URL is successfully created, display the video player
                     if let videoURL = temporaryFileURL {
@@ -385,7 +385,7 @@ struct DoorContentView: View {
             
         case .video(let filename):
             if let videoData = AppData.shared.loadMedia(identifier: filename),
-               let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: videoData) {
+               let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: videoData, doorNumber: door.number) {
                 itemsToShare.append(temporaryFileURL)
             }
         }

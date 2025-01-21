@@ -105,9 +105,9 @@ class AppData {
     }
     
     // Creates a temporary video file from the provided video data
-    func createTemporaryVideoFile(with data: Data) -> URL? {
+    func createTemporaryVideoFile(with data: Data, doorNumber: Int) -> URL? {
         let temporaryDirectoryURL = FileManager.default.temporaryDirectory // Gets the temporary directory URL
-        let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent("\(UUID().uuidString).mp4") // Creates a unique filename for the temporary video file
+        let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent("Calendar_Door_\(doorNumber)_Video.mp4") // Creates a unique filename for the temporary video file
         
         do {
             try data.write(to: temporaryFileURL) // Writes the video data to the temporary file
@@ -120,7 +120,7 @@ class AppData {
     // Creates a temporary image file from the provided image data
     func createTemporaryImageFile(_ image: UIImage, doorNumber: Int) -> URL? {
         let temporaryDirectoryURL = FileManager.default.temporaryDirectory // Gets the temporary directory URL
-        let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent("\(UUID().uuidString).jpg") // Creates a unique filename for the temporary image file
+        let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent("Calendar_Door_\(doorNumber)_Image.jpg") // Creates a unique filename for the temporary image file
         
         guard let imageData = image.jpegData(compressionQuality: 1.0) else { return nil }
         
@@ -135,7 +135,7 @@ class AppData {
     // Creates a temporary text file from the provided text data
     func createTemporaryTextFile(_ text: String, doorNumber: Int) -> URL? {
         let temporaryDirectoryURL = FileManager.default.temporaryDirectory // Gets the temporary directory URL
-        let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent("\(UUID().uuidString).txt") // Creates a unique filename for the temporary text file
+        let temporaryFileURL = temporaryDirectoryURL.appendingPathComponent("Calendar_Door_\(doorNumber)_Text.txt") // Creates a unique filename for the temporary text file
         
         do {
             try text.write(to: temporaryFileURL, atomically: true, encoding: .utf8) // Writes the text data to the temporary file

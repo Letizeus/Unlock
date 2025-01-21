@@ -177,7 +177,8 @@ struct TabViewCalendar: View {
         ) {
             ForEach(calendar.doors) { door in
                 DoorViewCell(isAnyDoorOpening: $isAnyDoorOpening, door: door, calendar: calendar)
-                    .aspectRatio(1, contentMode: .fit) // Maintain square shape
+                    .aspectRatio(1, contentMode: .fit)
+                    .background(.ultraThinMaterial.opacity(0.5), in: RoundedRectangle(cornerRadius: theme.cornerRadius))
             }
         }
         .padding(.horizontal, theme.padding.trailing)

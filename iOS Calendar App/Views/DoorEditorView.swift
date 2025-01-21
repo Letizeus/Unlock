@@ -56,7 +56,7 @@ struct DoorEditorView: View {
             case .video(let filename):
                 if let videoData = AppData.shared.loadMedia(identifier: filename) {
                     _selectedVideo = State(initialValue: videoData)
-                    let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: videoData)
+                    let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: videoData, doorNumber: 0)
                     if let videoURL = temporaryFileURL {
                         _videoPlayer = State(initialValue: AVPlayer(url: videoURL))
                         _isVideoPreviewReady = State(initialValue: true)
@@ -84,7 +84,6 @@ struct DoorEditorView: View {
                     }
                     contentTypeSection
                     contentSection
-                    markdownSection
                 }
                 .padding(theme.padding)
             }
@@ -184,7 +183,6 @@ struct DoorEditorView: View {
                     .minimumScaleFactor(0.75)
             }
         }
-        .padding(theme.padding)
         .background(theme.secondary)
         .cornerRadius(theme.cornerRadius)
     }
@@ -193,16 +191,15 @@ struct DoorEditorView: View {
     private var contentSection: some View {
         VStack(alignment: .leading, spacing: theme.spacing) {
             Section() {
-                HStack {
                     switch contentType {
                     case .text:
                         textEditor
+                        markdownSection
                     case .image:
                         imageSelector
                     case .video:
                         videoSelector
                     }
-                }
             } header: {
                 Text("Content")
                     .font(theme.headlineFont)
@@ -300,7 +297,7 @@ struct DoorEditorView: View {
                     selectedVideo = data
                     
                     // Creates temporary file for preview
-                    let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: data)
+                    let temporaryFileURL = AppData.shared.createTemporaryVideoFile(with: data, doorNumber: 0)
                     if let videoURL = temporaryFileURL {
                         let player = AVPlayer(url: videoURL)
                         videoPlayer = player

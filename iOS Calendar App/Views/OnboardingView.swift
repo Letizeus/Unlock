@@ -58,7 +58,7 @@ struct WelcomeView: View {
                 }
                 
                 // Content section with fade-in animation
-                VStack(spacing: 25) {
+                VStack(alignment: .leading, spacing: 25) {
                     // Feature items
                     featureItem(icon: Tab.calendar.icon,
                               title: "Your Journey",
