@@ -262,9 +262,25 @@ struct CountdownInfo {
     var minutes: Int = 0
 }
 
+// MARK: - LibraryItem
+// Represents an item in the library, which is either an exported or imported calendar
+struct LibraryItem: Identifiable, Codable {
+    let id: UUID
+    let calendar: HolidayCalendar
+    let type: CalendarType
+    let dateAdded: Date
+    
+    init(calendar: HolidayCalendar, type: CalendarType) {
+        self.id = UUID()
+        self.calendar = calendar
+        self.type = type
+        self.dateAdded = Date()
+    }
+}
+
 // MARK: - CalendarType
 // Defines the possible types of calendars that can appear in the library
-enum CalendarType {
+enum CalendarType: Codable {
     case exported
     case imported
 }

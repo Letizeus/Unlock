@@ -39,6 +39,8 @@ class EditorStateManager: ObservableObject {
     func exportCalendar() throws {
         let calendar = model.createCalendar() // Creates a calendar instance from the current editor model
         
+        try AppData.shared.addToLibrary(calendar, type: .exported) // Adds it to library
+        
         let (exportData, filename) = try AppData.shared.exportCalendar(calendar) // Gets export data and generated filename from AppStorage
         
         // Creates a temporary file URL

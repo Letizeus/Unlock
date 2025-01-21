@@ -28,6 +28,9 @@ struct MainView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SwitchToEditorTab"))) { _ in
             selectedTab = .editor
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SwitchToCalendarTab"))) { _ in
+            selectedTab = .calendar
+        }
         // Updates theme when colorScheme changes
         .onAppear {
             themeManager.updateForColorScheme(colorScheme)
@@ -72,11 +75,13 @@ struct MainView: View {
     }
     
     private var libraryTab: some View {
-        TabViewLibrary()
-            .tabItem {
-                Label(Tab.library.title, systemImage: Tab.library.icon)
-            }
-            .tag(Tab.library)
+        TabViewLibrary(onLoadCalendar: {
+            selectedTab = .calendar // Switches to calendar tab after loading
+        })
+        .tabItem {
+            Label(Tab.library.title, systemImage: Tab.library.icon)
+        }
+        .tag(Tab.library)
     }
 }
 

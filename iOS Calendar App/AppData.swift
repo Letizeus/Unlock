@@ -27,6 +27,12 @@ class AppData {
         documentsDirectory.appendingPathComponent("Media", isDirectory: true)
     }
     
+    // Creates a dedicated directory for storing library files
+    // Helps organize and separate library-related data from other app data
+    private var libraryDirectory: URL {
+        documentsDirectory.appendingPathComponent("Library", isDirectory: true)
+    }
+    
     private init() {
         // Creates necessary directories if they don't exist
         try? fileManager.createDirectory(at: calendarDirectory, withIntermediateDirectories: true)
@@ -137,6 +143,48 @@ class AppData {
         } catch {
             return nil
         }
+    }
+    
+    // MARK: - Library Calendar Storage
+    
+    // Defines the file path for the library's JSON representation
+    // Uses a fixed filename to represent the entire library
+    private var libraryURL: URL {
+        libraryDirectory.appendingPathComponent("library.json")
+    }
+    
+    // Saves a calendar to the library
+    func addToLibrary(_ calendar: HolidayCalendar, type: CalendarType) throws {
+        try FileManager.default.createDirectory(at: libraryDirectory, withIntermediateDirectories: true)
+        
+        var items = try loadLibraryItems()
+        let newItem = LibraryItem(calendar: calendar, type: type)
+        items.append(newItem)
+        
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(items)
+        try data.write(to: libraryURL)
+    }
+    
+    // Loads all library items
+    func loadLibraryItems() throws -> [LibraryItem] {
+        guard FileManager.default.fileExists(atPath: libraryURL.path) else {
+            return []
+        }
+        
+        let data = try Data(contentsOf: libraryURL)
+        let decoder = JSONDecoder()
+        return try decoder.decode([LibraryItem].self, from: data)
+    }
+    
+    // Deletes a library item
+    func deleteLibraryItem(withId id: UUID) throws {
+        var items = try loadLibraryItems()
+        items.removeAll { item in item.id == id }
+        
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(items)
+        try data.write(to: libraryURL)
     }
     
     // MARK: - Calendar Export/Import
