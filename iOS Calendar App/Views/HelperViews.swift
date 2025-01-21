@@ -143,7 +143,7 @@ struct DoorViewCell: View {
     
     var body: some View {
         ZStack {
-            suprise
+            surprise
                 .opacity(1 - manager.doorOpacity)
                 .shadow(color: theme.doorStyle.shadowColor.opacity(0.2), radius: 6, x: 0, y: 3)
             // Door front
@@ -164,13 +164,13 @@ struct DoorViewCell: View {
     // UI Components
     
     // The gift preview view that appears behind the door
-    private var suprise: some View {
+    private var surprise: some View {
         RoundedRectangle(cornerRadius: theme.cornerRadius)
-            .fill(theme.background.opacity(0.9))
+            .fill(calendar.doorColor != .clear ? calendar.doorColor : theme.doorStyle.completedBackground)
             .overlay(
                 Image(systemName: "gift.fill")
                     .font(.system(size: 24))
-                    .foregroundColor(theme.accent)
+                    .foregroundColor(.white)
             )
     }
     
