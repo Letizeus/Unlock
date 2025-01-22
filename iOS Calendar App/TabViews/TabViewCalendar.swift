@@ -130,6 +130,7 @@ struct TabViewCalendar: View {
             RoundedRectangle(cornerRadius: theme.cornerRadius)
                 .fill(theme.countdownStyle.backgroundColor)
                 .shadow(color: theme.countdownStyle.shadowColor.opacity(0.15), radius: 6, x: 0, y: 3)
+                .background(.ultraThinMaterial.opacity(0.5), in: RoundedRectangle(cornerRadius: theme.cornerRadius))
         }
     }
     
@@ -156,6 +157,7 @@ struct TabViewCalendar: View {
             RoundedRectangle(cornerRadius: theme.cornerRadius)
                 .fill(theme.countdownStyle.backgroundColor)
                 .shadow(color: theme.countdownStyle.shadowColor.opacity(0.15), radius: 6, x: 0, y: 3)
+                .background(.ultraThinMaterial.opacity(0.5), in: RoundedRectangle(cornerRadius: theme.cornerRadius))
         }
         
         // Separator view used between countdown cells
