@@ -16,9 +16,6 @@ struct CalendarApp: App {
                     }
             } else {
                 OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
-                    .onOpenURL { url in
-                        openURL = url
-                    }
             }
         }
     }
