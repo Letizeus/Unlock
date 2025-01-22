@@ -185,22 +185,8 @@ struct DoorContentView: View {
         .padding(.horizontal, theme.padding.leading)
         .frame(height: (UIScreen.main.bounds.width - (theme.padding.leading + theme.padding.trailing)) * uiImage.size.height / uiImage.size.width)
         .fullScreenCover(isPresented: $isFullscreen) {
-            ZStack {
-                Color.black.ignoresSafeArea()
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFit()
-                    .ignoresSafeArea()
-            }
-            .overlay(alignment: .topTrailing) {
-                Button {
-                    isFullscreen = false
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(theme.subtitleFont)
-                        .foregroundStyle(theme.text.opacity(0.6))
-                        .padding()
-                }
+            ZoomableImageView(image: uiImage) {
+                isFullscreen = false
             }
         }
     }
@@ -433,6 +419,131 @@ struct VideoViewController: UIViewControllerRepresentable {
     // Required by UIViewControllerRepresentable but unused in our case
     // Called when the SwiftUI view updates
     func updateUIViewController(_ uiViewController: AVPlayerViewController, context: Context) {}
+}
+
+// MARK: - ZoomableImageView
+
+// Displays a fullscreen image viewer with zoom functionality
+struct ZoomableImageView: View {
+    @Environment(\.colorScheme) private var colorScheme
+    
+    let image: UIImage
+    let onDismiss: () -> Void
+    
+    var body: some View {
+        ZStack {
+            Color.black.edgesIgnoringSafeArea(.all)
+            
+            ZoomableScrollView(image: image)
+        }
+        .overlay(alignment: .topTrailing) {
+            Button(action: {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                    onDismiss()
+                }
+            }) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(colorScheme == .dark ? .white : .black)
+                    .frame(width: 28, height: 28)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Circle())
+            }
+            .padding(.top, 46)
+            .padding(.trailing, 12)
+        }
+        .edgesIgnoringSafeArea(.all)
+        .statusBar(hidden: true)
+    }
+}
+
+// UIViewRepresentable wrapper for UIScrollView with zooming
+struct ZoomableScrollView: UIViewRepresentable {
+    let image: UIImage
+    
+    // Creates and configures the UIScrollView with proper zoom settings
+    func makeUIView(context: Context) -> UIScrollView {
+        // Set up scroll view
+        let scrollView = UIScrollView()
+        scrollView.delegate = context.coordinator
+        scrollView.maximumZoomScale = 3.0
+        scrollView.minimumZoomScale = 1.0
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.bouncesZoom = true
+        scrollView.decelerationRate = .fast
+        
+        // Set up image view
+        let imageView = UIImageView(image: image)
+        imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(imageView)
+        
+        // Configure auto layout constraints to center the image
+        NSLayoutConstraint.activate([
+            imageView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            imageView.heightAnchor.constraint(equalTo: scrollView.heightAnchor),
+            imageView.centerXAnchor.constraint(equalTo: scrollView.centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: scrollView.centerYAnchor)
+        ])
+        
+        // Adds double tap gesture
+        let doubleTapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleDoubleTap(_:)))
+        doubleTapGesture.numberOfTapsRequired = 2
+        scrollView.addGestureRecognizer(doubleTapGesture)
+        
+        return scrollView
+    }
+    func updateUIView(_ uiView: UIScrollView, context: Context) {}  // Required by UIViewRepresentable but unused in this implementation
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    // Handles UIScrollView delegate methods and gesture recognition
+    class Coordinator: NSObject, UIScrollViewDelegate {
+        let parent: ZoomableScrollView
+        
+        init(_ parent: ZoomableScrollView) {
+            self.parent = parent
+        }
+        
+        // Tells the scroll view which view to zoom (the image view)
+        func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+            scrollView.subviews.first as? UIImageView
+        }
+        
+        // Handles double tap gesture to zoom in/out
+        @objc func handleDoubleTap(_ gesture: UITapGestureRecognizer) {
+            guard let scrollView = gesture.view as? UIScrollView else { return }
+            
+            if scrollView.zoomScale > scrollView.minimumZoomScale {
+                // If zoomed in, zoom out to minimum scale
+                scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
+            } else {
+                // If zoomed out, zoom in on tap location
+                let point = gesture.location(in: scrollView)
+                let size = scrollView.bounds.size
+                
+                let width = size.width / scrollView.maximumZoomScale
+                let height = size.height / scrollView.maximumZoomScale
+                let rect = CGRect(x: point.x - width/2, y: point.y - height/2, width: width, height: height)
+                
+                scrollView.zoom(to: rect, animated: true)
+            }
+        }
+        
+        // Keeps the image centered while zooming
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+            guard let imageView = scrollView.subviews.first else { return }
+
+            let offsetX = max((scrollView.bounds.width - imageView.frame.width) * 0.5, 0)
+            let offsetY = max((scrollView.bounds.height - imageView.frame.height) * 0.5, 0)
+            
+            imageView.center = CGPoint(x: imageView.frame.width * 0.5 + offsetX,
+                                       y: imageView.frame.height * 0.5 + offsetY)
+        }
+    }
 }
 
 // MARK: - Preview
