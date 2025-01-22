@@ -313,6 +313,8 @@ struct TabViewEditor: View {
                         }
                 }
             }
+            .padding(.horizontal, theme.padding.trailing/4)
+            .padding(.vertical, theme.padding.leading/4)
         }
         .scrollIndicators(.hidden)
         .frame(maxHeight: theme.previewStyle.maxHeight)
