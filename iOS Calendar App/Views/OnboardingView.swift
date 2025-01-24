@@ -57,6 +57,8 @@ struct WelcomeView: View {
                         .opacity(showUnlock ? 1 : 0)
                 }
                 
+                // Spacer()
+                
                 // Content section with fade-in animation
                 VStack(alignment: .leading, spacing: 25) {
                     // Feature items
@@ -87,7 +89,8 @@ struct WelcomeView: View {
                 }
                 .offset(y: showContent ? 0 : 50)
                 .opacity(showContent ? 1 : 0)
-                
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
                 // Next button
                 Button(action: {
                     NotificationManager.shared.requestPermission()
@@ -130,6 +133,7 @@ struct WelcomeView: View {
                     .minimumScaleFactor(0.75)
             }
         }
+        .frame(maxHeight: .infinity)
     }
     
     // Triggers the entrance animations in sequence with proper timing and spring effects
