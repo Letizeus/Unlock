@@ -113,25 +113,41 @@ struct TabViewCalendar: View {
     // A view that displays a celebratory message when all doors have been unlocked
     private var completionView: some View {
         VStack(spacing: theme.spacing) {
-            Image(systemName: "trophy.circle.fill")
-                .font(.system(size: 44))
-            
-            Text("Congratulations!")
-                .font(theme.titleFont.bold())
-                .foregroundColor(theme.text)
-            
-            Text("You've unlocked all the doors!")
-                .font(theme.bodyFont)
-                .foregroundColor(theme.text.opacity(0.8))
+            HStack(spacing: theme.spacing * 1.2) {
+                // Trophy icon with animation
+                ZStack {
+                    Circle()
+                        .fill(theme.accent.opacity(0.1))
+                        .frame(width: 64, height: 64)
+                        .clipped()
+                    
+                    Image(systemName: "trophy.circle.fill")
+                        .font(.system(size: 40))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(theme.accent)
+                        .modifier(BoundedTrophyAnimation())
+                }
+                .clipShape(Circle())
+                
+                // Celebration text
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Congratulations!")
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .foregroundColor(theme.accent)
+                    
+                    Text("You've unlocked all the doors!")
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .foregroundColor(theme.text.opacity(0.8))
+                }
+            }
         }
-        .padding()
+        .padding(.vertical, 20)
+        .padding(.horizontal, 24)
         .background {
-            // Semi-transparent background container
             RoundedRectangle(cornerRadius: theme.cornerRadius)
-                .fill(theme.countdownStyle.backgroundColor)
-                .shadow(color: theme.countdownStyle.shadowColor.opacity(0.15), radius: 6, x: 0, y: 3)
-                .background(.ultraThinMaterial.opacity(0.5), in: RoundedRectangle(cornerRadius: theme.cornerRadius))
+                .fill(.ultraThinMaterial)
         }
+        .shadow(color: theme.countdownStyle.shadowColor.opacity(0.06), radius: 8, x: 0, y: 4)
     }
     
     // A view that displays the complete countdown timer for the next door
@@ -256,6 +272,33 @@ struct TabViewCalendar: View {
             .filter { $0.unlockDate > Date() && !$0.hasBeenOpened }
             .forEach { door in
                 NotificationManager.shared.scheduleDoorNotifications(for: door)
+            }
+    }
+}
+
+// MARK: - ViewModifiers
+
+// Bounded animation modifier for the trophy
+struct BoundedTrophyAnimation: ViewModifier {
+    @State private var isAnimating = false
+    
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(isAnimating ? 1.05 : 1.0)
+            .rotationEffect(.degrees(isAnimating ? 5 : -5))
+            .animation(
+                .easeInOut(duration: 1.2)
+                .repeatForever(autoreverses: true),
+                value: isAnimating
+            )
+            .onAppear {
+                // Slight delay to ensure proper initialization
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    isAnimating = true
+                }
+            }
+            .onDisappear {
+                isAnimating = false
             }
     }
 }
