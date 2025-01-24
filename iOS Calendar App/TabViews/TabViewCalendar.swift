@@ -235,13 +235,12 @@ struct TabViewCalendar: View {
             to: nextDoor.unlockDate
         )
         
-        // If countdown reaches 00:00:00, update door states
-        if components.day == 0 && components.hour == 0 && components.minute == 0 {
-            for door in calendar.doors {
-                var updatedDoor = door
-                updatedDoor.updateUnlockState()
-                CalendarStateManager.shared.silentlyUpdateDoor(updatedDoor)
-            }
+        // Checks if it's time to unlock the door
+        if Calendar.current.startOfDay(for: now) >= Calendar.current.startOfDay(for: nextDoor.unlockDate) {
+            var updatedDoor = nextDoor
+            updatedDoor.updateUnlockState()
+            CalendarStateManager.shared.silentlyUpdateDoor(updatedDoor)
+            updateCountdown()
         }
         
         countdown = CountdownInfo(

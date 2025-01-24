@@ -59,6 +59,9 @@ struct TabViewLibrary: View {
                 Text(errorMessage)
             }
             .onAppear(perform: loadLibraryItems) // Loads library items when the view appears
+            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SwitchToImportedSection"))) { _ in
+                selectedSegment = 1 // Switches to imported section
+            }
         }
     }
     

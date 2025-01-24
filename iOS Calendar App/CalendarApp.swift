@@ -22,42 +22,28 @@ struct CalendarApp: App {
     
     // Handles incoming .cal file URLs
     private func handleIncomingURL(_ url: URL) {
-        guard url.startAccessingSecurityScopedResource() else { return }
-        defer { url.stopAccessingSecurityScopedResource() }
+        guard url.startAccessingSecurityScopedResource() else { return }  // Requests permission to access the file from system security
+        defer { url.stopAccessingSecurityScopedResource() } // Ensures we release the security-scoped resource when we're done
         
         do {
             let data = try Data(contentsOf: url)
             let calendar = try AppData.shared.importCalendar(from: data)
+            try AppData.shared.addToLibrary(calendar, type: .imported)
             
-            // Creates a fresh calendar with reset states
-            let resetCalendar = HolidayCalendar(
-                title: calendar.title,
-                startDate: calendar.startDate,
-                endDate: calendar.endDate,
-                doors: calendar.doors.map { door in
-                    CalendarDoor(
-                        number: door.number,
-                        unlockDate: door.unlockDate,
-                        isUnlocked: Calendar.current.startOfDay(for: Date()) >= Calendar.current.startOfDay(for: door.unlockDate),
-                        content: door.content,
-                        hasBeenOpened: door.hasBeenOpened
-                    )
-                },
-                gridColumns: calendar.gridColumns,
-                backgroundImageData: calendar.backgroundImageData,
-                backgroundColor: calendar.backgroundColor,
-                doorColor: calendar.doorColor
-            )
-            CalendarStateManager.shared.reset(with: resetCalendar) // Updates the calendar state
-            try AppData.shared.addToLibrary(resetCalendar, type: .imported) // Adds the calendar to the library
-            // Force switches to calendar tab
+            // Redirects to library tab's imported section
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let window = windowScene.windows.first {
-                window.rootViewController = UIHostingController(rootView: MainView(initialTab: .calendar))
+                let mainView = MainView(initialTab: .library)
+                let hostingController = UIHostingController(rootView: mainView)
+                window.rootViewController = hostingController
+                
+                // Ensures the library view's segment is set after the view is fully loaded
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    NotificationCenter.default.post(name: NSNotification.Name("SwitchToImportedSection"), object: nil)
+                }
             }
-            
         } catch {
-            print("Error handling incoming URL: \(error)")
+            print("Error importing calendar: \(error)")
         }
     }
 }
