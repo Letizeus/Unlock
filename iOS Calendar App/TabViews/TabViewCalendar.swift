@@ -122,27 +122,33 @@ struct TabViewCalendar: View {
                         .clipped()
                     
                     Image(systemName: "trophy.circle.fill")
-                        .font(.system(size: 40))
+                        .font(.system(size: theme.spacing * 2.5))
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(theme.accent)
                         .modifier(BoundedTrophyAnimation())
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
                 }
                 .clipShape(Circle())
                 
                 // Celebration text
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Congratulations!")
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .font(theme.subtitleFont)
                         .foregroundColor(theme.accent)
+                        .minimumScaleFactor(0.5)
+                        .lineLimit(1)
                     
                     Text("You've unlocked all the doors!")
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .font(theme.bodyFont)
                         .foregroundColor(theme.text.opacity(0.8))
+                        .minimumScaleFactor(0.5)
+                          .lineLimit(1)
                 }
             }
         }
-        .padding(.vertical, 20)
-        .padding(.horizontal, 24)
+        .padding(.vertical, theme.padding.trailing)
+        .padding(.horizontal, theme.padding.top)
         .background {
             RoundedRectangle(cornerRadius: theme.cornerRadius)
                 .fill(.ultraThinMaterial)
@@ -181,7 +187,7 @@ struct TabViewCalendar: View {
             Text(":")
                 .foregroundStyle(theme.countdownStyle.separatorColor)
                 .font(theme.titleFont)
-                .offset(y: -theme.spacing) // Adjust colon position to allign with the numbers
+                .offset(y: -theme.spacing) // Adjust colon position to align with the numbers
         }
     }
     
