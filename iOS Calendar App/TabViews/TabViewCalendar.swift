@@ -121,7 +121,7 @@ struct TabViewCalendar: View {
                 // Trophy icon with animation
                 ZStack {
                     Circle()
-                        .fill(theme.accent.opacity(0.1))
+                        .fill(.yellow.opacity(0.1))
                         .frame(maxWidth: width * 0.2)
                         .aspectRatio(1, contentMode: .fit)
                         .clipped()
@@ -131,7 +131,8 @@ struct TabViewCalendar: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(maxWidth: width * 0.15)
                         .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(theme.accent)
+                        .foregroundStyle(.orange, .yellow)
+                        .shadow(color: .orange, radius: 1)
                         .modifier(BoundedTrophyAnimation())
                 }
                 .clipShape(Circle())
@@ -140,7 +141,7 @@ struct TabViewCalendar: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Congratulations!")
                         .font(theme.subtitleFont)
-                        .foregroundColor(theme.accent)
+                        .foregroundColor(theme.text)
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
                     
