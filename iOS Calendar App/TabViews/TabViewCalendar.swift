@@ -122,14 +122,14 @@ struct TabViewCalendar: View {
                 ZStack {
                     Circle()
                         .fill(theme.accent.opacity(0.1))
-                        .frame(maxWidth: width * 0.15)
+                        .frame(maxWidth: width * 0.2)
                         .aspectRatio(1, contentMode: .fit)
                         .clipped()
                     
                     Image(systemName: "trophy.circle.fill")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: width * 0.1)
+                        .frame(maxWidth: width * 0.15)
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(theme.accent)
                         .modifier(BoundedTrophyAnimation())
