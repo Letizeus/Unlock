@@ -25,7 +25,9 @@
 			<key>UTTypeDescription</key>
 			<string>Unlock Calendar</string>
 			<key>UTTypeIconFiles</key>
-			<array/>
+			<array>
+				<string>fileicon-trans</string>
+			</array>
 			<key>UTTypeIdentifier</key>
 			<string>com.unlock.calendar</string>
 			<key>UTTypeTagSpecification</key>
@@ -50,7 +52,9 @@
 			<key>UTTypeDescription</key>
 			<string>Unlock Calendar</string>
 			<key>UTTypeIconFiles</key>
-			<array/>
+			<array>
+				<string>fileicon-trans</string>
+			</array>
 			<key>UTTypeIdentifier</key>
 			<string>com.unlock.calendar</string>
 			<key>UTTypeTagSpecification</key>

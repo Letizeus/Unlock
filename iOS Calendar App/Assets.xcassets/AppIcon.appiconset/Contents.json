@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "AppIcon-LockStackv.1.3.png",
+      "filename" : "app-icon-white.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,7 +13,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "AppIcon-LockStackv.1.3 1.png",
+      "filename" : "app-icon-black2.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -25,7 +25,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-LockStackv.1.3 2.png",
+      "filename" : "app-icon-tinted2.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

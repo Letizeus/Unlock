@@ -252,7 +252,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"iOS Calendar App/Preview Content\"";
-				DEVELOPMENT_TEAM = S5QR9LSNC8;
+				DEVELOPMENT_TEAM = 367TMHMGDT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS-Calendar-App-Info.plist";
@@ -270,7 +270,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.9;
-				PRODUCT_BUNDLE_IDENTIFIER = "Fadi.iOS-Calendar-App";
+				PRODUCT_BUNDLE_IDENTIFIER = "mauroms.iOS-Calendar-App";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -286,7 +286,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"iOS Calendar App/Preview Content\"";
-				DEVELOPMENT_TEAM = S5QR9LSNC8;
+				DEVELOPMENT_TEAM = 367TMHMGDT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS-Calendar-App-Info.plist";
@@ -304,7 +304,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.9;
-				PRODUCT_BUNDLE_IDENTIFIER = "Fadi.iOS-Calendar-App";
+				PRODUCT_BUNDLE_IDENTIFIER = "mauroms.iOS-Calendar-App";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
