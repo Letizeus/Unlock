@@ -32,8 +32,12 @@ struct TabViewLibrary: View {
                 .pickerStyle(.segmented)
                 .padding()
                 
+                // Filters items based on selected segment
+                let filteredItems = libraryItems.filter { item in
+                    selectedSegment == 0 ? item.type == .exported : item.type == .imported
+                }
                 // Shows an empty state view if there are no library items
-                if libraryItems.isEmpty {
+                if filteredItems.isEmpty {
                     emptyStateView
                 } else {
                     calendarList
