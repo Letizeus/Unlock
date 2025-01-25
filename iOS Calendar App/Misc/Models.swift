@@ -269,12 +269,14 @@ struct LibraryItem: Identifiable, Codable {
     let calendar: HolidayCalendar
     let type: CalendarType
     let dateAdded: Date
+    var isPinned: Bool
     
-    init(calendar: HolidayCalendar, type: CalendarType) {
+    init(calendar: HolidayCalendar, type: CalendarType, isPinned: Bool = false) {
         self.id = UUID()
         self.calendar = calendar
         self.type = type
         self.dateAdded = Date()
+        self.isPinned = isPinned
     }
 }
 

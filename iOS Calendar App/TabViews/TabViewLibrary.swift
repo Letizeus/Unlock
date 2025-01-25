@@ -102,22 +102,17 @@ struct TabViewLibrary: View {
         let filteredItems = libraryItems.filter { item in
             selectedSegment == 0 ? item.type == .exported : item.type == .imported
         }
+        .sorted { $0.isPinned && !$1.isPinned } // Sorts pinned items to the top
         
-        return Group {
-            if filteredItems.isEmpty {
-                emptyStateView
-            } else {
-                List {
-                    ForEach(filteredItems) { item in
-                        calendarCard(item)
-                            .listRowInsets(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-                    }
-                }
-                .listStyle(.plain)
+        return List {
+            ForEach(filteredItems) { item in
+                calendarCard(item)
+                    .listRowInsets(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             }
         }
+        .listStyle(.plain)
     }
     
     // Creates a card view for displaying calendar information and actions
@@ -169,22 +164,31 @@ struct TabViewLibrary: View {
                     }
                 }
             }
-        
-            VStack(alignment: .leading, spacing: 4) {
-                Text(item.calendar.title)
-                    .font(theme.subtitleFont)
-                    .foregroundColor(theme.text)
-                
-                Text("Added \(formatter.string(from: item.dateAdded))")
-                    .font(theme.footnoteFont)
-                    .foregroundColor(theme.text.opacity(0.6))
-                
-                Text("\(item.calendar.doors.count) doors")
-                    .font(theme.footnoteFont)
-                    .foregroundColor(theme.text.opacity(0.6))
+            HStack(spacing: 0) {
+                if item.isPinned {
+                    Image(systemName: "pin.fill")
+                        .foregroundColor(.orange)
+                        .font(theme.subtitleFont)
+                        .padding(.leading)
+                        .padding(.bottom)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.calendar.title)
+                        .font(theme.subtitleFont)
+                        .foregroundColor(theme.text)
+                    
+                    Text("Added \(formatter.string(from: item.dateAdded))")
+                        .font(theme.footnoteFont)
+                        .foregroundColor(theme.text.opacity(0.6))
+                    
+                    Text("\(item.calendar.doors.count) doors")
+                        .font(theme.footnoteFont)
+                        .foregroundColor(theme.text.opacity(0.6))
+                }
+                .padding(.horizontal)
+                .padding(.bottom)
             }
-            .padding(.horizontal)
-            .padding(.bottom)
         }
         .background(theme.secondary)
         .cornerRadius(theme.cornerRadius)
@@ -202,7 +206,7 @@ struct TabViewLibrary: View {
             }
             .tint(Color.red)
         }
-        // Swipe action to edit the calendar item
+        // Swipe action to pin the calendar item
         .swipeActions(edge: .leading, allowsFullSwipe: false) {
             if item.type == .exported {
                 Button {
@@ -216,6 +220,33 @@ struct TabViewLibrary: View {
                     .padding(.vertical, 8)
                 }
                 .tint(theme.accent)
+            }
+        }
+        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+            if item.type == .exported {
+                Button {
+                    loadIntoEditor(item.calendar)
+                } label: {
+                    HStack {
+                        Image(systemName: "pencil")
+                        Text("Edit")
+                    }
+                    .font(theme.bodyFont)
+                    .padding(.vertical, 8)
+                }
+                .tint(theme.accent)
+            } else {
+                Button {
+                    togglePin(item)
+                } label: {
+                    HStack {
+                        Image(systemName: item.isPinned ? "pin.slash.fill" : "pin.fill")
+                        Text(item.isPinned ? "Unpin" : "Pin")
+                    }
+                    .font(theme.bodyFont)
+                    .padding(.vertical, 8)
+                }
+                .tint(item.isPinned ? .gray : .orange)
             }
         }
         .onTapGesture {
@@ -366,6 +397,16 @@ struct TabViewLibrary: View {
             }
         } catch {
             showError("Failed to export calendar: \(error.localizedDescription)")
+        }
+    }
+    
+    // Toggles the pinned state of a library item
+    private func togglePin(_ item: LibraryItem) {
+        // Finds the item in the array
+        if let index = libraryItems.firstIndex(where: { $0.id == item.id }) {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                libraryItems[index].isPinned.toggle() // Toggles the isPinned state
+            }
         }
     }
 }
