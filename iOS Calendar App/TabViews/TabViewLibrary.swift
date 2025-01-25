@@ -225,7 +225,7 @@ struct TabViewLibrary: View {
             Button {
                 shareCalendar(item.calendar)
             } label: {
-                Label("Export Calendar", systemImage: "square.and.arrow.up")
+                Label("Shared Calendar", systemImage: "square.and.arrow.up")
             }
         }
     }
