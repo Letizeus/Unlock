@@ -8,11 +8,14 @@ struct TabViewLibrary: View {
     
     // MARK: - Properties
     
-    @State private var selectedSegment = 0 // Controls which view is currently displayed (0 = exported, 1 = imported)
+    @AppStorage("librarySelectedSegment") private var selectedSegment = 0 // Controls which view is currently displayed (0 = exported, 1 = imported)
     @State private var showingImporter = false // Controls the presentation of the file importer
     @State private var showingError = false // Controls the presentation of error alerts
     @State private var errorMessage = "" // Stores the current error message
     @State private var libraryItems: [LibraryItem] = [] // Holds the array of library items (calendars)
+    
+    @State private var selectedCalendarForExport: LibraryItem? // Tracks calendar selected for export
+
     
     let onLoadCalendar: () -> Void // Callback function for when a calendar is loaded
     
@@ -123,20 +126,66 @@ struct TabViewLibrary: View {
         formatter.dateStyle = .medium
         
         return VStack(alignment: .leading, spacing: 8) {
-            Text(item.calendar.title)
-                .font(theme.subtitleFont)
-                .foregroundColor(theme.text)
-            
-            Text("Added \(formatter.string(from: item.dateAdded))")
-                .font(theme.footnoteFont)
-                .foregroundColor(theme.text.opacity(0.6))
-            
-            Text("\(item.calendar.doors.count) doors")
-                .font(theme.footnoteFont)
-                .foregroundColor(theme.text.opacity(0.6))
+            // Background Preview
+            ZStack {
+                if let backgroundData = item.calendar.backgroundImageData,
+                   let uiImage = UIImage(data: backgroundData) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(height: 60)
+                        .clipShape(RoundedRectangle(cornerRadius: theme.cornerRadius))
+                        .overlay {
+                            Color(UIColor.systemBackground)
+                                .opacity(0.2)
+                        }
+                } else if item.calendar.backgroundColor != .clear {
+                    item.calendar.backgroundColor
+                        .frame(height: 60)
+                        .clipShape(RoundedRectangle(cornerRadius: theme.cornerRadius))
+                        .overlay {
+                            Color(UIColor.systemBackground)
+                                .opacity(0.2)
+                        }
+                } else {
+                    theme.secondary
+                        .frame(height: 60)
+                        .clipShape(RoundedRectangle(cornerRadius: theme.cornerRadius))
+                }
+                
+                // Door Color Preview
+                if item.calendar.doorColor != .clear {
+                    HStack {
+                        Spacer()
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(item.calendar.doorColor)
+                            .frame(width: 30, height: 30)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                            )
+                            .shadow(radius: 2)
+                            .padding(8)
+                    }
+                }
+            }
+        
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.calendar.title)
+                    .font(theme.subtitleFont)
+                    .foregroundColor(theme.text)
+                
+                Text("Added \(formatter.string(from: item.dateAdded))")
+                    .font(theme.footnoteFont)
+                    .foregroundColor(theme.text.opacity(0.6))
+                
+                Text("\(item.calendar.doors.count) doors")
+                    .font(theme.footnoteFont)
+                    .foregroundColor(theme.text.opacity(0.6))
+            }
+            .padding(.horizontal)
+            .padding(.bottom)
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
         .background(theme.secondary)
         .cornerRadius(theme.cornerRadius)
         // Swipe action to delete the calendar item
@@ -151,10 +200,33 @@ struct TabViewLibrary: View {
                 .font(theme.bodyFont)
                 .padding(.vertical, 8)
             }
-            .tint(Color.red.opacity(0.9))
+            .tint(Color.red)
+        }
+        // Swipe action to edit the calendar item
+        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+            if item.type == .exported {
+                Button {
+                    loadIntoEditor(item.calendar)
+                } label: {
+                    HStack {
+                        Image(systemName: "pencil")
+                        Text("Edit")
+                    }
+                    .font(theme.bodyFont)
+                    .padding(.vertical, 8)
+                }
+                .tint(theme.accent)
+            }
         }
         .onTapGesture {
             loadCalendar(item.calendar)
+        }
+        .contextMenu {
+            Button {
+                shareCalendar(item.calendar)
+            } label: {
+                Label("Export Calendar", systemImage: "square.and.arrow.up")
+            }
         }
     }
     
@@ -191,7 +263,7 @@ struct TabViewLibrary: View {
                 
                 try AppData.shared.addToLibrary(calendar, type: .imported)
                 loadLibraryItems()
-                loadCalendar(calendar)
+                NotificationCenter.default.post(name: NSNotification.Name("SwitchToImportedSection"), object: nil)
             } catch {
                 showError("Failed to import calendar: \(error.localizedDescription)")
             }
@@ -242,6 +314,59 @@ struct TabViewLibrary: View {
     private func showError(_ message: String) {
         errorMessage = message
         showingError = true
+    }
+    
+    // Loads an exported calendar into the editor for modification
+    private func loadIntoEditor(_ calendar: HolidayCalendar) {
+        // Updates the editor state with the calendar data
+        var editorModel = EditorModel()
+        editorModel.calendarTitle = calendar.title
+        editorModel.startDate = calendar.startDate
+        editorModel.endDate = calendar.endDate
+        editorModel.doorCount = calendar.doors.count
+        editorModel.gridColumns = calendar.gridColumns
+        editorModel.backgroundImageData = calendar.backgroundImageData
+        editorModel.backgroundColor = calendar.backgroundColor
+        editorModel.doorColor = calendar.doorColor
+        editorModel.doors = calendar.doors
+        
+        // Resets the editor state with the new model
+        EditorStateManager.shared.reset()
+        EditorStateManager.shared.model = editorModel
+        
+        NotificationCenter.default.post(name: NSNotification.Name("SwitchToEditorTab"), object: nil)
+    }
+    
+    // Shares a calendar
+    private func shareCalendar(_ calendar: HolidayCalendar) {
+        do {
+            let (exportData, filename) = try AppData.shared.exportCalendar(calendar)
+            
+            // Creates a temporary file URL
+            let tempFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
+            try exportData.write(to: tempFileURL)
+            
+            // Retrieves the current window scene and root view controller
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first,
+               let rootViewController = window.rootViewController {
+                
+                // Creates activity view controller for sharing the exported file
+                let activityViewController = UIActivityViewController(
+                    activityItems: [tempFileURL],
+                    applicationActivities: nil
+                )
+                
+                // Cleans up the temporary file after sharing
+                activityViewController.completionWithItemsHandler = { _, _, _, _ in
+                    try? FileManager.default.removeItem(at: tempFileURL)
+                }
+                
+                rootViewController.present(activityViewController, animated: true)
+            }
+        } catch {
+            showError("Failed to export calendar: \(error.localizedDescription)")
+        }
     }
 }
 
