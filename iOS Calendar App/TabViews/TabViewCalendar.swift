@@ -29,27 +29,31 @@ struct TabViewCalendar: View {
                     
                     // Main content layout including title, countdown and calendar grid
                     VStack(spacing: 0) {
-                        Text(calendar.title)
-                            .font(theme.titleFont)
-                            .bold()
-                            .foregroundStyle(theme.text)
-                            .padding(.top, theme.padding.top)
-                            .padding(.bottom, theme.padding.bottom)
-                        
-                        if areAllDoorsUnlocked() {
-                            completionView
+                        VStack(spacing: 0) {
+                            Text(calendar.title)
+                                .font(theme.titleFont)
+                                .bold()
+                                .foregroundStyle(theme.text)
+                                .padding(.top, theme.padding.top)
                                 .padding(.bottom, theme.padding.bottom)
-                        } else {
-                            countdownView
-                                .padding(.bottom, theme.padding.bottom)
+                                .multilineTextAlignment(.center)
+                            
+                            if areAllDoorsUnlocked() {
+                                completionView(width: geometry.size.width)
+                                    .padding(.bottom, theme.padding.bottom)
+                            } else {
+                                countdownView
+                                    .padding(.bottom, theme.padding.bottom)
+                            }
                         }
+                        .padding(.horizontal, theme.padding.trailing)
                         Divider()
                             .background(theme.text)
                             .padding(.horizontal, theme.spacing)
                         // ScrollViewReader enables programmatic scrolling to specific doors
                         ScrollViewReader { proxy in
                             ScrollView {
-                                calendarGrid(width: geometry.size.width)
+                                calendarGrid()
                                     .padding(.top, theme.padding.top)
                                     .padding(.bottom, theme.padding.bottom)
                             }
@@ -111,23 +115,24 @@ struct TabViewCalendar: View {
     }
     
     // A view that displays a celebratory message when all doors have been unlocked
-    private var completionView: some View {
+    private func completionView(width: CGFloat) -> some View {
         VStack(spacing: theme.spacing) {
             HStack(spacing: theme.spacing * 1.2) {
                 // Trophy icon with animation
                 ZStack {
                     Circle()
                         .fill(theme.accent.opacity(0.1))
-                        .frame(width: 64, height: 64)
+                        .frame(maxWidth: width * 0.15)
+                        .aspectRatio(1, contentMode: .fit)
                         .clipped()
                     
                     Image(systemName: "trophy.circle.fill")
-                        .font(.system(size: theme.spacing * 2.5))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: width * 0.1)
                         .symbolRenderingMode(.hierarchical)
                         .foregroundStyle(theme.accent)
                         .modifier(BoundedTrophyAnimation())
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(1)
                 }
                 .clipShape(Circle())
                 
@@ -143,15 +148,17 @@ struct TabViewCalendar: View {
                         .font(theme.bodyFont)
                         .foregroundColor(theme.text.opacity(0.8))
                         .minimumScaleFactor(0.5)
-                          .lineLimit(1)
+                        .lineLimit(3)
                 }
             }
         }
-        .padding(.vertical, theme.padding.trailing)
-        .padding(.horizontal, theme.padding.top)
+        .padding(theme.padding.trailing)
         .background {
+            // Semi-transparent background container
             RoundedRectangle(cornerRadius: theme.cornerRadius)
-                .fill(.ultraThinMaterial)
+                .fill(theme.countdownStyle.backgroundColor)
+                .shadow(color: theme.countdownStyle.shadowColor.opacity(0.15), radius: 6, x: 0, y: 3)
+                .background(.ultraThinMaterial.opacity(0.5), in: RoundedRectangle(cornerRadius: theme.cornerRadius))
         }
         .shadow(color: theme.countdownStyle.shadowColor.opacity(0.06), radius: 8, x: 0, y: 4)
     }
@@ -172,8 +179,10 @@ struct TabViewCalendar: View {
                 .foregroundStyle(theme.text)
                 .font(theme.bodyFont)
                 .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
         }
-        .padding()
+        .padding(theme.padding.trailing)
         .background {
             // Semi-transparent background container
             RoundedRectangle(cornerRadius: theme.cornerRadius)
@@ -181,6 +190,7 @@ struct TabViewCalendar: View {
                 .shadow(color: theme.countdownStyle.shadowColor.opacity(0.15), radius: 6, x: 0, y: 3)
                 .background(.ultraThinMaterial.opacity(0.5), in: RoundedRectangle(cornerRadius: theme.cornerRadius))
         }
+        .shadow(color: theme.countdownStyle.shadowColor.opacity(0.06), radius: 8, x: 0, y: 4)
         
         // Separator view used between countdown cells
         func colonSeparator() -> some View {
@@ -192,7 +202,7 @@ struct TabViewCalendar: View {
     }
     
     // Creates the grid layout for calendar doors
-    private func calendarGrid(width: CGFloat) -> some View {
+    private func calendarGrid() -> some View {
         LazyVGrid(
             // Create an array of grid items, one for each column
             columns: Array(repeating: GridItem(.flexible(), spacing: theme.spacing),
