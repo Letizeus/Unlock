@@ -104,13 +104,11 @@ struct TabViewLibrary: View {
         }
         .sorted { $0.isPinned && !$1.isPinned } // Sorts pinned items to the top
         
-        return List {
-            ForEach(filteredItems) { item in
-                calendarCard(item)
-                    .listRowInsets(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-            }
+        return List(filteredItems) { item in
+            calendarCard(item)
+                .listRowInsets(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 20))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
     }

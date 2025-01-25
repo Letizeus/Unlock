@@ -157,10 +157,10 @@ struct TabViewCalendar: View {
             // Semi-transparent background container
             RoundedRectangle(cornerRadius: theme.cornerRadius)
                 .fill(theme.countdownStyle.backgroundColor)
-                .shadow(color: theme.countdownStyle.shadowColor.opacity(0.15), radius: 6, x: 0, y: 3)
+                .shadow(color: theme.countdownStyle.shadowColor.opacity(0.08), radius: 12, x: 0, y: 5)
+                .shadow(color: theme.countdownStyle.shadowColor.opacity(0.05), radius: 2, x: 0, y: 1)
                 .background(.ultraThinMaterial.opacity(0.5), in: RoundedRectangle(cornerRadius: theme.cornerRadius))
         }
-        .shadow(color: theme.countdownStyle.shadowColor.opacity(0.06), radius: 8, x: 0, y: 4)
     }
     
     // A view that displays the complete countdown timer for the next door
@@ -187,10 +187,10 @@ struct TabViewCalendar: View {
             // Semi-transparent background container
             RoundedRectangle(cornerRadius: theme.cornerRadius)
                 .fill(theme.countdownStyle.backgroundColor)
-                .shadow(color: theme.countdownStyle.shadowColor.opacity(0.15), radius: 6, x: 0, y: 3)
+                .shadow(color: theme.countdownStyle.shadowColor.opacity(0.08), radius: 12, x: 0, y: 5)
+                .shadow(color: theme.countdownStyle.shadowColor.opacity(0.05), radius: 2, x: 0, y: 1)
                 .background(.ultraThinMaterial.opacity(0.5), in: RoundedRectangle(cornerRadius: theme.cornerRadius))
         }
-        .shadow(color: theme.countdownStyle.shadowColor.opacity(0.06), radius: 8, x: 0, y: 4)
         
         // Separator view used between countdown cells
         func colonSeparator() -> some View {
