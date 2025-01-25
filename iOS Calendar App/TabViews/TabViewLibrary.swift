@@ -206,22 +206,7 @@ struct TabViewLibrary: View {
             }
             .tint(Color.red)
         }
-        // Swipe action to pin the calendar item
-        .swipeActions(edge: .leading, allowsFullSwipe: false) {
-            if item.type == .exported {
-                Button {
-                    loadIntoEditor(item.calendar)
-                } label: {
-                    HStack {
-                        Image(systemName: "pencil")
-                        Text("Edit")
-                    }
-                    .font(theme.bodyFont)
-                    .padding(.vertical, 8)
-                }
-                .tint(theme.accent)
-            }
-        }
+        // Swipe action to edit & pin the calendar item
         .swipeActions(edge: .leading, allowsFullSwipe: false) {
             if item.type == .exported {
                 Button {
