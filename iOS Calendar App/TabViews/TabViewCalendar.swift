@@ -165,7 +165,6 @@ struct TabViewCalendar: View {
     }
     
     // A view that displays the complete countdown timer for the next door
-    // Combines multiple CountdownCells with separators and descriptive text
     private var countdownView: some View {
         return VStack(spacing: theme.spacing) {
             HStack(spacing: 4) {
@@ -176,14 +175,20 @@ struct TabViewCalendar: View {
                 CountdownCell(value: countdown.minutes, label: "minutes")
             }
             
-            Text("until Door \(findNextDoor()?.number ?? 0)!")
-                .foregroundStyle(theme.text)
-                .font(theme.bodyFont)
-                .multilineTextAlignment(.center)
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
+            HStack {
+                Text("until")
+                Text("Door \(findNextDoor()?.number ?? 0)")
+                    .foregroundStyle(calendar.doorColor != .clear ? theme.text.mix(with: calendar.doorColor, by: 0.5) : theme.text.mix(with: .main, by: 0.5))
+            }
+            .font(theme.bodyFont)
+            .multilineTextAlignment(.center)
+            .monospaced()
+            .minimumScaleFactor(0.5)
+            .lineLimit(1)
+            .tracking(1)
         }
-        .padding(theme.padding.trailing)
+        .padding(theme.padding.trailing * 0.5)
+        .padding(.horizontal, theme.padding.trailing * 0.5)
         .background {
             // Semi-transparent background container
             RoundedRectangle(cornerRadius: theme.cornerRadius)
@@ -198,7 +203,7 @@ struct TabViewCalendar: View {
             Text(":")
                 .foregroundStyle(theme.countdownStyle.separatorColor)
                 .font(theme.titleFont)
-                .offset(y: -theme.spacing) // Adjust colon position to align with the numbers
+                .offset(y: -theme.spacing) // Adjusts colon position to align with the numbers
         }
     }
     

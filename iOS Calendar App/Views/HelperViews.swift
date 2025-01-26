@@ -70,24 +70,50 @@ struct DoorPreviewCell: View {
 // Reusable view component for displaying a countdown value and its label
 // Used to show days, hours, or minutes remaining until the next door unlock
 struct CountdownCell: View {
-    
     @Environment(\.calendarTheme) private var theme
+    
+    @State private var animateChange = false
     
     let value: Int
     let label: String // Label describing the value (e.g., "days", "hours")
     
     var body: some View {
         VStack(spacing: 2) {
-            Text(String(format: "%02d", value)) // Add leading zero
-                .font(theme.titleFont.bold())
+            // Number display
+            Text(String(format: "%02d", value)) // Adds leading zero
+                .font(theme.subtitleFont.bold())
                 .foregroundStyle(theme.text)
+                .contentTransition(.numericText(countsDown: true)) // Smooth number transitions
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
-            Text(label)
-                .font(theme.bodyFont)
+                .padding(.vertical, 6)
+                .frame(minWidth: theme.countdownStyle.cellWidth)
+                .background(
+                    RoundedRectangle(cornerRadius: theme.cornerRadius)
+                        .fill(theme.secondary)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: theme.cornerRadius)
+                                .stroke(theme.doorStyle.borderColor, lineWidth: 1)
+                        )
+                )
+                .shadow(color: theme.doorStyle.shadowColor.opacity(0.1), radius: 3, x: 0, y: 2)
+                .scaleEffect(animateChange ? 1.02 : 1.0)
+                .animation(.spring(response: 0.4, dampingFraction: 0.8), value: value)
+                .onChange(of: value) {
+                    animateChange = true
+                    // Resets the scale
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+                        animateChange = false
+                    }
+                }
+            // Label text
+            Text(label.uppercased())
+                .font(theme.captionFont)
+                .fontWeight(.medium)
                 .foregroundStyle(theme.text.opacity(0.8))
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
+                .tracking(1)
         }
         .frame(minWidth: theme.countdownStyle.cellWidth)
     }
