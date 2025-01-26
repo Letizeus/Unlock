@@ -10,11 +10,7 @@ struct CalendarApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if hasCompletedOnboarding {
-                MainView()
-            } else {
-                OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
-            }
+            LaunchScreenView()
         }
     }
 }
