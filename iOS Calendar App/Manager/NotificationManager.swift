@@ -57,7 +57,7 @@ class NotificationManager: NSObject, ObservableObject {
         
         // Schedules "10 minutes before" notification
         let tenMinContent = UNMutableNotificationContent()
-        tenMinContent.title = "Holiday Calendar"
+        tenMinContent.title = "Unlock"
         tenMinContent.body = "Door \(door.number) unlocks in 10 minutes!"
         tenMinContent.sound = .default
         
