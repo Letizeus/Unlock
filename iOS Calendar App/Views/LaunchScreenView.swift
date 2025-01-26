@@ -22,7 +22,7 @@ struct LaunchScreenView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color(.systemBackground))
             .onAppear {
-                // Delay of 0.5 second before transitioning
+                // Delay of 0.3 second before transitioning
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         self.isActive = true
