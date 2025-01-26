@@ -72,13 +72,25 @@ struct DoorPreviewCell: View {
 struct CountdownCell: View {
     @Environment(\.calendarTheme) private var theme
     
+    // Computed property for checking if on iPad
+    private var onIPad: Bool {
+        if (UIDevice.current.userInterfaceIdiom == .pad) {
+            return true
+        } else {
+            return false
+        }
+    }
+    
     let value: Int
     let label: String // Label describing the value (e.g., "days", "hours")
     
     var body: some View {
-        VStack(spacing: 2) {
+        VStack() {
             // Number display
             Text(String(format: "%02d", value)) // Adds leading zero
+                .if(onIPad) { view in
+                    view.font(.system(size: 25, design: .rounded).bold())
+                }
                 .font(theme.subtitleFont.bold())
                 .foregroundStyle(theme.text)
                 .minimumScaleFactor(0.5)
@@ -96,6 +108,9 @@ struct CountdownCell: View {
                 .shadow(color: theme.doorStyle.shadowColor.opacity(0.1), radius: 3, x: 0, y: 2)
             // Label text
             Text(label.uppercased())
+                .if(onIPad) { view in
+                    view.font(.system(size: 18))
+                }
                 .font(theme.captionFont)
                 .fontWeight(.medium)
                 .foregroundStyle(theme.text.opacity(0.8))
@@ -103,6 +118,10 @@ struct CountdownCell: View {
                 .lineLimit(1)
                 .tracking(1)
         }
+        .if(onIPad) { view in
+            view.lineSpacing(4)
+        }
+        .lineSpacing(2)
         .frame(minWidth: theme.countdownStyle.cellWidth)
     }
 }

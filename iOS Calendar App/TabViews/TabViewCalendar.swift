@@ -12,6 +12,15 @@ struct TabViewCalendar: View {
     @State private var countdown = CountdownInfo() // Current countdown information (days, hours, minutes)
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()// Timer that updates the countdown every second
     
+    // Computed property for checking if on iPad
+    private var onIPad: Bool {
+        if (UIDevice.current.userInterfaceIdiom == .pad) {
+            return true
+        } else {
+            return false
+        }
+    }
+    
     // MARK: - Initialization
     
     init(calendar: HolidayCalendar) {
@@ -31,7 +40,10 @@ struct TabViewCalendar: View {
                     VStack(spacing: 0) {
                         VStack(spacing: 0) {
                             Text(calendar.title)
-                                .font(theme.titleFont)
+                                .if(onIPad) { view in
+                                    view.font(.system(size: 50, design: .rounded))
+                                }
+                                .font(theme.largeTitleFont)
                                 .bold()
                                 .foregroundStyle(theme.text)
                                 .padding(.top, theme.padding.top)
@@ -167,19 +179,22 @@ struct TabViewCalendar: View {
     // A view that displays the complete countdown timer for the next door
     private var countdownView: some View {
         return VStack(spacing: theme.spacing) {
-            HStack(spacing: 4) {
+            HStack(spacing: onIPad ? 20 : 4) {
                 CountdownCell(value: countdown.days, label: "days")
                 colonSeparator()
                 CountdownCell(value: countdown.hours, label: "hours")
                 colonSeparator()
                 CountdownCell(value: countdown.minutes, label: "minutes")
             }
-            
+
             HStack {
                 Text("until")
                 Text("Door \(findNextDoor()?.number ?? 0)")
                     .foregroundStyle(calendar.doorColor != .clear ? theme.text.mix(with: calendar.doorColor, by: 0.5) : theme.text.mix(with: .main, by: 0.5))
                     .bold()
+            }
+            .if(onIPad) { view in
+                view.font(.system(size: 20, design: .rounded))
             }
             .font(theme.bodyFont)
             .multilineTextAlignment(.center)
@@ -203,7 +218,13 @@ struct TabViewCalendar: View {
         func colonSeparator() -> some View {
             Text(":")
                 .foregroundStyle(theme.countdownStyle.separatorColor)
+                .if(onIPad) { view in
+                    view.font(.system(size: 30, design: .rounded))
+                }
                 .font(theme.titleFont)
+                .if(onIPad) { view in
+                    view.offset(y: -theme.spacing + 10)
+                }
                 .offset(y: -theme.spacing + 6) // Adjusts colon position to align with the numbers
         }
     }

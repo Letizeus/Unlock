@@ -73,45 +73,16 @@ struct DoorInteractionModifier: ViewModifier {
     @ObservedObject var manager: DoorOpeningManager
     let onCompletion: () -> Void
     
-    func body(content: Content) -> some View {
-        // Destinction if iPad to provide view with fullScreenCover instead of sheet
-        
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            content
-            .scaleEffect(manager.isPressed ? 0.95 : 1.0)
-            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: manager.isPressed)
-            // Handle tap interaction
-            .onTapGesture {
-                if manager.door.isUnlocked && !manager.isAnyDoorOpening {
-                    withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
-                        manager.isPressed = true
-                    }
-                    // Reset the pressed state after a short delay and trigger door opening
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
-                            manager.isPressed = false
-                        }
-                        manager.handleDoorTap(completion: onCompletion)
-                    }
-                }
-            }
-            // Only allow interaction with unlocked doors
-            .allowsHitTesting(manager.door.isUnlocked && !manager.isAnyDoorOpening)
-            
-            // Present content screen cover when door is opened
-            .fullScreenCover(isPresented: $manager.isShowingContent, content: {
-                DoorContentView(
-                    content: manager.door.content,
-                    door: manager.door,
-                    onReactionAdded: handleReactionAdded
-                )
-                .interactiveDismissDisabled()
-            })
-            // Checks unlock state when view appears
-            .onAppear {
-                manager.updateUnlockState()
-            }
+    // Computed property for checking if on iPad
+    private var onIPad: Bool {
+        if (UIDevice.current.userInterfaceIdiom == .pad) {
+            return true
         } else {
+            return false
+        }
+    }
+    
+    func body(content: Content) -> some View {
             content
             .scaleEffect(manager.isPressed ? 0.95 : 1.0)
             .animation(.spring(response: 0.2, dampingFraction: 0.6), value: manager.isPressed)
@@ -132,22 +103,35 @@ struct DoorInteractionModifier: ViewModifier {
             }
             // Only allow interaction with unlocked doors
             .allowsHitTesting(manager.door.isUnlocked && !manager.isAnyDoorOpening)
-            // Present content sheet when door is opened
             
-            .sheet(isPresented: $manager.isShowingContent) {
-                DoorContentView(
-                    content: manager.door.content,
-                    door: manager.door,
-                    onReactionAdded: handleReactionAdded
-                )
+            // Destinction if iPad to provide view with fullScreenCover instead of sheet
+            .if(onIPad) { view in
+                // Present content screen cover when door is opened
+                view.fullScreenCover(isPresented: $manager.isShowingContent, content: {
+                    DoorContentView(
+                        content: manager.door.content,
+                        door: manager.door,
+                        onReactionAdded: handleReactionAdded
+                    )
                     .interactiveDismissDisabled()
+                })
             }
             
+            .if(!onIPad) { view in
+                view.sheet(isPresented: $manager.isShowingContent) {
+                    DoorContentView(
+                        content: manager.door.content,
+                        door: manager.door,
+                        onReactionAdded: handleReactionAdded
+                    )
+                        .interactiveDismissDisabled()
+                }
+            }
+        
             // Checks unlock state when view appears
             .onAppear {
                 manager.updateUnlockState()
             }
-        }
     }
     
     // Handles when a user adds a new reaction

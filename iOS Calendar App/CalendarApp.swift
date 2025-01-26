@@ -72,3 +72,14 @@ class SceneDelegate: NSObject, UIWindowSceneDelegate {
         }
     }
 }
+
+// MARK: - iPad support view extension
+extension View {
+    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
+    }
+}

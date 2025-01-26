@@ -29,27 +29,39 @@ struct WelcomeView: View {
     @State private var showUnlock = false
     @State private var showContent = false
     
+    // Computed property for checking if on iPad
+    private var onIPad: Bool {
+        if (UIDevice.current.userInterfaceIdiom == .pad) {
+            return true
+        } else {
+            return false
+        }
+    }
+    
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 30) {
                 // Animated headline section
                 VStack(alignment: .leading, spacing: 8) {
                     // "Welcome to" text with slide-up animation
-                    HStack {
-                        Text("Welcome to")
-                            .bold()
-                            .font(.system(size: 36))
-                            .minimumScaleFactor(0.75)
-                            .lineLimit(1)
-                            .offset(y: showWelcome ? 0 : 50)
-                            .opacity(showWelcome ? 1 : 0)
-                        Spacer()
-                    }
+                    Text("Welcome to")
+                        .bold()
+                        .if(onIPad) { view in
+                            view.font(.system(size: 60))
+                        }
+                        .font(.system(size: 36))
+                        .minimumScaleFactor(0.75)
+                        .lineLimit(1)
+                        .offset(y: showWelcome ? 0 : 50)
+                        .opacity(showWelcome ? 1 : 0)
                     
                     // "Unlock" text with scale and slide animation
                     Text("Unlock")
                         .bold()
                         .foregroundStyle(.main)
+                        .if(onIPad) { view in
+                            view.font(.system(size: 120))
+                        }
                         .font(.system(size: 72))
                         .minimumScaleFactor(0.75)
                         .lineLimit(1)
@@ -58,22 +70,20 @@ struct WelcomeView: View {
                         .opacity(showUnlock ? 1 : 0)
                 }
                 
-                // Spacer()
-                
                 // Content section with fade-in animation
                 VStack(alignment: .leading, spacing: theme.spacing) {
                     // Feature items
                     featureItem(icon: Tab.calendar.icon,
-                              title: "Your Journey",
+                                title: "Your Journey",
                                 description: "Complete calendars from other users by opening doors and embrace creative content.")
                     
                     featureItem(icon: Tab.editor.icon,
-                              title: "Your Creativity",
-                              description: "Create your own calenders in the editor and share them with the world.")
+                                title: "Your Creativity",
+                                description: "Create your own calenders in the editor and share them with the world.")
                     
                     featureItem(icon: "bell",
-                              title: "Never Miss A Door",
-                              description: "Receive notifications when a new door gets unlocked.")
+                                title: "Never Miss A Door",
+                                description: "Receive notifications when a new door gets unlocked.")
                     
                     // Notification info
                     VStack(alignment: .center, spacing: theme.spacing) {
@@ -81,7 +91,10 @@ struct WelcomeView: View {
                             .foregroundStyle(.gray)
                         Text("Allow notifications in the next step to get notified when new doors get unlocked.")
                             .foregroundStyle(.gray)
-                            .font(theme.footnoteFont)
+                            .if(onIPad) { view in
+                                view.font(.system(size: 15))
+                            }
+                            .font(.system(size: 13))
                             .multilineTextAlignment(.center)
                             .minimumScaleFactor(0.75)
                             .frame(maxWidth: .infinity)
@@ -91,7 +104,7 @@ struct WelcomeView: View {
                 .offset(y: showContent ? 0 : 50)
                 .opacity(showContent ? 1 : 0)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-
+                
                 // Next button
                 Button(action: {
                     NotificationManager.shared.requestPermission()
@@ -101,7 +114,10 @@ struct WelcomeView: View {
                 }) {
                     Text("Next")
                         .bold()
-                        .font(theme.headlineFont)
+                        .if(onIPad) { view in
+                            view.font(.system(size: 20))
+                        }
+                        .font(.system(size: 17))
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
@@ -111,6 +127,7 @@ struct WelcomeView: View {
                 .opacity(showContent ? 1 : 0)
                 .offset(y: showContent ? 0 : 20)
             }
+            
             .padding(50)
             .onAppear {
                 animateEntrance()
@@ -120,18 +137,32 @@ struct WelcomeView: View {
     
     // Creates an item with an icon, title, and description
     private func featureItem(icon: String, title: String, description: String) -> some View {
-        HStack(alignment: .top, spacing: 25) {
+        HStack(alignment: .top, spacing: onIPad ? 40 : 25) {
             Image(systemName: icon)
                 .resizable()
+            
+                .if(onIPad) { view in
+                    view.frame(width: 60, height: 60)
+                }
+            
                 .frame(width: 50, height: 50)
+            
                 .aspectRatio(contentMode: .fit)
             
             VStack(alignment: .leading) {
                 Text(title)
                     .bold()
+                    .if(onIPad) { view in
+                        view.font(.system(size: 20))
+                    }
+                    .font(.system(size: 17))
                     .minimumScaleFactor(0.75)
                     .lineLimit(1)
                 Text(description)
+                    .if(onIPad) { view in
+                        view.font(.system(size: 20))
+                    }
+                    .font(.system(size: 17))
                     .minimumScaleFactor(0.75)
             }
         }
