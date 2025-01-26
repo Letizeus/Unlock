@@ -394,6 +394,7 @@ struct TabViewLibrary: View {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 libraryItems[index].isPinned.toggle() // Toggles the isPinned state
             }
+            try? AppData.shared.saveLibraryItems(libraryItems)
         }
     }
 }

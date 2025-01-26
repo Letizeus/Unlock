@@ -166,6 +166,15 @@ class AppData {
         try data.write(to: libraryURL)
     }
     
+    // Saves a library item
+    func saveLibraryItems(_ items: [LibraryItem]) throws {
+        try FileManager.default.createDirectory(at: libraryDirectory, withIntermediateDirectories: true)
+        
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(items)
+        try data.write(to: libraryURL)
+    }
+    
     // Loads all library items
     func loadLibraryItems() throws -> [LibraryItem] {
         guard FileManager.default.fileExists(atPath: libraryURL.path) else {
