@@ -9,9 +9,11 @@ struct TabViewMap: View {
     
     // MARK: - Properties
     
+    @State private var isAnyDoorOpening = false // Only one door at once
+    
     let calendar: HolidayCalendar // The calendar data model containing all doors and their content
     
-    @State private var isAnyDoorOpening = false // Only one door at once
+    var nodeNumber: Int { calendar.doors.count }
     
     // MARK: - View Body
     
@@ -26,7 +28,7 @@ struct TabViewMap: View {
                         Rectangle()
                             .fill(theme.roadStyle.color)
                             .frame(width: theme.roadStyle.width)
-                        
+
                         // Vertical stack of checkpoint nodes representing each door
                         LazyVStack(spacing: theme.roadStyle.nodeSpacing) {
                             ForEach(calendar.doors) { door in
@@ -67,6 +69,19 @@ struct TabViewMap: View {
         return calendar.doors.first { door in
             Calendar.current.isDate(today, inSameDayAs: door.unlockDate)
         }
+    }
+    
+    private func randomXPosition(in width: CGFloat) -> CGFloat {
+        return CGFloat.random(in: 50...(width-50))
+    }
+    
+    private func pathCurvePoint(from start: CGPoint, to end: CGPoint) -> CGPoint {
+        let midX = (start.x + end.x) / 2
+        let midY = (start.y + end.y) / 2
+        return CGPoint(
+            x: midX + CGFloat.random(in: -50...50),
+            y: midY + CGFloat.random(in: -50...50)
+        )
     }
 }
 

@@ -53,7 +53,7 @@ struct TabViewEditor: View {
                 .sheet(isPresented: $isPreviewActive) {
                     calendarPreview
                 }
-                .sheet(item: $selectedDoor) { door in
+                .fullScreenCover(item: $selectedDoor) { door in
                     NavigationStack {
                         DoorEditorView(
                             door: door,
@@ -109,7 +109,7 @@ struct TabViewEditor: View {
                 .sheet(isPresented: $isPreviewActive) {
                     calendarPreview
                 }
-                .fullScreenCover(item: $selectedDoor) { door in
+                .sheet(item: $selectedDoor) { door in
                     NavigationStack {
                         DoorEditorView(
                             door: door,
