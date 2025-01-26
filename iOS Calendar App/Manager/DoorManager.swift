@@ -28,24 +28,24 @@ class DoorOpeningManager: ObservableObject {
         
         isAnyDoorOpening = true
         
-        // Animate door opening
+        // Animates door opening
         withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
-            doorRotation = 180 // Rotate half turn
-            doorOpacity = 0.0 // Fade out door to see content
+            doorRotation = 180 // Rotates half turn
+            doorOpacity = 0.0 // Fades out door to see content
         }
         
-        // Show content sheet after the door animation
-        // Schedule code execution after a delay of 0.5 seconds
+        // Shows content sheet after the door animation
+        // Schedules code execution after a delay of 0.5 seconds
         // - Uses the main dispatch queue to ensure UI updates happen on the main thread
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             self.isShowingContent = true
             self.door.hasBeenOpened = true
             self.door.isUnlocked = true
             
-            // Propagate state change to other views
+            // Propagates state change to other views
             CalendarStateManager.shared.silentlyUpdateDoor(self.door)
             
-            // Reset door after a brief delay
+            // Resets door after a brief delay
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
                     self.doorRotation = 0
@@ -56,7 +56,7 @@ class DoorOpeningManager: ObservableObject {
         }
     }
     
-    // Cleanup: remove this manager from receiving updates when view is destroyed
+    // Cleanup: removes this manager from receiving updates when view is destroyed
     deinit {
         CalendarStateManager.shared.removeObserver(self)
     }
@@ -86,13 +86,13 @@ struct DoorInteractionModifier: ViewModifier {
             content
             .scaleEffect(manager.isPressed ? 0.95 : 1.0)
             .animation(.spring(response: 0.2, dampingFraction: 0.6), value: manager.isPressed)
-            // Handle tap interaction
+            // Handles tap interaction
             .onTapGesture {
                 if manager.door.isUnlocked && !manager.isAnyDoorOpening {
                     withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
                         manager.isPressed = true
                     }
-                    // Reset the pressed state after a short delay and trigger door opening
+                    // Resets the pressed state after a short delay and trigger door opening
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) {
                             manager.isPressed = false
@@ -103,8 +103,7 @@ struct DoorInteractionModifier: ViewModifier {
             }
             // Only allow interaction with unlocked doors
             .allowsHitTesting(manager.door.isUnlocked && !manager.isAnyDoorOpening)
-            
-            // Destinction if iPad to provide view with fullScreenCover instead of sheet
+            // Destinctions if iPad to provide view with fullScreenCover instead of sheet
             .if(onIPad) { view in
                 // Present content screen cover when door is opened
                 view.fullScreenCover(isPresented: $manager.isShowingContent, content: {
@@ -116,7 +115,6 @@ struct DoorInteractionModifier: ViewModifier {
                     .interactiveDismissDisabled()
                 })
             }
-            
             .if(!onIPad) { view in
                 view.sheet(isPresented: $manager.isShowingContent) {
                     DoorContentView(
@@ -127,7 +125,6 @@ struct DoorInteractionModifier: ViewModifier {
                         .interactiveDismissDisabled()
                 }
             }
-        
             // Checks unlock state when view appears
             .onAppear {
                 manager.updateUnlockState()

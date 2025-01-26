@@ -347,6 +347,15 @@ struct TabViewLibrary: View {
         editorModel.backgroundColor = calendar.backgroundColor
         editorModel.doorColor = calendar.doorColor
         editorModel.doors = calendar.doors
+        editorModel.backgroundType = calendar.backgroundColor != .clear ? .color : .image
+        // Determines unlock mode based on door unlock dates
+        let hasSequentialDates = calendar.doors.enumerated().allSatisfy { index, door in
+            if index == 0 { return true }
+            let previousDoor = calendar.doors[index - 1]
+            let daysBetween = Calendar.current.dateComponents([.day], from: previousDoor.unlockDate, to: door.unlockDate).day ?? 0
+            return daysBetween == 1
+        }
+        editorModel.unlockMode = hasSequentialDates ? .daily : .specific
         
         // Resets the editor state with the new model
         EditorStateManager.shared.reset()

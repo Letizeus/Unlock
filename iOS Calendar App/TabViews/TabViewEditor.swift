@@ -81,7 +81,6 @@ struct TabViewEditor: View {
                     .interactiveDismissDisabled()
                 }
             }
-        
             .if(!onIPad) { view in
                 view.sheet(item: $selectedDoor) { door in
                     NavigationStack {
@@ -102,7 +101,6 @@ struct TabViewEditor: View {
                     .interactiveDismissDisabled()
                 }
             }
-        
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     saveButton
