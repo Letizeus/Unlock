@@ -182,7 +182,7 @@ struct TabViewCalendar: View {
             }
             .font(theme.bodyFont)
             .multilineTextAlignment(.center)
-            .monospaced()
+            // .monospaced()
             .minimumScaleFactor(0.5)
             .lineLimit(1)
             .tracking(1)
