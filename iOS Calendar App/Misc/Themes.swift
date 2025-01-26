@@ -9,6 +9,7 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
     let padding: EdgeInsets
     
     // Typography
+    let largeTitleFont: Font
     let titleFont: Font
     let subtitleFont: Font
     let bodyFont: Font
@@ -58,6 +59,7 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
             padding: EdgeInsets(top: 24, leading: 20, bottom: 24, trailing: 20),
             
             // Typography
+            largeTitleFont: .system(.largeTitle, design: .rounded),
             titleFont: .system(.title, design: .rounded),
             subtitleFont: .system(.title2, design: .rounded),
             bodyFont: .system(.body, design: .rounded),
@@ -102,6 +104,7 @@ struct CalendarTheme: ViewTheme, Typography, ColorPalette {
             padding: EdgeInsets(top: 24, leading: 20, bottom: 24, trailing: 20),
             
             // Typography
+            largeTitleFont: .system(.largeTitle, design: .rounded),
             titleFont: .system(.title, design: .rounded),
             subtitleFont: .system(.title2, design: .rounded),
             bodyFont: .system(.body, design: .rounded),
@@ -147,6 +150,7 @@ struct EditorTheme: ViewTheme, Typography, ColorPalette {
     let padding: EdgeInsets
     
     // Typography
+    let largeTitleFont: Font
     let titleFont: Font
     let subtitleFont: Font
     let bodyFont: Font
@@ -182,7 +186,8 @@ struct EditorTheme: ViewTheme, Typography, ColorPalette {
             cornerRadius: 12,
             padding: EdgeInsets(top: 20, leading: 20, bottom: 20, trailing: 20),
             
-            titleFont: .system(.title, design: .default),
+            largeTitleFont: .system(.largeTitle),
+            titleFont: .system(.title),
             subtitleFont: .system(.title2),
             bodyFont: .system(.body),
             headlineFont: .headline,
@@ -217,6 +222,7 @@ struct MapTheme: ViewTheme, Typography, ColorPalette {
     let padding: EdgeInsets
     
     // Typography
+    let largeTitleFont: Font
     let titleFont: Font
     let subtitleFont: Font
     let bodyFont: Font
@@ -263,6 +269,7 @@ struct MapTheme: ViewTheme, Typography, ColorPalette {
             cornerRadius: 12,
             padding: EdgeInsets(top: 20, leading: 20, bottom: 20, trailing: 20),
             
+            largeTitleFont: .system(.largeTitle, design: .rounded),
             titleFont: .system(.title, design: .rounded),
             subtitleFont: .system(.title2, design: .rounded),
             bodyFont: .system(.body, design: .rounded),

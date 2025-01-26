@@ -21,6 +21,7 @@ struct OnboardingView: View {
 
 // Initial welcome screen that introduces the app's main features
 struct WelcomeView: View {
+    @Environment(\.editorTheme) private var theme
     @Binding var currentStep: OnboardingStep // Controls navigation to next step
     
     // Animation states
@@ -60,7 +61,7 @@ struct WelcomeView: View {
                 // Spacer()
                 
                 // Content section with fade-in animation
-                VStack(alignment: .leading, spacing: 25) {
+                VStack(alignment: .leading, spacing: theme.spacing) {
                     // Feature items
                     featureItem(icon: Tab.calendar.icon,
                               title: "Your Journey",
@@ -75,12 +76,12 @@ struct WelcomeView: View {
                               description: "Receive notifications when a new door gets unlocked.")
                     
                     // Notification info
-                    VStack(alignment: .center, spacing: 10) {
+                    VStack(alignment: .center, spacing: theme.spacing) {
                         Image(systemName: "info.circle.fill")
                             .foregroundStyle(.gray)
                         Text("Allow notifications in the next step to get notified when new doors get unlocked.")
                             .foregroundStyle(.gray)
-                            .font(.footnote)
+                            .font(theme.footnoteFont)
                             .multilineTextAlignment(.center)
                             .minimumScaleFactor(0.75)
                             .frame(maxWidth: .infinity)
@@ -100,11 +101,12 @@ struct WelcomeView: View {
                 }) {
                     Text("Next")
                         .bold()
+                        .font(theme.headlineFont)
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(.main)
-                        .cornerRadius(12)
+                        .cornerRadius(theme.cornerRadius)
                 }
                 .opacity(showContent ? 1 : 0)
                 .offset(y: showContent ? 0 : 20)
@@ -156,6 +158,8 @@ struct WelcomeView: View {
 // Home view that provides initial setup options for the calendar
 // Allows users to import existing calendars, use defaults, or create new ones
 struct HomeView: View {
+    @Environment(\.editorTheme) private var theme
+    
     @Binding var hasCompletedOnboarding: Bool // Controls transition to main app
     
     @State private var showingImporter = false // Controls file importer presentation
@@ -175,12 +179,12 @@ struct HomeView: View {
             // Header
             VStack(alignment: .leading, spacing: 8) {
                 Text("Choose an option")
-                    .font(.system(size: 35, weight: .bold))
+                    .font(theme.largeTitleFont).bold()
                     .opacity(appearAnimation ? 1 : 0)
                     .offset(y: appearAnimation ? 0 : 20)
                 
                 Text("to get started")
-                    .font(.system(size: 35, weight: .bold))
+                    .font(theme.largeTitleFont).bold()
                     .foregroundStyle(.main)
                     .opacity(appearAnimation ? 1 : 0)
                     .offset(y: appearAnimation ? 0 : 20)
@@ -190,7 +194,7 @@ struct HomeView: View {
             .padding(.bottom, 40)
             
             // Options
-            VStack(spacing: 25) {
+            VStack(spacing: theme.spacing * 2) {
                 // Import Calendar Option
                 OptionButton(
                     icon: "square.and.arrow.down.fill",
@@ -247,6 +251,9 @@ struct HomeView: View {
     
     /// Custom button design for options
     struct OptionButton: View {
+        
+        @Environment(\.editorTheme) private var theme
+        
         let icon: String
         let title: String
         let subtitle: String
@@ -258,23 +265,23 @@ struct HomeView: View {
                 HStack(spacing: 16) {
                     // Icon
                     ZStack {
-                        RoundedRectangle(cornerRadius: 12)
+                        RoundedRectangle(cornerRadius: theme.cornerRadius)
                             .fill(.main)
                             .frame(width: 50, height: 50)
                         
                         Image(systemName: icon)
-                            .font(.system(size: 24))
+                            .font(theme.titleFont)
                             .foregroundColor(.white)
                     }
                     
                     // Text
                     VStack(alignment: .leading, spacing: 4) {
                         Text(title)
-                            .font(.headline)
+                            .font(theme.headlineFont)
                             .foregroundColor(.primary)
                         
                         Text(subtitle)
-                            .font(.subheadline)
+                            .font(theme.bodyFont)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.leading)
                     }
@@ -282,12 +289,12 @@ struct HomeView: View {
                     Spacer()
                     
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(theme.bodyFont)
                         .foregroundColor(.secondary)
                 }
-                .padding(16)
+                .padding(theme.padding)
                 .background(Color(.secondarySystemBackground))
-                .cornerRadius(16)
+                .cornerRadius(theme.cornerRadius)
             }
             .opacity(isAnimated ? 1 : 0)
             .offset(y: isAnimated ? 0 : 20)

@@ -32,61 +32,121 @@ struct TabViewEditor: View {
     
     var body: some View {
         NavigationStack {
-            ZStack {
-                backgroundLayer
-                
-                ScrollView {
-                    VStack(spacing: theme.spacing) {
-                        basicInfoSection
-                        backgroundStyleSection
-                        doorStyleSection
-                        previewSection
-                        filesButton
-                    }
-                    .padding(theme.padding)
-                }
-            }
-            .navigationTitle("Create Calendar")
-            .sheet(isPresented: $isPreviewActive) {
-                calendarPreview
-            }
-            .sheet(item: $selectedDoor) { door in
-                NavigationStack {
-                    DoorEditorView(
-                        door: door,
-                        unlockMode: stateManager.model.unlockMode
-                    ) { updatedDoor in
-                        // When the door is saved:
-                        // Finds the index of the door in our array using its ID
-                        if let index = stateManager.model.doors.firstIndex(where: { $0.id == updatedDoor.id }) {
-                            // Updates the door at that index with the edited version
-                            stateManager.model.doors[index] = updatedDoor
+            
+            // Destinction if iPad to provide view with fullScreenCover instead of sheet
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                ZStack {
+                    backgroundLayer
+                    
+                    ScrollView {
+                        VStack(spacing: theme.spacing) {
+                            basicInfoSection
+                            backgroundStyleSection
+                            doorStyleSection
+                            previewSection
+                            filesButton
                         }
-                        // Sets selectedDoor to nil to dismiss the sheet
-                        selectedDoor = nil
+                        .padding(theme.padding)
                     }
                 }
-                .interactiveDismissDisabled()
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    saveButton
+                .navigationTitle("Create Calendar")
+                .sheet(isPresented: $isPreviewActive) {
+                    calendarPreview
                 }
-                ToolbarItem(placement: .topBarLeading) {
-                    previewButton
+                .sheet(item: $selectedDoor) { door in
+                    NavigationStack {
+                        DoorEditorView(
+                            door: door,
+                            unlockMode: stateManager.model.unlockMode
+                        ) { updatedDoor in
+                            // When the door is saved:
+                            // Finds the index of the door in our array using its ID
+                            if let index = stateManager.model.doors.firstIndex(where: { $0.id == updatedDoor.id }) {
+                                // Updates the door at that index with the edited version
+                                stateManager.model.doors[index] = updatedDoor
+                            }
+                            // Sets selectedDoor to nil to dismiss the sheet
+                            selectedDoor = nil
+                        }
+                    }
+                    .interactiveDismissDisabled()
                 }
-            }
-            .onAppear(perform: generateDoors) // Generates initial doors when view appears
-            // Updates doors when dates change
-            .onChange(of: stateManager.model.startDate) { generateDoors() }
-            .onChange(of: stateManager.model.endDate) { generateDoors() }
-            // Regeneratse doors when count changes in specific mode
-            .onChange(of: stateManager.model.doorCount) {
-                if stateManager.model.unlockMode == .specific {
-                    generateDoors()
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        saveButton
+                    }
+                    ToolbarItem(placement: .topBarLeading) {
+                        previewButton
+                    }
                 }
+                .onAppear(perform: generateDoors) // Generates initial doors when view appears
+                // Updates doors when dates change
+                .onChange(of: stateManager.model.startDate) { generateDoors() }
+                .onChange(of: stateManager.model.endDate) { generateDoors() }
+                // Regeneratse doors when count changes in specific mode
+                .onChange(of: stateManager.model.doorCount) {
+                    if stateManager.model.unlockMode == .specific {
+                        generateDoors()
+                    }
+                }
+                .onChange(of: stateManager.model.unlockMode) { generateDoors() } // Regenerates doors when unlock mode changes
+            } else {
+                ZStack {
+                    backgroundLayer
+                    
+                    ScrollView {
+                        VStack(spacing: theme.spacing) {
+                            basicInfoSection
+                            backgroundStyleSection
+                            doorStyleSection
+                            previewSection
+                            filesButton
+                        }
+                        .padding(theme.padding)
+                    }
+                }
+                .navigationTitle("Create Calendar")
+                .sheet(isPresented: $isPreviewActive) {
+                    calendarPreview
+                }
+                .fullScreenCover(item: $selectedDoor) { door in
+                    NavigationStack {
+                        DoorEditorView(
+                            door: door,
+                            unlockMode: stateManager.model.unlockMode
+                        ) { updatedDoor in
+                            // When the door is saved:
+                            // Finds the index of the door in our array using its ID
+                            if let index = stateManager.model.doors.firstIndex(where: { $0.id == updatedDoor.id }) {
+                                // Updates the door at that index with the edited version
+                                stateManager.model.doors[index] = updatedDoor
+                            }
+                            // Sets selectedDoor to nil to dismiss the sheet
+                            selectedDoor = nil
+                        }
+                    }
+                    .interactiveDismissDisabled()
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        saveButton
+                    }
+                    ToolbarItem(placement: .topBarLeading) {
+                        previewButton
+                    }
+                }
+                .onAppear(perform: generateDoors) // Generates initial doors when view appears
+                // Updates doors when dates change
+                .onChange(of: stateManager.model.startDate) { generateDoors() }
+                .onChange(of: stateManager.model.endDate) { generateDoors() }
+                // Regeneratse doors when count changes in specific mode
+                .onChange(of: stateManager.model.doorCount) {
+                    if stateManager.model.unlockMode == .specific {
+                        generateDoors()
+                    }
+                }
+                .onChange(of: stateManager.model.unlockMode) { generateDoors() } // Regenerates doors when unlock mode changes
             }
-            .onChange(of: stateManager.model.unlockMode) { generateDoors() } // Regenerates doors when unlock mode changes
         }
     }
     
