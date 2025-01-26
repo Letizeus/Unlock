@@ -6,8 +6,6 @@ import SwiftData
 struct CalendarApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
-    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false // Tracks whether the user has completed the onboarding process
-    
     var body: some Scene {
         WindowGroup {
             LaunchScreenView()

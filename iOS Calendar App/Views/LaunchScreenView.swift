@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct LaunchScreenView: View {
-    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false // Tracks whether the user has completed the onboarding process
     @State private var isActive = false
     
     var body: some View {
