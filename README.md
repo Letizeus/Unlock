@@ -42,5 +42,3 @@ Your creations remain private and secure on your device until you choose to shar
 ![2](https://github.com/user-attachments/assets/87df1b76-fa3a-4d66-a374-af6963528020)
 ![3](https://github.com/user-attachments/assets/002eec82-9ae6-4f78-bacc-eef3f0d111ad)
 ![4](https://github.com/user-attachments/assets/f5f9c435-fc13-4dc7-9219-dfa99632d1be)
-
-
