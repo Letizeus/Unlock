@@ -1,8 +1,5 @@
-
-
-![d35a4662-ec0d-4d8f-8f03-3903debc267f-removebg-preview](https://github.com/user-attachments/assets/8d395eb7-b0e5-4f7d-a642-34cf6143847b)
 <div align="center">
-  <img src="![d35a4662-ec0d-4d8f-8f03-3903debc267f-removebg-preview](https://github.com/user-attachments/assets/758344ab-72da-43a0-b6f9-6884c4b0aa67)" alt="Unlock App Icon" width="120"/>
+  <img src="https://github.com/user-attachments/assets/758344ab-72da-43a0-b6f9-6884c4b0aa67" alt="Unlock App Icon" width="120"/>
 </div>
 
 A creative platform for designing interactive digital calendars. The essential tool for artists and designers to craft personalized reveals.
