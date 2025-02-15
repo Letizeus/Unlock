@@ -38,8 +38,8 @@ Your creations remain private and secure on your device until you choose to shar
 # Screenshots
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/b8948de7-1c8d-4be1-bf8f-2acc1954a844" width="42%" style="margin: 20px;">
-  <img src="https://github.com/user-attachments/assets/87df1b76-fa3a-4d66-a374-af6963528020" width="42%" style="margin: 20px;">
+  <img src="https://github.com/user-attachments/assets/b8948de7-1c8d-4be1-bf8f-2acc1954a844" width="42%" style="margin: 80px;">
+  <img src="https://github.com/user-attachments/assets/87df1b76-fa3a-4d66-a374-af6963528020" width="42%" style="margin: 80px;">
 </div>
 
 <div align="center">
