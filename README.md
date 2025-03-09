@@ -32,7 +32,7 @@ Your creations remain private and secure on your device until you choose to shar
 ---
 
 <div align="center">
-  Download now and start creating.
+  Download now and start creating. (Launching soon on the App Store)
 </div>
 
 # Screenshots
