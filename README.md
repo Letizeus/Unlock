@@ -2,11 +2,11 @@
   <img src="https://github.com/user-attachments/assets/758344ab-72da-43a0-b6f9-6884c4b0aa67" alt="Unlock App Icon" width="120"/>
 </div>
 
-A creative platform for designing interactive digital calendars. The essential tool for artists and designers to craft personalized reveals.
+A creative platform for designing interactive digital countdown calendars. The essential tool for artists and designers to craft personalized reveals.
 
 ## Design With Purpose
 
-Transform your ideas into thoughtfully designed doors. Each one can showcase your photos, videos, or written content, arranged in customizable grid layouts that reflect your artistic vision.
+Transform your ideas into thoughtfully designed doors. Each one can showcase your photos, videos, or written content.
 
 ## Creative Tools
 
