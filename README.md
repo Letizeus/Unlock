@@ -1,9 +1,9 @@
-<div style="display: flex; justify-content: space-between; align-items: center;">
+<div style="display: flex; align-items: center; justify-content: space-between;">
+  <img src="https://github.com/user-attachments/assets/758344ab-72da-43a0-b6f9-6884c4b0aa67" alt="Unlock App Icon" width="120"/>
   <a href="https://github.com/Letizeus/Unlock">
     <img src="https://img.shields.io/badge/repo%20status-Active-brightgreen" alt="repo status: Active" width="200">
   </a>
-  <img src="https://github.com/user-attachments/assets/758344ab-72da-43a0-b6f9-6884c4b0aa67" alt="Unlock App Icon" width="120"/>
-</div>
+</div>   
 
 iOS app for designing interactive countdown calendars. The essential tool for artists and designers to craft personalized reveals.
 
@@ -51,5 +51,6 @@ Your creations remain private and secure on your device until you choose to shar
   &nbsp;&nbsp;&nbsp;&nbsp;
   <img src="https://github.com/user-attachments/assets/f5f9c435-fc13-4dc7-9219-dfa99632d1be" width="42%">
 </div>
+
 
 
