@@ -1,8 +1,8 @@
 <p align="center">
   <a href="https://github.com/Letizeus/Unlock">
     <img
-      src="https://img.shields.io/badge/repo%20status-Active-22c55e?style=for-the-badge&labelColor=111827"
-      alt="repo status: Active"
+      src="https://img.shields.io/badge/repo%20status-Inactive-6b7280?style=for-the-badge&labelColor=111827"
+      alt="repo status: Inactive"
       height="32"
     />
   </a>
@@ -14,6 +14,7 @@
     width="104"
   />
 </p>
+
 
 iOS app for designing interactive countdown calendars. The essential tool for artists and designers to craft personalized reveals.
 
